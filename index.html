@@ -79,7 +79,7 @@
 
         /* HERO SECTION */
         .hero {
-            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.4)), url('https://i.imgur.com/3JAl89S.jpeg');
+            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.4)), url('https://imgur.com/qAxXmrB.jpg');
             background-size: cover; background-position: center center; height: 100vh;
             display: flex; align-items: center; justify-content: center;
             text-align: center; color: var(--white); padding: 0 20px;
@@ -542,10 +542,15 @@
                         <input type="hidden" id="cpDestino"><input type="hidden" id="cpOrigen">
 
                         <div class="input-wrapper" id="divDestinoInput"><label id="labelDestino">Destino</label><input type="text" id="destino" placeholder="¿A qué hotel vas?"></div>
+                        
                         <div class="input-wrapper" id="divHorasInput" style="display:none;">
                             <label id="label-duracion">Duración Requerida</label>
                             <select id="horasSeleccionadas">
-                                <option value="2 Horas">2 Horas</option><option value="4 Horas">4 Horas</option><option value="6 Horas">6 Horas</option><option value="8 Horas">8 Horas</option><option value="Mas de 8 Horas">Más de 8 Horas</option>
+                                <option value="2 Horas" id="opt-2h">2 Horas</option>
+                                <option value="4 Horas" id="opt-4h">4 Horas</option>
+                                <option value="6 Horas" id="opt-6h">6 Horas</option>
+                                <option value="8 Horas" id="opt-8h">8 Horas</option>
+                                <option value="Mas de 8 Horas" id="opt-more8h">Más de 8 Horas</option>
                             </select>
                         </div>
 
@@ -1355,7 +1360,7 @@
         if (modo === 'desdeAero') {
             origen.value = activeLangAirportName; origen.setAttribute('readonly', true); origen.style.cssText = ro;
             destino.value = ""; destino.removeAttribute('readonly'); destino.style.cssText = ed; 
-            destino.placeholder = currentLang === 'en' ? "Where are you going?" : "¿A qué hotel vas?";
+            destino.placeholder = translations[currentLang].placeholderDest || "¿A qué hotel vas?";
             btnAccion.innerText = translations[currentLang].btnAccion;
         } else if (modo === 'haciaAero') {
             destino.value = activeLangAirportName; destino.setAttribute('readonly', true); destino.style.cssText = ro;
@@ -1421,7 +1426,6 @@
 
     function cotizar() {
         try {
-            // CORRECCION FINAL: ALERTA TRADUCIDA SEGÚN IDIOMA
             const t = translations[currentLang];
 
             if(!document.getElementById('termsCheck').checked) { alert(t.alertTerms); return; }
@@ -1452,12 +1456,12 @@
                 let fechaVueltaVal = "";
                 let horaVueltaVal = "";
                 if(document.getElementById('tipoServicio').value === 'REDONDO') {
-                       fechaVueltaVal = document.getElementById('fechaVuelta').value;
-                       if(!fechaVueltaVal) { alert(t.alertReturnDate); return; }
-                       
-                       const rawHoraVuelta = document.getElementById('horaVuelta').value;
-                       if(!rawHoraVuelta) { alert(t.alertReturnTime); return; }
-                       horaVueltaVal = convertirHora12h(rawHoraVuelta);
+                      fechaVueltaVal = document.getElementById('fechaVuelta').value;
+                      if(!fechaVueltaVal) { alert(t.alertReturnDate); return; }
+                      
+                      const rawHoraVuelta = document.getElementById('horaVuelta').value;
+                      if(!rawHoraVuelta) { alert(t.alertReturnTime); return; }
+                      horaVueltaVal = convertirHora12h(rawHoraVuelta);
                 }
 
                 const codigoUnico = generarCodigo();
@@ -1646,10 +1650,9 @@
         
         baseText += `%0A%0A*${l.name}:* ${data.nombre}`;
         
-        // CORRECCION FINAL: ASUNTO TRADUCIDO SEGÚN IDIOMA
+        // CORRECCION FINAL: "SOLICITUD" AHORA SE TRADUCE
         const subject = encodeURIComponent(t.emailSubject + " " + data.codigo + " - " + data.nombre);
         
-        // CORRECCION 2: Sin TyC en el mail y WA
         const mailBody = encodeURIComponent(baseText.replace(/%0A/g, "\n").replace(/\*/g, "")); 
 
         document.getElementById('btnWhatsapp').href = `https://wa.me/529842411158?text=${baseText}`; 
