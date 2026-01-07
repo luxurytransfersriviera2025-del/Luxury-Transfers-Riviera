@@ -471,6 +471,30 @@
             .vehicle-img-clean { height: 250px; } .slider-btn { width: 40px; height: 40px; font-size: 16px; top: 40%; } .vehicle-name-clean { font-size: 1.6rem; }
             .modal-box { width: 95%; max-height: 95vh; }
         }
+
+        /* ==========================================================================
+           MODIFICACIÓN SOLICITADA: PANTALLA DE GRACIAS (FULL PAGE)
+           ========================================================================== */
+        #modalConfirmacion {
+            background-color: #ffffff !important; /* Fondo blanco cubre todo */
+            backdrop-filter: none;
+        }
+        #modalConfirmacion .modal-box {
+            width: 100% !important;
+            max-width: 100% !important;
+            height: 100% !important;
+            max-height: 100vh !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+        }
+        #modalConfirmacion .modal-scrollable-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Centrar verticalmente el contenido */
+            max-width: 600px; /* Limitar ancho del texto para que se vea bien */
+            margin: 0 auto; /* Centrar horizontalmente el contenedor de texto */
+        }
     </style>
 </head>
 <body>
