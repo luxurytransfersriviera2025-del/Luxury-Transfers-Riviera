@@ -963,9 +963,9 @@
 
             loadingText: "GENERANDO RESERVA...",
 
-            modalTitleReceived: "¡Solicitud Recibida!",
-            modalTitleSent: "¡Solicitud Enviada!",
-            modalTextReceived: "Hemos recibido tu solicitud. Un asesor te contactará lo más breve posible para finalizar tu reserva.",
+            modalTitleReceived: "¡GRACIAS POR TU RESERVA!",
+            modalTitleSent: "¡SOLICITUD ENVIADA!",
+            modalTextReceived: "Hemos recibido tu solicitud correctamente. Un asesor te contactará lo más breve posible para finalizar tu reserva.",
             modalTextSent: "Hemos recibido tu solicitud. Un asesor te contactará lo más breve posible para darte un precio.",
             
             modalCodeLabel: "TU CÓDIGO DE REFERENCIA ES:",
@@ -1073,9 +1073,9 @@
 
             loadingText: "GENERATING BOOKING...",
 
-            modalTitleReceived: "Request Received!",
-            modalTitleSent: "Request Sent!",
-            modalTextReceived: "We have received your request. An advisor will contact you shortly to finalize your reservation.",
+            modalTitleReceived: "THANK YOU FOR YOUR BOOKING!",
+            modalTitleSent: "REQUEST SENT!",
+            modalTextReceived: "We have received your request correctly. An advisor will contact you shortly to finalize your reservation.",
             modalTextSent: "We have received your request. An advisor will contact you shortly with the price.",
 
             modalCodeLabel: "YOUR REFERENCE CODE IS:",
@@ -1685,6 +1685,9 @@
         .then(() => {
             document.getElementById('loadingOverlay').style.display = 'none';
             
+            // --- CAMBIO DE URL (AQUÍ ESTÁ LA MAGIA) ---
+            window.location.hash = "gracias"; // Esto cambia la URL a #gracias
+
             if(data.esVenta) {
                 document.getElementById('modalTitle').innerText = t.modalTitleReceived;
                 document.getElementById('modalMainTitle').innerText = t.modalTitleReceived;
@@ -1703,7 +1706,11 @@
         });
     }
 
-    function cerrarModal() { document.getElementById('modalConfirmacion').style.display = 'none'; }
+    function cerrarModal() { 
+        document.getElementById('modalConfirmacion').style.display = 'none';
+        // --- RESTAURAR URL ---
+        window.location.hash = ""; 
+    }
     
     function initAutocomplete() {
         const bounds = new google.maps.LatLngBounds(new google.maps.LatLng(17.9, -91.5), new google.maps.LatLng(21.8, -86.5));
