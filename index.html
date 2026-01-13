@@ -715,6 +715,80 @@
         </div>
     </section>
 
+<div class="slider-dots">
+                <button class="slider-dot active"></button>
+                <button class="slider-dot"></button>
+                <button class="slider-dot"></button>
+                <button class="slider-dot"></button>
+            </div>
+        </div>
+    </section>
+
+    <style>
+        /* Estilos exclusivos para esta sección de redes */
+        .ltr-social-container {
+            text-align: center;
+            padding: 20px 10px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+        .ltr-social-container h3 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 18px;
+            font-family: sans-serif;
+        }
+        .ltr-social-icons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .ltr-social-link {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            text-decoration: none;
+            color: white;
+            font-size: 20px;
+            transition: transform 0.2s;
+        }
+        .ltr-social-link:hover {
+            transform: scale(1.1);
+            opacity: 0.9;
+        }
+        /* Colores de marca */
+        .ltr-fb { background-color: #1877F2; }
+        .ltr-insta { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+        .ltr-tiktok { background-color: #000000; }
+        .ltr-trip { background-color: #34E0A1; }
+        .ltr-yt { background-color: #FF0000; }
+        .ltr-wa { background-color: #25D366; }
+        .ltr-email { background-color: #555555; }
+        .ltr-phone { background-color: #0d6efd; }
+    </style>
+
+    <div class="ltr-social-container">
+        <h3 id="social-title">Síguenos y contáctanos</h3>
+        <div class="ltr-social-icons">
+            <a href="https://wa.me/529842411158" target="_blank" class="ltr-social-link ltr-wa" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="https://facebook.com/share/1Yt1WbvDFV" target="_blank" class="ltr-social-link ltr-fb" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://instagram.com/luxury_transfers_riviera" target="_blank" class="ltr-social-link ltr-insta" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://tiktok.com/@luxurytransfersriviera?_r=1&_t=ZS-92t33quHLzs" target="_blank" class="ltr-social-link ltr-tiktok" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+            <a href="https://www.youtube.com/@LuxuryTransfersRiviera" target="_blank" class="ltr-social-link ltr-yt" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+            <a href="https://www.tripadvisor.es/Attraction_Review-g150812-d34109769-Reviews-Luxury_Transfers_Riviera-Playa_del_Carmen_Yucatan_Peninsula.html" target="_blank" class="ltr-social-link ltr-trip" title="TripAdvisor">
+    <img src="https://static.tacdn.com/img2/brand_refresh/Tripadvisor_logomark.svg" style="width: 24px; height: 24px;">
+</a>
+            <a href="mailto:reservas@luxurytransfersriviera.com.mx" class="ltr-social-link ltr-email" title="Correo"><i class="fa-solid fa-envelope"></i></a>
+            <a href="tel:+529842411158" class="ltr-social-link ltr-phone" title="Llamar"><i class="fa-solid fa-phone"></i></a>
+        </div>
+    </div>
+    <footer id="footer-text">&copy; 2026 Luxury Transfers Riviera. Todos los derechos reservados.</footer>
+
+    <div class="loading-overlay" id="loadingOverlay">
     <footer id="footer-text">&copy; 2026 Luxury Transfers Riviera. Todos los derechos reservados.</footer>
 
     <div class="loading-overlay" id="loadingOverlay">
@@ -914,6 +988,7 @@
             placeholderNotes: "Ej: Llevamos 4 maletas grandes, necesitamos silla de bebé...",
             footerText: "&copy; 2026 Luxury Transfers Riviera. Todos los derechos reservados.",
             resultsFor: "Resultados para",
+            socialTitle: "Síguenos y contáctanos",
 
             // ETIQUETAS NUEVAS
             labelDuracion: "Duración Requerida",
@@ -1025,6 +1100,7 @@
             placeholderNotes: "Ex: We have 4 large suitcases...",
             footerText: "&copy; 2026 Luxury Transfers Riviera. All rights reserved.",
             resultsFor: "Results for",
+            socialTitle: "Follow us & Contact us",
 
             // ETIQUETAS NUEVAS
             labelDuracion: "Duration Required",
@@ -1153,6 +1229,7 @@
         document.getElementById('itinerarioCliente').placeholder = t.placeholderItinerary;
         document.getElementById('notasCliente').placeholder = t.placeholderNotes;
         document.getElementById('footer-text').innerHTML = t.footerText;
+        document.getElementById('social-title').innerText = t.socialTitle;
 
         document.getElementById('labelDestino').innerText = t.labelDestino;
         document.getElementById('labelOrigen').innerText = t.labelOrigen;
@@ -1716,4 +1793,3 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdK5yLQ20SQrLc_0rOuo7oxxHVQ233Bh0&libraries=places&callback=initAutocomplete" async defer></script>
 </body>
 </html>
-
