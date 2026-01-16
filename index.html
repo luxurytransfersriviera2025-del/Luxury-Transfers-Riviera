@@ -1748,27 +1748,65 @@
         const t = translations[currentLang]; 
         const l = t.waLabels; 
         
+        // 1. Definir etiquetas dinámicas para los campos de texto extra
+        const lblFlight = currentLang === 'en' ? 'FLIGHT' : 'VUELO';
+        const lblItinerary = currentLang === 'en' ? 'ITINERARY' : 'ITINERARIO';
+        const lblNotes = currentLang === 'en' ? 'NOTES' : 'NOTAS';
+        const lblReturn = currentLang === 'en' ? 'RETURN INFO' : 'DATOS REGRESO';
+
+        // 2. Construir el mensaje base usando saltos de línea normales (\n)
         let saludo = data.esVenta ? t.waGreetingConfirm : t.waGreetingQuote;
         
-        // FIX: Se incluye PAX y se estructura mejor
-        let baseText = `${saludo}%0A%0A*${l.code}:* ${data.codigo}%0A*${l.type}:* ${data.tipoViaje}%0A*${l.veh}:* ${data.vehiculo}%0A*${l.orig}:* ${data.origen}%0A*${l.dest}:* ${data.destino}%0A*${l.date}:* ${data.fecha} - *${l.time}:* ${data.hora}%0A*${l.pax}:* ${data.pasajeros}`;
+        let msg = `${saludo}\n\n`;
+        msg += `*${l.code}:* ${data.codigo}\n`;
+        msg += `*${l.type}:* ${data.tipoViaje}\n`;
+        msg += `*${l.veh}:* ${data.vehiculo}\n`;
+        msg += `*${l.orig}:* ${data.origen}\n`;
+        msg += `*${l.dest}:* ${data.destino}\n`;
+        msg += `*${l.date}:* ${data.fecha} - *${l.time}:* ${data.hora}\n`;
+        msg += `*${l.pax}:* ${data.pasajeros}\n`;
+
+        // 3. AGREGAR LOS CAMPOS QUE FALTABAN (Vuelo, Regreso, Itinerario, Notas)
         
-        // FIX: Bloque para agregar retorno solo si existe
-        if(data.fechaRegreso) {
-            const labelRet = currentLang === 'en' ? 'RETURN' : 'REGRESO';
-            baseText += `%0A*${labelRet}:* ${data.fechaRegreso} - ${data.horaRegreso}`;
+        // Agregar Vuelo si existe
+        if(data.vuelo && data.vuelo.trim().length > 1) {
+            msg += `*${lblFlight}:* ${data.vuelo}\n`;
         }
 
-        if(data.precio && data.precio !== t.valToBeQuoted) { baseText += `%0A*${l.price}:* ${data.precio}`; }
+        // Agregar Regreso si existe
+        if(data.fechaRegreso) {
+            msg += `*${lblReturn}:* ${data.fechaRegreso} - ${data.horaRegreso}\n`;
+        }
+
+        // Agregar Precio si aplica
+        if(data.precio && data.precio !== t.valToBeQuoted) { 
+            msg += `*${l.price}:* ${data.precio}\n`; 
+        }
+
+        // Agregar Itinerario (Importante para tours)
+        if(data.itinerario && data.itinerario.trim() !== "") {
+            msg += `\n*${lblItinerary}:*\n${data.itinerario}\n`;
+        }
+
+        // Agregar Notas (Importante para sillas bebé, maletas, etc)
+        if(data.notas && data.notas.trim() !== "") {
+            msg += `\n*${lblNotes}:*\n${data.notas}\n`;
+        }
         
-        baseText += `%0A%0A*${l.name}:* ${data.nombre}`;
+        msg += `\n*${l.name}:* ${data.nombre}`;
+        
+        // 4. GENERAR LOS ENLACES CORRECTAMENTE CODIFICADOS
+        // Esto evita que el mensaje se corte si usan símbolos raros
+        const encodedMsg = encodeURIComponent(msg); 
         
         const subject = encodeURIComponent(t.emailSubject + " " + data.codigo + " - " + data.nombre);
-        const mailBody = encodeURIComponent(baseText.replace(/%0A/g, "\n").replace(/\*/g, "")); 
+        // Para correo usamos el mismo texto pero nos aseguramos que los saltos de línea funcionen en body
+        const mailBody = encodeURIComponent(msg); 
 
-        document.getElementById('btnWhatsapp').href = `https://wa.me/529842411158?text=${baseText}`; 
+        document.getElementById('btnWhatsapp').href = `https://wa.me/529842411158?text=${encodedMsg}`; 
         document.getElementById('btnMail').href = `mailto:reservas@luxurytransfersriviera.com.mx?subject=${subject}&body=${mailBody}`; 
 
+        // 5. ENVIAR AL GOOGLE SHEET
         fetch(SCRIPT_URL, {
             method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
         })
