@@ -1525,10 +1525,10 @@
                 
                 let fechaVueltaVal = "";
                 let horaVueltaVal = "";
+                
                 if(document.getElementById('tipoServicio').value === 'REDONDO') {
                        fechaVueltaVal = document.getElementById('fechaVuelta').value;
                        if(!fechaVueltaVal) { alert(t.alertReturnDate); return; }
-                       
                        const rawHoraVuelta = document.getElementById('horaVuelta').value;
                        if(!rawHoraVuelta) { alert(t.alertReturnTime); return; }
                        horaVueltaVal = convertirHora12h(rawHoraVuelta);
@@ -1536,16 +1536,41 @@
 
                 const codigoUnico = generarCodigo();
                 let notasFinales = document.getElementById('notasCliente').value;
-                if(horaVueltaVal) {
-                    notasFinales += ` // ${t.labelReturnEmail}: ${fechaVueltaVal} a las ${horaVueltaVal}`;
+                
+                // Traducción del Tipo de Viaje
+                let tipoViajeTxt = document.getElementById('tipoServicio').value;
+                if(currentLang === 'en') {
+                    tipoViajeTxt = (tipoViajeTxt === 'REDONDO') ? 'Round Trip' : 'One Way';
+                } else {
+                    tipoViajeTxt = (tipoViajeTxt === 'REDONDO') ? 'Redondo' : 'Sencillo';
                 }
+                tipoViajeTxt += " - " + subtipoTxt;
 
-                const datosCotizacion = { esVenta: false, codigo: codigoUnico, nombre: nombre, telefono: tel, email: email, tipoViaje: document.getElementById('tipoServicio').value + " - " + subtipoTxt, origen: document.getElementById('origen').value, destino: destinoFinal, fecha: fecha, hora: hora, notas: notasFinales, itinerario: document.getElementById('itinerarioCliente').value, vehiculo: t.valSpecialQuote, precio: t.valToBeQuoted, idioma: currentLang };
+                const datosCotizacion = { 
+                    esVenta: false, 
+                    codigo: codigoUnico, 
+                    nombre: nombre, 
+                    telefono: tel, 
+                    email: email, 
+                    pasajeros: document.getElementById('pasajeros').value, // FIX: Agregado pasajeros
+                    tipoViaje: tipoViajeTxt, // FIX: Traducido
+                    origen: document.getElementById('origen').value, 
+                    destino: destinoFinal, 
+                    fecha: fecha, 
+                    hora: hora, 
+                    fechaRegreso: fechaVueltaVal, // FIX: Separado
+                    horaRegreso: horaVueltaVal,   // FIX: Separado
+                    notas: notasFinales, 
+                    itinerario: document.getElementById('itinerarioCliente').value, 
+                    vehiculo: t.valSpecialQuote, 
+                    precio: t.valToBeQuoted, 
+                    idioma: currentLang 
+                };
+
                 document.getElementById('codigoDisplay').innerText = codigoUnico;
                 iniciarEnvio(datosCotizacion);
                 return;
             }
-
             const tipo = document.getElementById('tipoServicio').value;
             
             if (tipo === 'REDONDO') {
@@ -1667,20 +1692,28 @@
 
     function prepararVenta(datosCard) {
         const codigoUnico = generarCodigo();
-        
         const rawHora = document.getElementById('horaIda').value;
         const horaIda = convertirHora12h(rawHora);
         const t = translations[currentLang];
-
-        let notasFinales = document.getElementById('notasCliente').value;
         
-        if(document.getElementById('tipoServicio').value === 'REDONDO') {
+        let notasFinales = document.getElementById('notasCliente').value;
+        let fechaVueltaVal = "";
+        let horaVueltaVal = "";
+        
+        // Lógica de traducción
+        let tipoViajeRaw = document.getElementById('tipoServicio').value;
+        let tipoViajeFinal = tipoViajeRaw;
+        
+        if(currentLang === 'en') {
+             tipoViajeFinal = (tipoViajeRaw === 'REDONDO') ? 'Round Trip' : 'One Way';
+        } else {
+             tipoViajeFinal = (tipoViajeRaw === 'REDONDO') ? 'Redondo' : 'Sencillo';
+        }
+
+        if(tipoViajeRaw === 'REDONDO') {
              const rawHoraVuelta = document.getElementById('horaVuelta').value;
-             const horaVuelta = convertirHora12h(rawHoraVuelta);
-             const fechaVuelta = document.getElementById('fechaVuelta').value;
-             if(fechaVuelta) {
-                 notasFinales += ` // ${t.labelReturnEmail}: ${fechaVuelta} a las ${horaVuelta}`;
-             }
+             horaVueltaVal = convertirHora12h(rawHoraVuelta);
+             fechaVueltaVal = document.getElementById('fechaVuelta').value;
         }
 
         const datosVenta = {
@@ -1689,11 +1722,14 @@
             nombre: document.getElementById('nombreCliente').value,
             telefono: document.getElementById('telefonoCliente').value,
             email: document.getElementById('emailCliente').value,
-            tipoViaje: document.getElementById('tipoServicio').value,
+            pasajeros: document.getElementById('pasajeros').value, // FIX: Agregado pasajeros
+            tipoViaje: tipoViajeFinal, // FIX: Traducido
             origen: document.getElementById('origen').value,
             destino: document.getElementById('destino').value,
             fecha: document.getElementById('fechaIda').value,
             hora: horaIda,
+            fechaRegreso: fechaVueltaVal, // FIX: Separado
+            horaRegreso: horaVueltaVal,   // FIX: Separado
             notas: notasFinales,
             vuelo: document.getElementById('aerolinea').value + ' ' + document.getElementById('numVuelo').value,
             vehiculo: datosCard.vehiculo,
@@ -1714,16 +1750,20 @@
         
         let saludo = data.esVenta ? t.waGreetingConfirm : t.waGreetingQuote;
         
-        let baseText = `${saludo}%0A%0A*${l.code}:* ${data.codigo}%0A*${l.type}:* ${data.tipoViaje}%0A*${l.veh}:* ${data.vehiculo}%0A*${l.orig}:* ${data.origen}%0A*${l.dest}:* ${data.destino}%0A*${l.date}:* ${data.fecha} - *${l.time}:* ${data.hora}%0A*${l.pax}:* ${document.getElementById('pasajeros').value}`;
+        // FIX: Se incluye PAX y se estructura mejor
+        let baseText = `${saludo}%0A%0A*${l.code}:* ${data.codigo}%0A*${l.type}:* ${data.tipoViaje}%0A*${l.veh}:* ${data.vehiculo}%0A*${l.orig}:* ${data.origen}%0A*${l.dest}:* ${data.destino}%0A*${l.date}:* ${data.fecha} - *${l.time}:* ${data.hora}%0A*${l.pax}:* ${data.pasajeros}`;
         
+        // FIX: Bloque para agregar retorno solo si existe
+        if(data.fechaRegreso) {
+            const labelRet = currentLang === 'en' ? 'RETURN' : 'REGRESO';
+            baseText += `%0A*${labelRet}:* ${data.fechaRegreso} - ${data.horaRegreso}`;
+        }
+
         if(data.precio && data.precio !== t.valToBeQuoted) { baseText += `%0A*${l.price}:* ${data.precio}`; }
         
         baseText += `%0A%0A*${l.name}:* ${data.nombre}`;
         
-        // CORRECCION FINAL: ASUNTO TRADUCIDO SEGÚN IDIOMA
         const subject = encodeURIComponent(t.emailSubject + " " + data.codigo + " - " + data.nombre);
-        
-        // CORRECCION 2: Sin TyC en el mail y WA
         const mailBody = encodeURIComponent(baseText.replace(/%0A/g, "\n").replace(/\*/g, "")); 
 
         document.getElementById('btnWhatsapp').href = `https://wa.me/529842411158?text=${baseText}`; 
@@ -1734,7 +1774,6 @@
         })
         .then(() => {
             document.getElementById('loadingOverlay').style.display = 'none';
-            
             if(data.esVenta) {
                 document.getElementById('modalTitle').innerText = t.modalTitleReceived;
                 document.getElementById('modalMainTitle').innerText = t.modalTitleReceived;
