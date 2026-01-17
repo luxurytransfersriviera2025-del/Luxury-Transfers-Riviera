@@ -1517,7 +1517,12 @@
             
             if (direccionMode === 'personalizado') {
                 const subtipo = document.getElementById('subtipoPersonalizado').value;
-                const subtipoTxt = document.getElementById('subtipoPersonalizado').options[document.getElementById('subtipoPersonalizado').selectedIndex].text;
+                
+                // --- LIMPIEZA DE EMOJIS (Para evitar el signo ?) ---
+                let subtipoTxt = document.getElementById('subtipoPersonalizado').options[document.getElementById('subtipoPersonalizado').selectedIndex].text;
+                subtipoTxt = subtipoTxt.replace("📍", "").replace("🎢", "").replace("⏳", "").trim(); 
+                // ---------------------------------------------------
+
                 let destinoFinal = (subtipo === 'HORAS') ? document.getElementById('horasSeleccionadas').value : document.getElementById('destino').value;
                 
                 if(!document.getElementById('origen').value) { alert(t.alertPickup); return; }
@@ -1858,3 +1863,4 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdK5yLQ20SQrLc_0rOuo7oxxHVQ233Bh0&libraries=places&callback=initAutocomplete" async defer></script>
 </body>
 </html>
+
