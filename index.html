@@ -1817,6 +1817,11 @@
             method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
         })
         .then(() => {
+            // --- CÓDIGO DE GOOGLE ADS ---
+      gtag('event', 'conversion', {
+          'send_to': 'AW-17859609175/8AeACLKZ6N4bENeEkMRC',
+          'transaction_id': data.codigo
+      });
             document.getElementById('loadingOverlay').style.display = 'none';
             if(data.esVenta) {
                 document.getElementById('modalTitle').innerText = t.modalTitleReceived;
@@ -1864,5 +1869,6 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdK5yLQ20SQrLc_0rOuo7oxxHVQ233Bh0&libraries=places&callback=initAutocomplete" async defer></script>
 </body>
 </html>
+
 
 
