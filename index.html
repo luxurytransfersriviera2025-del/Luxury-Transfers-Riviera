@@ -1311,12 +1311,17 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         overlay.id = 'wd-overlay-'+uid;
         overlay.style.cssText = 'display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:99999;align-items:flex-end;justify-content:center;';
 
+        const isEN = currentLang === 'en';
+        const lblCancel = isEN ? 'Cancel' : 'Cancelar';
+        const lblTitle  = isEN ? 'Time'   : 'Hora';
+        const lblOk     = isEN ? 'Done'   : 'Listo';
+
         overlay.innerHTML = `
         <div style="background:#f9f9f9;width:100%;border-radius:16px 16px 0 0;padding-bottom:env(safe-area-inset-bottom);">
             <div style="display:flex;justify-content:space-between;padding:14px 20px;border-bottom:0.5px solid #ddd;">
-                <button id="wd-cancel-${uid}" style="border:none;background:none;font-size:16px;color:#888;cursor:pointer;font-family:var(--font-body);">Cancelar</button>
-                <span style="font-size:16px;font-weight:700;color:#333;font-family:var(--font-title);">Hora</span>
-                <button id="wd-ok-${uid}" style="border:none;background:none;font-size:16px;font-weight:700;color:#007AFF;cursor:pointer;font-family:var(--font-body);">Listo</button>
+                <button id="wd-cancel-${uid}" style="border:none;background:none;font-size:16px;color:#888;cursor:pointer;font-family:var(--font-body);">${lblCancel}</button>
+                <span style="font-size:16px;font-weight:700;color:#333;font-family:var(--font-title);">${lblTitle}</span>
+                <button id="wd-ok-${uid}" style="border:none;background:none;font-size:16px;font-weight:700;color:#007AFF;cursor:pointer;font-family:var(--font-body);">${lblOk}</button>
             </div>
             <div style="position:relative;height:180px;overflow:hidden;background:#f9f9f9;">
                 <div style="position:absolute;top:0;left:0;right:0;height:60px;background:linear-gradient(to bottom,#f9f9f9,transparent);z-index:2;pointer-events:none;"></div>
