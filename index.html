@@ -79,7 +79,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         body {
             font-family: var(--font-body);
             margin: 0; padding: 0; color: var(--dark-gray); background-color: var(--white);
-            overflow-x: hidden;
+            overflow-x: clip;
         }
 
         img { max-width: 100%; height: auto; }
@@ -3250,7 +3250,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     function copiarCupon(el) {
         navigator.clipboard.writeText('LTR-10').then(() => {
             const hint = document.getElementById('cupon-hint');
-            hint.textContent = '✅ ¡Código copiado!';
+            hint.textContent = currentLang === 'en' ? '✅ Code copied!' : '✅ ¡Código copiado!';
             hint.style.color = 'var(--gold)';
         });
     }
