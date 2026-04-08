@@ -576,6 +576,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             .custom-form-grid { grid-template-columns: 1fr !important; }
             .ltr-social-link { width: 34px; height: 34px; font-size: 15px; }
         }
+        body.lang-loading { visibility: hidden; }
         /* CUPÓN EMERGENTE */
         #cupon-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -631,7 +632,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         #cupon-box .cupon-btn:hover { background: var(--gold-hover); }
     </style>
 </head>
-<body>
+<body class="lang-loading">
 
     <!-- CUPÓN EMERGENTE -->
     <div id="cupon-overlay">
@@ -1763,6 +1764,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         origenInput.style.cssText = 'color:var(--text-dark); background:transparent;';
 
         setLang('en');
+        document.body.classList.remove('lang-loading');
         document.body.style.opacity = '1';
 
         // Restaurar modo correcto sin re-llenar el campo
