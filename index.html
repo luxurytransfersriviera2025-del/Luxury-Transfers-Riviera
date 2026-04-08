@@ -302,9 +302,25 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         /* Ajuste específico para que el input type="time" se vea bien en móviles y desktop */
         input[type="time"] {
-            font-family: 'Open Sans', sans-serif; /* Misma fuente que el resto */
+            font-family: 'Open Sans', sans-serif;
             cursor: pointer;
         }
+
+        /* SELECTOR DE HORA PERSONALIZADO */
+        .custom-time-wrapper {
+            display: flex; align-items: center; gap: 4px;
+            background: transparent; border: none; outline: none;
+            font-size: 14px; font-weight: 600; color: #333;
+            font-family: var(--font-body); width: 100%;
+        }
+        .custom-time-wrapper select {
+            border: none; outline: none; background: transparent;
+            font-size: 14px; font-weight: 600; color: #333;
+            font-family: var(--font-body); cursor: pointer;
+            padding: 4px 2px; -webkit-appearance: none; appearance: none;
+            text-align: center;
+        }
+        .custom-time-wrapper .time-sep { font-weight: 700; color: #333; }
 
         .contact-section { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; margin-top: 20px; border-top: 1px dashed #ddd; padding-top: 25px; }
         .flight-fields-container { grid-column: 1 / -1; display: contents; }
@@ -1197,6 +1213,52 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     const imgUrlSuburban    = baseGH + "LUXURY%20VIP%20Desglose%20de%20Precios.webp";
     const imgUrlToyotaGL    = baseGH + "FAMILY%20VAN%20Desglose%20de%20Precios.webp";
 
+    // SELECTOR DE HORA PERSONALIZADO — solo para Android (en iOS y desktop el nativo funciona bien)
+    const isAndroid = /Android/i.test(navigator.userAgent);
+
+    function buildHoursOptions() {
+        let opts = '';
+        for (let h = 0; h < 24; h++) {
+            const label = String(h).padStart(2,'0');
+            opts += `<option value="${label}">${label}</option>`;
+        }
+        return opts;
+    }
+    function buildMinsOptions() {
+        let opts = '';
+        for (let m = 0; m < 60; m += 5) {
+            const label = String(m).padStart(2,'0');
+            opts += `<option value="${label}">${label}</option>`;
+        }
+        return opts;
+    }
+    function replaceTimeInput(inputId) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        if (!isAndroid) return; // Solo reemplazar en Android
+        const wrapper = document.createElement('div');
+        wrapper.className = 'custom-time-wrapper';
+        wrapper.innerHTML = `
+            <select class="time-hr" aria-label="Hour">${buildHoursOptions()}</select>
+            <span class="time-sep">:</span>
+            <select class="time-min" aria-label="Minutes">${buildMinsOptions()}</select>
+        `;
+        const syncValue = () => {
+            input.value = wrapper.querySelector('.time-hr').value + ':' + wrapper.querySelector('.time-min').value;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+        };
+        wrapper.querySelector('.time-hr').addEventListener('change', syncValue);
+        wrapper.querySelector('.time-min').addEventListener('change', syncValue);
+        if (input.value) {
+            const parts = input.value.split(':');
+            wrapper.querySelector('.time-hr').value = parts[0] || '00';
+            wrapper.querySelector('.time-min').value = parts[1] ? (Math.round(parseInt(parts[1])/5)*5).toString().padStart(2,'0') : '00';
+        }
+        input.style.display = 'none';
+        input.parentNode.insertBefore(wrapper, input.nextSibling);
+    }
+
     function adjustScrollMargin() {
         const header = document.querySelector('header');
         if(header) {
@@ -1772,6 +1834,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         initSlider();
         adjustScrollMargin();
+
+        // Reemplazar todos los inputs de hora con selector personalizado
+        ['horaIda', 'horaIdaRT', 'horaVuelta', 'custom-hora', 'custom-hora-regreso'].forEach(replaceTimeInput);
     };
 
     function initSlider() {
