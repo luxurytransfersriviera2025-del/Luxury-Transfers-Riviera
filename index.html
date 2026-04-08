@@ -1311,17 +1311,16 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         overlay.id = 'wd-overlay-'+uid;
         overlay.style.cssText = 'display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:99999;align-items:flex-end;justify-content:center;';
 
-        const isEN = currentLang === 'en';
-        const lblCancel = isEN ? 'Cancel' : 'Cancelar';
-        const lblTitle  = isEN ? 'Time'   : 'Hora';
-        const lblOk     = isEN ? 'Done'   : 'Listo';
+        const lblCancel = () => currentLang === 'en' ? 'Cancel' : 'Cancelar';
+        const lblTitle  = () => currentLang === 'en' ? 'Time'   : 'Hora';
+        const lblOk     = () => currentLang === 'en' ? 'Done'   : 'Listo';
 
         overlay.innerHTML = `
         <div style="background:#f9f9f9;width:100%;border-radius:16px 16px 0 0;padding-bottom:env(safe-area-inset-bottom);">
             <div style="display:flex;justify-content:space-between;padding:14px 20px;border-bottom:0.5px solid #ddd;">
-                <button id="wd-cancel-${uid}" style="border:none;background:none;font-size:16px;color:#888;cursor:pointer;font-family:var(--font-body);">${lblCancel}</button>
-                <span style="font-size:16px;font-weight:700;color:#333;font-family:var(--font-title);">${lblTitle}</span>
-                <button id="wd-ok-${uid}" style="border:none;background:none;font-size:16px;font-weight:700;color:#007AFF;cursor:pointer;font-family:var(--font-body);">${lblOk}</button>
+                <button id="wd-cancel-${uid}" style="border:none;background:none;font-size:16px;color:#888;cursor:pointer;font-family:var(--font-body);"></button>
+                <span id="wd-title-${uid}" style="font-size:16px;font-weight:700;color:#333;font-family:var(--font-title);"></span>
+                <button id="wd-ok-${uid}" style="border:none;background:none;font-size:16px;font-weight:700;color:#007AFF;cursor:pointer;font-family:var(--font-body);"></button>
             </div>
             <div style="position:relative;height:180px;overflow:hidden;background:#f9f9f9;">
                 <div style="position:absolute;top:0;left:0;right:0;height:60px;background:linear-gradient(to bottom,#f9f9f9,transparent);z-index:2;pointer-events:none;"></div>
@@ -1351,6 +1350,12 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         display.addEventListener('click', ()=>{
             overlay.style.display = 'flex';
+            // Actualizar labels según idioma actual
+            overlay.querySelector('#wd-cancel-'+uid).textContent = lblCancel();
+            overlay.querySelector('#wd-title-'+uid).textContent  = lblTitle();
+            overlay.querySelector('#wd-ok-'+uid).textContent     = lblOk();
+            // Bloquear scroll del fondo
+            document.body.style.overflow = 'hidden';
             const cur = from24h(input.value || '06:00');
             wheelScrollToIdx(colH,  hours12.indexOf(cur.h));
             wheelScrollToIdx(colM,  mins5.indexOf(cur.m) > -1 ? mins5.indexOf(cur.m) : 0);
@@ -1360,6 +1365,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         overlay.querySelector('#wd-cancel-'+uid).addEventListener('click',()=>{
             overlay.style.display='none';
+            document.body.style.overflow='';
         });
         overlay.querySelector('#wd-ok-'+uid).addEventListener('click',()=>{
             const h  = wheelGetSelected(colH);
@@ -1371,6 +1377,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             input.dispatchEvent(new Event('change',{bubbles:true}));
             document.querySelector('#wd-txt-'+uid).textContent = h+':'+m+' '+ap;
             overlay.style.display='none';
+            document.body.style.overflow='';
         });
 
         input.style.display = 'none';
@@ -1990,9 +1997,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
     function abrirTyC() { 
         document.getElementById('tyc-body').innerHTML = translations[currentLang].tycContent;
-        document.getElementById('modalTyC').style.display = 'flex'; 
+        document.getElementById('modalTyC').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
-    function cerrarTyC() { document.getElementById('modalTyC').style.display = 'none'; }
+    function cerrarTyC() { document.getElementById('modalTyC').style.display = 'none'; document.body.style.overflow = ''; }
 
     function generarCodigo() {
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -3347,6 +3355,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 document.getElementById('modalText').innerHTML = t.modalTextSent;
             }
             document.getElementById('modalConfirmacion').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         })
         .catch(e => {
             console.error(e);
@@ -3422,17 +3431,19 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         iniciarEnvio(datos);
     }
 
-    function cerrarModal() { document.getElementById('modalConfirmacion').style.display = 'none'; }
+    function cerrarModal() { document.getElementById('modalConfirmacion').style.display = 'none'; document.body.style.overflow = ''; }
 
     // CUPÓN EMERGENTE
     function mostrarCupon() {
         const overlay = document.getElementById('cupon-overlay');
         if (!sessionStorage.getItem('cuponVisto')) {
             overlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
     }
     function cerrarCupon() {
         document.getElementById('cupon-overlay').style.display = 'none';
+        document.body.style.overflow = '';
         sessionStorage.setItem('cuponVisto', '1');
     }
     function copiarCupon(el) {
