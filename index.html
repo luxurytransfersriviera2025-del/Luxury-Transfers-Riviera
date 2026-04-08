@@ -585,6 +585,30 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             .ltr-social-link { width: 34px; height: 34px; font-size: 15px; }
         }
         body.lang-loading { visibility: hidden; }
+
+        /* SPLASH LOADER */
+        #splash-loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0a0a0a; z-index: 999999;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 20px;
+            transition: opacity 0.4s ease;
+        }
+        #splash-loader img { width: 60px; height: 60px; object-fit: contain; }
+        #splash-loader .splash-brand {
+            font-family: var(--font-title); font-size: 1.3rem; font-weight: 800;
+            color: var(--gold); text-transform: uppercase; letter-spacing: 3px;
+        }
+        #splash-loader .splash-bar-wrap {
+            width: 140px; height: 3px; background: rgba(212,175,55,0.2);
+            border-radius: 10px; overflow: hidden;
+        }
+        #splash-loader .splash-bar {
+            height: 100%; width: 0%; background: var(--gold);
+            border-radius: 10px;
+            animation: splashFill 1.5s ease forwards;
+        }
+        @keyframes splashFill { from { width: 0%; } to { width: 100%; } }
         /* CUPÓN EMERGENTE */
         #cupon-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -641,6 +665,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     </style>
 </head>
 <body class="lang-loading">
+
+    <!-- SPLASH LOADER -->
+    <div id="splash-loader">
+        <img src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Favicon%20200%20x%20200%20px.webp" alt="Luxury Transfers">
+        <div class="splash-brand">Luxury Transfers Riviera</div>
+        <div class="splash-bar-wrap"><div class="splash-bar"></div></div>
+    </div>
 
     <!-- CUPÓN EMERGENTE -->
     <div id="cupon-overlay">
@@ -1910,6 +1941,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         setLang('en');
         document.body.classList.remove('lang-loading');
         document.body.style.opacity = '1';
+        const splash = document.getElementById('splash-loader');
+        if (splash) {
+            splash.style.opacity = '0';
+            setTimeout(() => splash.style.display = 'none', 400);
+        }
 
         // Restaurar modo correcto sin re-llenar el campo
         direccionMode = 'desdeAero';
