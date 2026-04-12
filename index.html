@@ -1332,6 +1332,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7Fc9DMmnbwoc2Xt8xoRdem8jOoRNlnrofAx0JjFUNzlBLvVzpX5zi8Hj5OaojlGw/exec"; 
+    const CAPI_WORKER_URL = "https://meta-conversiones-api.luxurytransferiviera2025.workers.dev";
 
     let direccionMode = 'desdeAero'; 
     const baseGH = "https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/";
@@ -3374,6 +3375,48 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         iniciarEnvio(datosVenta);
     }
 
+    async function enviarConversionsAPI(data, eventName) {
+        try {
+            async function hashSHA256(str) {
+                const msgBuffer = new TextEncoder().encode(str.toLowerCase().trim());
+                const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+            const userData = {};
+            if (data.email)    userData.em = [await hashSHA256(data.email)];
+            if (data.telefono) userData.ph = [await hashSHA256(data.telefono.replace(/\D/g,''))];
+            if (data.nombre) {
+                const parts = data.nombre.trim().split(' ');
+                userData.fn = [await hashSHA256(parts[0])];
+                if (parts.length > 1) userData.ln = [await hashSHA256(parts.slice(1).join(' '))];
+            }
+            const payload = {
+                data: [{
+                    event_name: eventName,
+                    event_time: Math.floor(Date.now() / 1000),
+                    event_id: data.codigo,
+                    action_source: 'website',
+                    event_source_url: window.location.href,
+                    user_data: userData
+                }]
+            };
+            if (eventName === 'Purchase' && data.precio) {
+                const priceNum = parseFloat(data.precio.replace(/[^0-9.]/g,'')) || 0;
+                if (priceNum > 0) {
+                    payload.data[0].custom_data = { value: priceNum, currency: 'USD', order_id: data.codigo };
+                }
+            }
+            await fetch(CAPI_WORKER_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+        } catch(e) {
+            console.warn('CAPI error (non-blocking):', e);
+        }
+    }
+
     function iniciarEnvio(data) {
         if(SCRIPT_URL.includes("PEGAR")) { alert("Falta configurar la URL del Script."); return; }
         document.getElementById('loadingOverlay').style.display = 'flex';
@@ -3386,6 +3429,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 fbq('track', 'Lead');
             }
         }
+
+        // META CONVERSIONS API (server-side) — envío paralelo al navegador
+        const capiEvent = data.esVenta ? 'Purchase' : 'Lead';
+        enviarConversionsAPI(data, capiEvent);
         
         const t = translations[currentLang]; 
         const l = t.waLabels; 
