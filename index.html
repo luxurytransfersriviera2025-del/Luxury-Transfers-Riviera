@@ -1263,7 +1263,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     <div class="ltr-social-container">
         <h3 id="social-title">Síguenos y contáctanos</h3>
         <div class="ltr-social-icons">
-            <a href="https://api.whatsapp.com/send/?phone=529842411158&text&type=phone_number&app_absent=0" target="_blank" class="ltr-social-link ltr-wa" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="https://api.whatsapp.com/send/?phone=529842411158&text&type=phone_number&app_absent=0" target="_blank" class="ltr-social-link ltr-wa" title="WhatsApp" onclick="if(typeof fbq!=='undefined') fbq('track','Contact');"><i class="fa-brands fa-whatsapp"></i></a>
             <a href="https://facebook.com/share/1Yt1WbvDFV" target="_blank" class="ltr-social-link ltr-fb" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
             <a href="https://instagram.com/luxury_transfers_riviera" target="_blank" class="ltr-social-link ltr-insta" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
             <a href="https://tiktok.com/@luxurytransfersriviera?_r=1&_t=ZS-92t33quHLzs" target="_blank" class="ltr-social-link ltr-tiktok" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
@@ -1271,7 +1271,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             <a href="https://www.tripadvisor.es/Attraction_Review-g150812-d34109769-Reviews-Luxury_Transfers_Riviera-Playa_del_Carmen_Yucatan_Peninsula.html" target="_blank" class="ltr-social-link ltr-trip" title="TripAdvisor">
     <img src="https://static.tacdn.com/img2/brand_refresh/Tripadvisor_logomark.svg" style="width: 24px; height: 24px;">
 </a>
-            <a href="mailto:reservas@luxurytransfersriviera.com.mx" class="ltr-social-link ltr-email" title="Correo"><i class="fa-solid fa-envelope"></i></a>
+            <a href="/cdn-cgi/l/email-protection#265443554354504755664a535e53545f525447485540435455544f504f4354470845494b084b5e" class="ltr-social-link ltr-email" title="Correo"><i class="fa-solid fa-envelope"></i></a>
             <a href="tel:+529842411158" class="ltr-social-link ltr-phone" title="Llamar"><i class="fa-solid fa-phone"></i></a>
         </div>
     </div>
@@ -1330,7 +1330,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         </div>
     </div>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7Fc9DMmnbwoc2Xt8xoRdem8jOoRNlnrofAx0JjFUNzlBLvVzpX5zi8Hj5OaojlGw/exec"; 
 
     let direccionMode = 'desdeAero'; 
@@ -2569,6 +2569,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             if(!fecha) { alert(t.alertDate); return; }
             if(!rawHora) { alert(t.alertTime); return; }
             
+            // META PIXEL — Search
+            if(typeof fbq !== 'undefined') fbq('track', 'Search');
+            
             if (direccionMode === 'personalizado') {
                 const subtipo = document.getElementById('subtipoPersonalizado').value;
                 
@@ -2768,6 +2771,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             }
             divRes.style.display = 'block';
             divRes.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // META PIXEL — ViewContent (precios mostrados)
+            if(typeof fbq !== 'undefined') fbq('track', 'ViewContent');
             // Iniciar sliders de imágenes después de renderizar
             setTimeout(initErtigaSliders, 100);
         } catch (error) {
@@ -3255,6 +3260,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const tarjeta = document.getElementById(id);
         const isOpen = form.classList.contains('open');
 
+        // META PIXEL — InitiateCheckout al abrir formulario de reserva
+        if(!isOpen && typeof fbq !== 'undefined') fbq('track', 'InitiateCheckout');
+
         // Guardar datos del formulario actualmente abierto antes de cerrar
         document.querySelectorAll('.tarjeta-booking-form.open').forEach(f => {
             const openId = f.id.replace('form-', '');
@@ -3369,6 +3377,15 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     function iniciarEnvio(data) {
         if(SCRIPT_URL.includes("PEGAR")) { alert("Falta configurar la URL del Script."); return; }
         document.getElementById('loadingOverlay').style.display = 'flex';
+
+        // META PIXEL — Lead o Schedule según tipo
+        if(typeof fbq !== 'undefined') {
+            if(data.esVenta) {
+                fbq('track', 'Schedule');
+            } else {
+                fbq('track', 'Lead');
+            }
+        }
         
         const t = translations[currentLang]; 
         const l = t.waLabels; 
@@ -3519,6 +3536,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         if (email.length < 5)   { alert(t.alertEmail); return; }
         if (tel.length < 5)     { alert(t.alertPhone); return; }
 
+        // META PIXEL — SubmitApplication
+        if(typeof fbq !== 'undefined') fbq('track', 'SubmitApplication');
+
         const codigoUnico = generarCodigo();
         const datos = {
             esVenta: false,
@@ -3615,6 +3635,4 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         });
     }
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdK5yLQ20SQrLc_0rOuo7oxxHVQ233Bh0&libraries=places&callback=initAutocomplete" async defer></script>
-</body>
-</html>
+    <script src="
