@@ -3366,6 +3366,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             notas: notasFinales, vuelo,
             vueloRegreso: document.getElementById('vuelo-regreso-' + id) ? document.getElementById('vuelo-regreso-' + id).value : "",
             vehiculo: datosCard.vehiculo, precio: datosCard.precio,
+            precioTotal: (() => {
+                const base = parseFloat((datosCard.precio || "0").replace(/[^0-9.]/g,"")) || 0;
+                const tot  = base + extrasTotal;
+                return "$" + tot + " " + moneda;
+            })(),
             zona: datosCard.zona, idioma: currentLang, pago,
             extraAgua, extraCerveza, extraAguaR, extraCervezaR, extraStop, extraStopR,
             totalExtras: totalExtrasStr,
@@ -3415,12 +3420,12 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             };
 
             // Valor económico solo en Purchase (paso 4 con precio confirmado)
-            if (eventName === 'Purchase' && data.precio) {
-                const priceNum = parseFloat(data.precio.replace(/[^0-9.]/g,'')) || 0;
+            if (eventName === "Purchase" && (data.precioTotal || data.precio)) {
+                const priceNum = parseFloat((data.precioTotal || data.precio).replace(/[^0-9.]/g,'')) || 0;
                 if (priceNum > 0) {
                     payload.data[0].custom_data = {
                         value:    priceNum,
-                        currency: 'USD',
+                        currency: (data.precioTotal || data.precio || "USD").includes("MXN") ? "MXN" : (data.precioTotal || data.precio || "USD").includes("CAD") ? "CAD" : "USD",
                         order_id: data.codigo
                     };
                 }
@@ -3444,7 +3449,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         // Purchase = reserva con precio confirmado | Lead = cotización personalizada
         const metaEventName = data.esVenta ? 'Purchase' : 'Lead';
         if(typeof fbq !== 'undefined') {
-            fbq('track', metaEventName, {}, { eventID: data.codigo });
+            if (data.esVenta && data.precio) {
+                const priceNum = parseFloat(data.precioTotal || data.precio.replace(/[^0-9.]/g,'')) || 0;
+                const currency = data.precioTotal || data.precio.includes('MXN') ? 'MXN' : data.precioTotal || data.precio.includes('CAD') ? 'CAD' : 'USD';
+                fbq('track', 'Purchase', { value: priceNum, currency: currency }, { eventID: data.codigo });
+            } else {
+                fbq('track', 'Lead', {}, { eventID: data.codigo });
+            }
         }
         enviarConversionsAPI(data, metaEventName);
         
