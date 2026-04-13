@@ -2570,8 +2570,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             if(!fecha) { alert(t.alertDate); return; }
             if(!rawHora) { alert(t.alertTime); return; }
             
-            // META PIXEL — Search
-            if(typeof fbq !== 'undefined') fbq('track', 'Search');
+            // META PIXEL + CAPI — Search (paso 2 del funnel)
+            const searchEventId = 'SCH-' + Date.now() + '-' + Math.random().toString(36).substr(2,6);
+            if(typeof fbq !== 'undefined') fbq('track', 'Search', {}, { eventID: searchEventId });
+            enviarConversionsAPI({ codigo: searchEventId }, 'Search');
             
             if (direccionMode === 'personalizado') {
                 const subtipo = document.getElementById('subtipoPersonalizado').value;
@@ -3261,8 +3263,12 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const tarjeta = document.getElementById(id);
         const isOpen = form.classList.contains('open');
 
-        // META PIXEL — InitiateCheckout al abrir formulario de reserva
-        if(!isOpen && typeof fbq !== 'undefined') fbq('track', 'InitiateCheckout');
+        // META PIXEL + CAPI — InitiateCheckout (paso 3 del funnel: clic en Book Now)
+        if (!isOpen) {
+            const iciEventId = 'ICI-' + Date.now() + '-' + Math.random().toString(36).substr(2,6);
+            if (typeof fbq !== 'undefined') fbq('track', 'InitiateCheckout', {}, { eventID: iciEventId });
+            enviarConversionsAPI({ codigo: iciEventId }, 'InitiateCheckout');
+        }
 
         // Guardar datos del formulario actualmente abierto antes de cerrar
         document.querySelectorAll('.tarjeta-booking-form.open').forEach(f => {
@@ -3384,6 +3390,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
             }
             const userData = {};
+
+            // Datos del formulario hasheados (solo disponibles en pasos 4)
             if (data.email)    userData.em = [await hashSHA256(data.email)];
             if (data.telefono) userData.ph = [await hashSHA256(data.telefono.replace(/\D/g,''))];
             if (data.nombre) {
@@ -3391,22 +3399,33 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 userData.fn = [await hashSHA256(parts[0])];
                 if (parts.length > 1) userData.ln = [await hashSHA256(parts.slice(1).join(' '))];
             }
+
+            // User-Agent del navegador (el Worker agrega IP y ciudad desde Cloudflare)
+            userData.client_user_agent = navigator.userAgent;
+
             const payload = {
                 data: [{
-                    event_name: eventName,
-                    event_time: Math.floor(Date.now() / 1000),
-                    event_id: data.codigo,
-                    action_source: 'website',
+                    event_name:       eventName,
+                    event_time:       Math.floor(Date.now() / 1000),
+                    event_id:         data.codigo,   // mismo ID que el Pixel → deduplicación
+                    action_source:    'website',
                     event_source_url: window.location.href,
-                    user_data: userData
+                    user_data:        userData
                 }]
             };
+
+            // Valor económico solo en Purchase (paso 4 con precio confirmado)
             if (eventName === 'Purchase' && data.precio) {
                 const priceNum = parseFloat(data.precio.replace(/[^0-9.]/g,'')) || 0;
                 if (priceNum > 0) {
-                    payload.data[0].custom_data = { value: priceNum, currency: 'USD', order_id: data.codigo };
+                    payload.data[0].custom_data = {
+                        value:    priceNum,
+                        currency: 'USD',
+                        order_id: data.codigo
+                    };
                 }
             }
+
             await fetch(CAPI_WORKER_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -3421,18 +3440,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         if(SCRIPT_URL.includes("PEGAR")) { alert("Falta configurar la URL del Script."); return; }
         document.getElementById('loadingOverlay').style.display = 'flex';
 
-        // META PIXEL — Lead o Schedule según tipo
+        // META PIXEL + CAPI — mismo evento y mismo eventID (paso 4: Send Booking Request)
+        // Purchase = reserva con precio confirmado | Lead = cotización personalizada
+        const metaEventName = data.esVenta ? 'Purchase' : 'Lead';
         if(typeof fbq !== 'undefined') {
-            if(data.esVenta) {
-                fbq('track', 'Schedule');
-            } else {
-                fbq('track', 'Lead');
-            }
+            fbq('track', metaEventName, {}, { eventID: data.codigo });
         }
-
-        // META CONVERSIONS API (server-side) — envío paralelo al navegador
-        const capiEvent = data.esVenta ? 'Purchase' : 'Lead';
-        enviarConversionsAPI(data, capiEvent);
+        enviarConversionsAPI(data, metaEventName);
         
         const t = translations[currentLang]; 
         const l = t.waLabels; 
@@ -3583,8 +3597,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         if (email.length < 5)   { alert(t.alertEmail); return; }
         if (tel.length < 5)     { alert(t.alertPhone); return; }
 
-        // META PIXEL — SubmitApplication
-        if(typeof fbq !== 'undefined') fbq('track', 'SubmitApplication');
+        // META PIXEL — Lead con eventID (formulario de servicio personalizado)
+        // CAPI se envía dentro de iniciarEnvio(datos) que ejecuta justo abajo
+        if(typeof fbq !== 'undefined') fbq('track', 'Lead', {}, { eventID: datos.codigo });
 
         const codigoUnico = generarCodigo();
         const datos = {
