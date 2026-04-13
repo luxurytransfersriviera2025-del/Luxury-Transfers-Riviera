@@ -2042,7 +2042,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         
         // --- AUTO-UPDATE RESULTADOS ---
         if(document.getElementById('resultados').style.display === 'block') {
-             cotizar(); 
+             cotizar(false); 
         }
     }
 
@@ -2560,7 +2560,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
     function limpiarResultados() { document.getElementById('resultados').style.display = 'none'; }
 
-    function cotizar() {
+    function cotizar(dispararMeta = true) {
         try {
             const t = translations[currentLang];
 
@@ -2570,10 +2570,16 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             if(!fecha) { alert(t.alertDate); return; }
             if(!rawHora) { alert(t.alertTime); return; }
             
-            // META PIXEL + CAPI — Search (paso 2 del funnel)
-            const searchEventId = 'SCH-' + Date.now() + '-' + Math.random().toString(36).substr(2,6);
-            if(typeof fbq !== 'undefined') fbq('track', 'Search', {}, { eventID: searchEventId });
-            enviarConversionsAPI({ codigo: searchEventId }, 'Search');
+            // META PIXEL + CAPI — Search (solo en clic manual, no en auto-update)
+            if (dispararMeta) {
+                const searchEventId = 'SCH-' + Date.now() + '-' + Math.random().toString(36).substr(2,6);
+                if(typeof fbq !== 'undefined') fbq('track', 'Search', {}, { eventID: searchEventId });
+                enviarConversionsAPI({ codigo: searchEventId }, 'Search');
+            }
+
+
+
+
             
             if (direccionMode === 'personalizado') {
                 const subtipo = document.getElementById('subtipoPersonalizado').value;
