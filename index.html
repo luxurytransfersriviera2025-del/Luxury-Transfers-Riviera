@@ -2738,7 +2738,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             const promoCode = isRedondoMode
                 ? (document.getElementById('codigoPromo') ? document.getElementById('codigoPromo').value.trim().toUpperCase() : '')
                 : (document.getElementById('codigoPromoOneWay') ? document.getElementById('codigoPromoOneWay').value.trim().toUpperCase() : '');
-            const descuento = (promoCode === 'LTR-10' || promoCode === 'LTR10') ? 0.10 : 0;
+            const descuento = (promoCode === 'LTR-10' || promoCode === 'LTR10') ? 0.10
+                            : (promoCode === 'LUX-20' || promoCode === 'LUX20') ? 0.20
+                            : 0;
             const cp = (usd) => {
                 const base = convertirPrecio(usd, moneda);
                 return descuento > 0 ? Math.round(base * (1 - descuento)) : base;
@@ -2748,7 +2750,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             if (descuento > 0) {
                 divRes.innerHTML += `<div style="background:linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 100%);border-left:4px solid var(--gold);border-radius:8px;padding:14px 20px;margin-bottom:16px;display:flex;align-items:center;gap:12px;">
                     <i class="fas fa-tag" style="color:var(--gold);font-size:16px;"></i>
-                    <span style="font-weight:700;color:var(--gold);font-size:13px;letter-spacing:1px;text-transform:uppercase;font-family:var(--font-title);">${currentLang==='en' ? 'Promo LTR-10 — 10% exclusive discount applied' : 'Código LTR-10 — 10% de descuento exclusivo aplicado'}</span>
+                    <span style="font-weight:700;color:var(--gold);font-size:13px;letter-spacing:1px;text-transform:uppercase;font-family:var(--font-title);">${
+                        promoCode === 'LUX-20' || promoCode === 'LUX20'
+                            ? (currentLang==='en' ? 'Code LUX-20 — 20% exclusive discount applied' : 'Código LUX-20 — 20% de descuento exclusivo aplicado')
+                            : (currentLang==='en' ? 'Promo LTR-10 — 10% exclusive discount applied' : 'Código LTR-10 — 10% de descuento exclusivo aplicado')
+                    }</span>
                 </div>`;
             }
 
@@ -2816,11 +2822,12 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const promoCode = (tipoActivo === 'REDONDO')
             ? (document.getElementById('codigoPromo') ? document.getElementById('codigoPromo').value.trim().toUpperCase() : '')
             : (document.getElementById('codigoPromoOneWay') ? document.getElementById('codigoPromoOneWay').value.trim().toUpperCase() : '');
-        const tieneDescuento = (promoCode === 'LTR-10' || promoCode === 'LTR10');
+        const tieneDescuento = (promoCode === 'LTR-10' || promoCode === 'LTR10' || promoCode === 'LUX-20' || promoCode === 'LUX20');
 
         // Precio mostrado ya viene con descuento aplicado si hay código
         // precioOriginal = precio sin descuento (para segunda tacha)
-        const precioOriginal = tieneDescuento ? Math.round(precio / 0.90) : precio;
+        const descuentoPct = (promoCode === 'LUX-20' || promoCode === 'LUX20') ? 0.80 : 0.90;
+        const precioOriginal = tieneDescuento ? Math.round(precio / descuentoPct) : precio;
 
         const dataStr = JSON.stringify({ esVenta: true, vehiculo: veh, precio: "$" + precio + " " + moneda, zona: zona, origen: document.getElementById('origen').value, destino: document.getElementById('destino').value }).replace(/"/g, "&quot;");
         let tipoTexto = (tipo === 'SENCILLO') ? t.oneWay : t.roundTrip;
