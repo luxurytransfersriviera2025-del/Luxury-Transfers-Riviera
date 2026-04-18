@@ -312,6 +312,17 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             font-family: 'Open Sans', sans-serif;
             cursor: pointer;
         }
+        .time-wrapper { display:flex; align-items:center; gap:4px; width:100%; }
+        .time-wrapper input[type="time"] { flex:1; }
+        .time-arrows { display:flex; flex-direction:column; gap:1px; flex-shrink:0; }
+        .time-arrows button {
+            border:none; background:#f0f4f8; color:var(--navy-bg); cursor:pointer;
+            width:20px; height:18px; border-radius:3px; font-size:10px; line-height:1;
+            display:flex; align-items:center; justify-content:center;
+            transition:background 0.15s;
+        }
+        .time-arrows button:hover { background:var(--navy-bg); color:#fff; }
+        @media (max-width: 768px) { .time-arrows { display:none; } }
 
         /* WHEEL PICKER ESTILO iOS — Android only */
         .wheel-item {
@@ -1411,7 +1422,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
     function replaceTimeInput(inputId) {
         const input = document.getElementById(inputId);
-        if (!input) return;
+        if (!input || !isMobile) return;
 
         const uid = inputId;
         const hours12 = Array.from({length:12},(_,i)=>String(i+1).padStart(2,'0'));
@@ -2147,8 +2158,24 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         initSlider();
         adjustScrollMargin();
 
-        // Reemplazar todos los inputs de hora con selector personalizado
+        // Reemplazar todos los inputs de hora con selector personalizado (móvil)
         ['horaIda', 'horaIdaRT', 'horaVuelta', 'custom-hora', 'custom-hora-regreso'].forEach(replaceTimeInput);
+
+        // Agregar flechas ▲▼ para desktop (ocultas en móvil via CSS)
+        ['horaIda', 'horaIdaRT', 'horaVuelta', 'custom-hora', 'custom-hora-regreso'].forEach(function(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input || input.parentElement.classList.contains('time-wrapper')) return;
+            const wrapper = document.createElement('div');
+            wrapper.className = 'time-wrapper';
+            input.parentNode.insertBefore(wrapper, input);
+            wrapper.appendChild(input);
+            const arrows = document.createElement('div');
+            arrows.className = 'time-arrows';
+            arrows.innerHTML =
+                '<button type="button" title="+" onclick="(function(i){var p=i.value.split(\':\');var h=parseInt(p[0])||0;var m=parseInt(p[1])||0;h=(h+1)%24;i.value=(h<10?\'0\'+h:h)+\':\'+(m<10?\'0\'+m:m);i.dispatchEvent(new Event(\'input\'));})(document.getElementById(\''+inputId+'\'))">&#9650;</button>' +
+                '<button type="button" title="-" onclick="(function(i){var p=i.value.split(\':\');var h=parseInt(p[0])||0;var m=parseInt(p[1])||0;h=(h+23)%24;i.value=(h<10?\'0\'+h:h)+\':\'+(m<10?\'0\'+m:m);i.dispatchEvent(new Event(\'input\'));})(document.getElementById(\''+inputId+'\'))">&#9660;</button>';
+            wrapper.appendChild(arrows);
+        });
     };
 
     function initSlider() {
