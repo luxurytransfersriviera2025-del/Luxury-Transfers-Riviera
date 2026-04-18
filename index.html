@@ -1409,7 +1409,110 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         return { h: String(h).padStart(2,'0'), m, ap };
     }
 
-    function replaceTimeInput(inputId) { /* usa picker nativo */ }
+    function replaceTimeInput(inputId) {
+        const input = document.getElementById(inputId);
+        if (!input || !isMobile) return;
+
+        const uid      = inputId;
+        const hours12  = Array.from({length:12}, (_,i) => String(i+1).padStart(2,'0'));
+        const mins5    = Array.from({length:12}, (_,i) => String(i*5).padStart(2,'0'));
+        const ampmVals = ['AM','PM'];
+        const init     = input.value ? from24h(input.value) : {h:'06',m:'00',ap:'AM'};
+
+        // Display que reemplaza el input nativo
+        const display = document.createElement('div');
+        display.id = 'wd-display-'+uid;
+        display.style.cssText = 'font-size:14px;font-weight:600;color:#333;cursor:pointer;font-family:var(--font-body);padding:4px 0;display:flex;align-items:center;gap:6px;';
+        display.innerHTML = '<span id="wd-txt-'+uid+'">'+init.h+':'+init.m+' '+init.ap+'</span>';
+
+        // Overlay de fondo oscuro
+        const overlay = document.createElement('div');
+        overlay.id = 'wd-overlay-'+uid;
+        overlay.style.cssText = 'display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:99999;align-items:center;justify-content:center;';
+
+        const lblCancel = () => currentLang === 'en' ? 'Cancel' : 'Cancelar';
+        const lblTitle  = () => currentLang === 'en' ? 'Time'   : 'Hora';
+        const lblOk     = () => currentLang === 'en' ? 'Done'   : 'Listo';
+
+        overlay.innerHTML =
+            '<div style="background:#fff;width:88%;max-width:340px;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);">' +
+                // Header
+                '<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid #e5e5e5;">' +
+                    '<button id="wd-cancel-'+uid+'" style="border:none;background:none;font-size:16px;color:#888;cursor:pointer;font-family:var(--font-body);padding:4px 8px;"></button>' +
+                    '<span id="wd-title-'+uid+'" style="font-size:16px;font-weight:700;color:#333;font-family:var(--font-title);"></span>' +
+                    '<button id="wd-ok-'+uid+'" style="border:none;background:none;font-size:16px;font-weight:700;color:var(--navy-bg);cursor:pointer;font-family:var(--font-body);padding:4px 8px;"></button>' +
+                '</div>' +
+                // Wheel columns
+                '<div style="position:relative;height:200px;overflow:hidden;background:#fff;">' +
+                    '<div style="position:absolute;top:0;left:0;right:0;height:66px;background:linear-gradient(to bottom,rgba(255,255,255,1),rgba(255,255,255,0));z-index:2;pointer-events:none;"></div>' +
+                    '<div style="position:absolute;bottom:0;left:0;right:0;height:66px;background:linear-gradient(to top,rgba(255,255,255,1),rgba(255,255,255,0));z-index:2;pointer-events:none;"></div>' +
+                    '<div style="position:absolute;top:50%;left:0;right:0;height:44px;transform:translateY(-50%);background:rgba(0,0,0,0.06);border-radius:8px;margin:0 16px;z-index:1;pointer-events:none;"></div>' +
+                    '<div style="display:flex;height:100%;padding:0 16px;gap:0;">' +
+                        '<div id="wd-h-'+uid+'"  style="flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none;"></div>' +
+                        '<div style="display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:400;color:#333;z-index:3;width:20px;">:</div>' +
+                        '<div id="wd-m-'+uid+'"  style="flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none;"></div>' +
+                        '<div style="width:8px;"></div>' +
+                        '<div id="wd-ap-'+uid+'" style="flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none;"></div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+
+        document.body.appendChild(overlay);
+
+        const colH  = overlay.querySelector('#wd-h-'+uid);
+        const colM  = overlay.querySelector('#wd-m-'+uid);
+        const colAP = overlay.querySelector('#wd-ap-'+uid);
+
+        wheelBuildCol(colH,  hours12);
+        wheelBuildCol(colM,  mins5);
+        wheelBuildCol(colAP, ampmVals);
+
+        [colH, colM, colAP].forEach(c => c.addEventListener('scroll', () => wheelHighlight(c)));
+
+        display.addEventListener('click', () => {
+            overlay.style.display = 'flex';
+            overlay.querySelector('#wd-cancel-'+uid).textContent = lblCancel();
+            overlay.querySelector('#wd-title-'+uid).textContent  = lblTitle();
+            overlay.querySelector('#wd-ok-'+uid).textContent     = lblOk();
+            document.body.style.overflow = 'hidden';
+            const cur = from24h(input.value || '06:00');
+            wheelScrollToIdx(colH,  hours12.indexOf(cur.h));
+            wheelScrollToIdx(colM,  mins5.indexOf(cur.m) > -1 ? mins5.indexOf(cur.m) : 0);
+            wheelScrollToIdx(colAP, ampmVals.indexOf(cur.ap));
+            setTimeout(() => { [colH, colM, colAP].forEach(c => wheelHighlight(c)); }, 50);
+        });
+
+        overlay.querySelector('#wd-cancel-'+uid).addEventListener('click', () => {
+            overlay.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+
+        overlay.querySelector('#wd-ok-'+uid).addEventListener('click', () => {
+            const h  = wheelGetSelected(colH);
+            const m  = wheelGetSelected(colM);
+            const ap = wheelGetSelected(colAP);
+            if (!h || !m || !ap) return;
+            let h24 = parseInt(h, 10);
+            if (ap === 'AM' && h24 === 12) h24 = 0;
+            if (ap === 'PM' && h24 !== 12) h24 += 12;
+            input.value = String(h24).padStart(2,'0') + ':' + m;
+            input.dispatchEvent(new Event('input'));
+            document.getElementById('wd-txt-'+uid).textContent = h + ':' + m + ' ' + ap;
+            overlay.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+
+        // Cerrar al tocar el fondo oscuro
+        overlay.addEventListener('click', e => {
+            if (e.target === overlay) {
+                overlay.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        });
+
+        input.style.display = 'none';
+        input.parentNode.insertBefore(display, input.nextSibling);
+    }
     function adjustScrollMargin() {
         const header = document.querySelector('header');
         if(header) {
