@@ -890,8 +890,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         .tarjeta-booking-form.open { display: block; }
                         @keyframes slideDownBF { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
                         .tarjeta.expanded { border-color: var(--action-green) !important; box-shadow: 0 5px 25px rgba(0,166,81,0.15) !important; overflow: hidden; }
-                        .form-card-grid { display: grid; grid-template-columns: repeat(4,1fr); gap:12px; margin-bottom:14px; }
-                        .form-card-notes { display: grid; grid-template-columns: 3fr 1fr; gap:12px; margin-bottom:16px; }
+                        .form-card-grid { display: grid; grid-template-columns: 1fr 1fr 1.6fr 0.8fr; gap:12px; margin-bottom:14px; }
+                        .form-card-notes { display: grid; grid-template-columns: 1fr; gap:12px; margin-bottom:16px; }
                         .btn-enviar-reserva { background:var(--action-green); color:white; border:none; border-radius:8px; padding:15px 40px; font-size:16px; font-weight:800; cursor:pointer; font-family:var(--font-title); text-transform:uppercase; letter-spacing:1px; transition:all 0.2s; width:100%; box-shadow:0 5px 0 #007a3d; }
                         .btn-enviar-reserva:hover { background:var(--action-green-hover); transform:translateY(2px); box-shadow:0 3px 0 #007a3d; }
                         @media (max-width: 768px) { 
@@ -950,11 +950,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     <div class="row-bottom-ow" id="rowBottomOneWay">
                         <div class="input-wrapper">
                             <label id="label-fecha">SERVICE DATE</label>
-                            <input type="date" id="fechaIda" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%;">
+                            <input type="date" id="fechaIda" onclick="try{this.showPicker()}catch(e){}" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%;">
                         </div>
                         <div class="input-wrapper">
                             <label id="label-hora">SERVICE TIME</label>
-                            <input type="time" id="horaIda" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%; cursor:pointer;">
+                            <input type="time" id="horaIda" onclick="try{this.showPicker()}catch(e){}" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%; cursor:pointer;">
                         </div>
                         <div class="input-wrapper">
                             <label id="label-pax">PASSENGERS</label>
@@ -985,19 +985,19 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     <div class="row-bottom-rt" id="rowBottomRoundTrip">
                         <div class="input-wrapper">
                             <label id="label-fecha-rt">SERVICE DATE</label>
-                            <input type="date" id="fechaIdaRT" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%;" oninput="document.getElementById('fechaIda').value=this.value">
+                            <input type="date" id="fechaIdaRT" onclick="try{this.showPicker()}catch(e){}" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%;" oninput="document.getElementById('fechaIda').value=this.value">
                         </div>
                         <div class="input-wrapper">
                             <label id="label-hora-rt">SERVICE TIME</label>
-                            <input type="time" id="horaIdaRT" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%; cursor:pointer;" oninput="document.getElementById('horaIda').value=this.value">
+                            <input type="time" id="horaIdaRT" onclick="try{this.showPicker()}catch(e){}" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%; cursor:pointer;" oninput="document.getElementById('horaIda').value=this.value">
                         </div>
                         <div class="input-wrapper" style="background:#f8fafc; border-color:#cbd5e1;">
                             <label id="label-fecha-vuelta" style="color:var(--action-green);">RETURN DATE</label>
-                            <input type="date" id="fechaVuelta" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%;">
+                            <input type="date" id="fechaVuelta" onclick="try{this.showPicker()}catch(e){}" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%;">
                         </div>
                         <div class="input-wrapper" style="background:#f8fafc; border-color:#cbd5e1;">
                             <label id="label-hora-vuelta" style="color:var(--action-green);">RETURN TIME</label>
-                            <input type="time" id="horaVuelta" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%; cursor:pointer;">
+                            <input type="time" id="horaVuelta" onclick="try{this.showPicker()}catch(e){}" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%; cursor:pointer;">
                         </div>
                         <div class="input-wrapper">
                             <label id="label-promo-rt" style="color:var(--gold);">PROMO CODE</label>
@@ -1183,19 +1183,19 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     </div>
                     <div class="input-wrapper">
                         <label id="custom-label-fecha" style="color:var(--navy-bg);">SERVICE DATE</label>
-                        <input type="date" id="custom-fecha" style="border:none;outline:none;background:transparent;font-size:14px;font-weight:600;color:#333;font-family:var(--font-body);min-height:25px;width:100%;">
+                        <input type="date" id="custom-fecha" onclick="try{this.showPicker()}catch(e){}" style="border:none;outline:none;background:transparent;font-size:14px;font-weight:600;color:#333;font-family:var(--font-body);min-height:25px;width:100%;">
                     </div>
                     <div class="input-wrapper">
                         <label id="custom-label-hora" style="color:var(--navy-bg);">SERVICE TIME</label>
-                        <input type="time" id="custom-hora" style="border:none;outline:none;background:transparent;font-size:14px;font-weight:600;color:#333;font-family:var(--font-body);min-height:25px;width:100%;cursor:pointer;">
+                        <input type="time" id="custom-hora" onclick="try{this.showPicker()}catch(e){}" style="border:none;outline:none;background:transparent;font-size:14px;font-weight:600;color:#333;font-family:var(--font-body);min-height:25px;width:100%;cursor:pointer;">
                     </div>
                     <div class="input-wrapper" id="custom-fecha-regreso-wrapper" style="display:none;">
                         <label id="custom-label-fecha-regreso" style="color:var(--action-green);">RETURN DATE</label>
-                        <input type="date" id="custom-fecha-regreso" style="border:none;outline:none;background:transparent;font-size:14px;font-weight:600;color:#333;font-family:var(--font-body);min-height:25px;width:100%;">
+                        <input type="date" id="custom-fecha-regreso" onclick="try{this.showPicker()}catch(e){}" style="border:none;outline:none;background:transparent;font-size:14px;font-weight:600;color:#333;font-family:var(--font-body);min-height:25px;width:100%;">
                     </div>
                     <div class="input-wrapper" id="custom-hora-regreso-wrapper" style="display:none;">
                         <label id="custom-label-hora-regreso" style="color:var(--action-green);">RETURN TIME</label>
-                        <input type="time" id="custom-hora-regreso" style="border:none;outline:none;background:transparent;font-size:14px;font-weight:600;color:#333;font-family:var(--font-body);min-height:25px;width:100%;cursor:pointer;">
+                        <input type="time" id="custom-hora-regreso" onclick="try{this.showPicker()}catch(e){}" style="border:none;outline:none;background:transparent;font-size:14px;font-weight:600;color:#333;font-family:var(--font-body);min-height:25px;width:100%;cursor:pointer;">
                     </div>
                     <div class="input-wrapper">
                         <label id="custom-label-tipo" style="color:var(--navy-bg);">SERVICE TYPE</label>
@@ -2052,6 +2052,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
              cotizar(false); 
         }
     }
+
+    // Ocultar loading overlay al cargar/recargar la página
+    // Esto evita que quede visible si el usuario regresa con el botón Atrás del navegador
+    window.addEventListener('pageshow', function(e) {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) overlay.style.display = 'none';
+    });
 
     window.onload = function() {
         const today = new Date().toISOString().split('T')[0];
@@ -3008,7 +3015,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     </div>
                     ` : `
                     <!-- ONE WAY: extras en grid 2 columnas -->
-                    <div class="extras-ow-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; min-width:0;">
+                    <div class="extras-ow-grid" style="display:grid; grid-template-columns:1fr; gap:10px; min-width:0;">
                         <div class="extra-card-ow" style="display:flex; align-items:center; justify-content:space-between; background:#fff; border-radius:8px; padding:10px 14px; border:1px solid #ccc;">
                             <span style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body);">🥤 ${isEN ? 'Water Bottle' : 'Agua'} <span style="color:#aaa; font-size:11px;">${formatExtraPrice(2)}</span></span>
                             <div style="display:flex; align-items:center; gap:8px;">
@@ -3066,6 +3073,16 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
                 <!-- BLOQUE DE PAGO -->
                 <div id="payment-block-${id}" style="display:none; margin-top:20px;">
+
+                    <!-- Solo el monto — sin repetir vehículo ni ruta -->
+                    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 18px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between;">
+                        <span style="font-size:11px; color:#999; text-transform:uppercase; letter-spacing:1px; font-family:var(--font-title);">
+                            ${isEN ? 'Total to pay' : 'Total a pagar'}
+                        </span>
+                        <span style="font-size:22px; font-weight:900; color:var(--navy-bg); font-family:var(--font-title); letter-spacing:-0.5px;">
+                            $${precio} <small style="font-size:13px; font-weight:600;">${moneda}</small>
+                        </span>
+                    </div>
 
                     <p style="font-size:11px; font-weight:800; color:#999; text-transform:uppercase; letter-spacing:1px; margin:0 0 12px; font-family:var(--font-title);">
                         ${isEN ? 'Choose how to pay' : 'Elige c&oacute;mo pagar'}
