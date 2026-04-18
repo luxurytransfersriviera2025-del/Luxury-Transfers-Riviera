@@ -890,7 +890,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         .tarjeta-booking-form.open { display: block; }
                         @keyframes slideDownBF { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
                         .tarjeta.expanded { border-color: var(--action-green) !important; box-shadow: 0 5px 25px rgba(0,166,81,0.15) !important; overflow: hidden; }
-                        .form-card-grid { display: grid; grid-template-columns: 1fr 1fr 1.6fr 0.8fr; gap:12px; margin-bottom:14px; }
+                        .form-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:14px; }
                         .form-card-notes { display: grid; grid-template-columns: 1fr; gap:12px; margin-bottom:16px; }
                         .btn-enviar-reserva { background:var(--action-green); color:white; border:none; border-radius:8px; padding:15px 40px; font-size:16px; font-weight:800; cursor:pointer; font-family:var(--font-title); text-transform:uppercase; letter-spacing:1px; transition:all 0.2s; width:100%; box-shadow:0 5px 0 #007a3d; }
                         .btn-enviar-reserva:hover { background:var(--action-green-hover); transform:translateY(2px); box-shadow:0 3px 0 #007a3d; }
@@ -2053,11 +2053,25 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
     }
 
-    // Ocultar loading overlay al cargar/recargar la página
-    // Esto evita que quede visible si el usuario regresa con el botón Atrás del navegador
+    // Ocultar loading overlay y resetear botones al cargar/regresar con botón Atrás
     window.addEventListener('pageshow', function(e) {
         const overlay = document.getElementById('loadingOverlay');
         if (overlay) overlay.style.display = 'none';
+        // Resetear todos los botones de Stripe que quedaron en estado "Redirecting"
+        document.querySelectorAll('[id^="btn-stripe-"]').forEach(function(btn) {
+            const isEN = currentLang === 'en';
+            btn.disabled = false;
+            btn.innerHTML = '<span style="display:flex; align-items:center; gap:12px;">' +
+                '<span style="display:flex; gap:5px; align-items:center;">' +
+                '<svg width="38" height="24" viewBox="0 0 38 24" style="border:1px solid #e2e8f0;border-radius:4px;flex-shrink:0;"><rect width="38" height="24" rx="4" fill="#fff"/><text x="5" y="17" font-family="Arial" font-size="11" font-weight="900" fill="#1a1f71">VISA</text></svg>' +
+                '<svg width="38" height="24" viewBox="0 0 38 24" style="border:1px solid #e2e8f0;border-radius:4px;flex-shrink:0;"><rect width="38" height="24" rx="4" fill="#fff"/><circle cx="15" cy="12" r="7" fill="#eb001b"/><circle cx="23" cy="12" r="7" fill="#f79e1b"/><path d="M19 6.8a7 7 0 0 1 0 10.4A7 7 0 0 1 19 6.8z" fill="#ff5f00"/></svg>' +
+                '<svg width="38" height="24" viewBox="0 0 38 24" style="border:1px solid #e2e8f0;border-radius:4px;flex-shrink:0;"><rect width="38" height="24" rx="4" fill="#007bc1"/><text x="4" y="17" font-family="Arial" font-size="9" font-weight="900" fill="#fff">AMEX</text></svg>' +
+                '<svg width="38" height="24" viewBox="0 0 38 24" style="border:1px solid #e2e8f0;border-radius:4px;flex-shrink:0;"><rect width="38" height="24" rx="4" fill="#fff"/><circle cx="24" cy="12" r="7" fill="#f76f20"/><text x="3" y="16" font-family="Arial" font-size="7" font-weight="700" fill="#231f20">DISC</text></svg>' +
+                '</span>' +
+                '<span style="color:#1a1a2e; font-weight:700;">' + (isEN ? 'Pay with Card' : 'Pagar con Tarjeta') + '</span>' +
+                '</span>' +
+                '<i class="fas fa-chevron-right" style="font-size:11px; color:#aaa;"></i>';
+        });
     });
 
     window.onload = function() {
@@ -2883,11 +2897,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 <div class="price-container">
                     ${precioHTML}
                 </div>
-                <div id="total-con-extras-${id}" style="display:none; margin-top:6px; padding-top:6px; border-top:1px dashed #ddd; text-align:right; width:100%;">
-                    <div style="font-size:10px; color:#888; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">${isEN ? '+ Extras' : '+ Extras'}</div>
-                    <div style="font-size:11px; color:#555; font-weight:600;" id="extras-linea-${id}"></div>
-                    <div style="font-size:11px; color:#888; font-weight:600;">${isEN ? 'Total:' : 'Total:'} <span style="font-size:1.1rem; font-weight:900; color:var(--action-green);" id="grand-total-${id}"></span></div>
-                </div>
+                <div id="total-con-extras-${id}" style="display:none;"></div>
                 <button class="btn-reservar" style="width:100%;" onclick="abrirFormCard('${id}', ${dataStr})">${t.bookBtn} <i class="fas fa-chevron-down"></i></button>
             </div>
 
@@ -3079,7 +3089,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         <span style="font-size:11px; color:#999; text-transform:uppercase; letter-spacing:1px; font-family:var(--font-title);">
                             ${isEN ? 'Total to pay' : 'Total a pagar'}
                         </span>
-                        <span style="font-size:22px; font-weight:900; color:var(--navy-bg); font-family:var(--font-title); letter-spacing:-0.5px;">
+                        <span id="total-to-pay-display-${id}" style="font-size:22px; font-weight:900; color:var(--navy-bg); font-family:var(--font-title); letter-spacing:-0.5px;">
                             $${precio} <small style="font-size:13px; font-weight:600;">${moneda}</small>
                         </span>
                     </div>
@@ -3298,27 +3308,20 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             amountEl.innerText = `${symbol}${extrasTotalLocal} ${monedaActual}`;
         }
 
-        // Actualizar grand total en la tarjeta de precio
-        const grandTotalEl = document.getElementById(`grand-total-${id}`);
-        const extrasLineaEl = document.getElementById(`extras-linea-${id}`);
-        const totalConExtrasEl = document.getElementById(`total-con-extras-${id}`);
-        if (grandTotalEl && totalConExtrasEl) {
-            if (extrasTotalLocal > 0) {
-                const priceEl = document.querySelector(`#${id} .price-current`);
-                const precioBase = priceEl ? priceEl.innerText.replace(/[^0-9.]/g,'') : '0';
-                const moneda = getExtrasMoneda();
-                const precioBaseNum = parseFloat(precioBase) || 0;
-                // Usar total local directamente (ya calculado correctamente en la moneda del cliente)
-                const extraParaTotal = extrasTotalLocal;
-                const grandTotal = Math.round(precioBaseNum + extraParaTotal);
-                const symbol = moneda === 'MXN' ? '$' : moneda === 'CAD' ? 'C$' : '$';
-                if (extrasLineaEl) extrasLineaEl.innerText = `+${symbol}${extrasTotalLocal} ${moneda}`;
-                grandTotalEl.innerText = `${symbol}${grandTotal} ${moneda}`;
-                totalConExtrasEl.style.display = 'block';
-            } else {
-                totalConExtrasEl.style.display = 'none';
-            }
+        // Actualizar el display "TOTAL TO PAY" en el bloque de pago
+        const totalToPayEl = document.getElementById(`total-to-pay-display-${id}`);
+        if (totalToPayEl) {
+            const priceEl = document.querySelector(`#${id} .price-current`);
+            const precioBase = priceEl ? parseFloat(priceEl.innerText.replace(/[^0-9.]/g,'')) || 0 : 0;
+            const moneda = getExtrasMoneda();
+            const symbol = moneda === 'MXN' ? '$' : moneda === 'CAD' ? 'C$' : '$';
+            const grandTotal = Math.round(precioBase + extrasTotalLocal);
+            totalToPayEl.innerHTML = `${symbol}${grandTotal} <small style="font-size:13px; font-weight:600;">${moneda}</small>`;
         }
+
+        // Ocultar el bloque lateral de extras (ya no se usa)
+        const totalConExtrasEl = document.getElementById(`total-con-extras-${id}`);
+        if (totalConExtrasEl) totalConExtrasEl.style.display = 'none';
     }
 
     function getExtrasText(id) {
