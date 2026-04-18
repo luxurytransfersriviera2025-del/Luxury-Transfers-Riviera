@@ -1422,38 +1422,36 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         // Display que reemplaza el input nativo
         const display = document.createElement('div');
         display.id = 'wd-display-'+uid;
-        display.style.cssText = 'font-size:14px;font-weight:600;color:#333;cursor:pointer;font-family:var(--font-body);padding:4px 0;display:flex;align-items:center;gap:6px;';
+        display.style.cssText = 'font-size:14px;font-weight:600;color:#333;cursor:pointer;font-family:var(--font-body);padding:4px 0;';
         display.innerHTML = '<span id="wd-txt-'+uid+'">'+init.h+':'+init.m+' '+init.ap+'</span>';
 
-        // Overlay de fondo oscuro
+        // Overlay fondo oscuro
         const overlay = document.createElement('div');
         overlay.id = 'wd-overlay-'+uid;
         overlay.style.cssText = 'display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:99999;align-items:center;justify-content:center;';
 
-        const lblCancel = () => currentLang === 'en' ? 'Cancel' : 'Cancelar';
-        const lblTitle  = () => currentLang === 'en' ? 'Time'   : 'Hora';
-        const lblOk     = () => currentLang === 'en' ? 'Done'   : 'Listo';
+        const lblCancel = () => currentLang === 'en' ? 'Cancel'  : 'Cancelar';
+        const lblOk     = () => currentLang === 'en' ? 'Done'    : 'Listo';
 
         overlay.innerHTML =
             '<div style="background:#fff;width:88%;max-width:340px;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);">' +
-                // Header
-                '<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid #e5e5e5;">' +
-                    '<button id="wd-cancel-'+uid+'" style="border:none;background:none;font-size:16px;color:#888;cursor:pointer;font-family:var(--font-body);padding:4px 8px;"></button>' +
-                    '<span id="wd-title-'+uid+'" style="font-size:16px;font-weight:700;color:#333;font-family:var(--font-title);"></span>' +
-                    '<button id="wd-ok-'+uid+'" style="border:none;background:none;font-size:16px;font-weight:700;color:var(--navy-bg);cursor:pointer;font-family:var(--font-body);padding:4px 8px;"></button>' +
-                '</div>' +
-                // Wheel columns
-                '<div style="position:relative;height:200px;overflow:hidden;background:#fff;">' +
-                    '<div style="position:absolute;top:0;left:0;right:0;height:66px;background:linear-gradient(to bottom,rgba(255,255,255,1),rgba(255,255,255,0));z-index:2;pointer-events:none;"></div>' +
-                    '<div style="position:absolute;bottom:0;left:0;right:0;height:66px;background:linear-gradient(to top,rgba(255,255,255,1),rgba(255,255,255,0));z-index:2;pointer-events:none;"></div>' +
-                    '<div style="position:absolute;top:50%;left:0;right:0;height:44px;transform:translateY(-50%);background:rgba(0,0,0,0.06);border-radius:8px;margin:0 16px;z-index:1;pointer-events:none;"></div>' +
-                    '<div style="display:flex;height:100%;padding:0 16px;gap:0;">' +
+                // Wheel columns — sin header
+                '<div style="position:relative;height:216px;overflow:hidden;background:#fff;">' +
+                    '<div style="position:absolute;top:0;left:0;right:0;height:72px;background:linear-gradient(to bottom,rgba(255,255,255,1),rgba(255,255,255,0));z-index:2;pointer-events:none;"></div>' +
+                    '<div style="position:absolute;bottom:0;left:0;right:0;height:72px;background:linear-gradient(to top,rgba(255,255,255,1),rgba(255,255,255,0));z-index:2;pointer-events:none;"></div>' +
+                    '<div style="position:absolute;top:50%;left:0;right:0;height:44px;transform:translateY(-50%);background:rgba(0,0,0,0.06);border-radius:8px;margin:0 12px;z-index:1;pointer-events:none;"></div>' +
+                    '<div style="display:flex;height:100%;padding:0 12px;gap:0;align-items:stretch;">' +
                         '<div id="wd-h-'+uid+'"  style="flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none;"></div>' +
-                        '<div style="display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:400;color:#333;z-index:3;width:20px;">:</div>' +
+                        '<div style="display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:300;color:#333;z-index:3;width:18px;flex-shrink:0;">:</div>' +
                         '<div id="wd-m-'+uid+'"  style="flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none;"></div>' +
-                        '<div style="width:8px;"></div>' +
+                        '<div style="flex:0 0 8px;"></div>' +
                         '<div id="wd-ap-'+uid+'" style="flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none;"></div>' +
                     '</div>' +
+                '</div>' +
+                // Footer con botones
+                '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-top:1px solid #e5e5e5;">' +
+                    '<button id="wd-cancel-'+uid+'" style="border:none;background:none;font-size:16px;color:#888;cursor:pointer;font-family:var(--font-body);padding:6px 10px;border-radius:8px;"></button>' +
+                    '<button id="wd-ok-'+uid+'"     style="border:none;background:none;font-size:16px;font-weight:700;color:var(--navy-bg);cursor:pointer;font-family:var(--font-body);padding:6px 10px;border-radius:8px;"></button>' +
                 '</div>' +
             '</div>';
 
@@ -1472,7 +1470,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         display.addEventListener('click', () => {
             overlay.style.display = 'flex';
             overlay.querySelector('#wd-cancel-'+uid).textContent = lblCancel();
-            overlay.querySelector('#wd-title-'+uid).textContent  = lblTitle();
             overlay.querySelector('#wd-ok-'+uid).textContent     = lblOk();
             document.body.style.overflow = 'hidden';
             const cur = from24h(input.value || '06:00');
@@ -1502,7 +1499,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             document.body.style.overflow = '';
         });
 
-        // Cerrar al tocar el fondo oscuro
         overlay.addEventListener('click', e => {
             if (e.target === overlay) {
                 overlay.style.display = 'none';
