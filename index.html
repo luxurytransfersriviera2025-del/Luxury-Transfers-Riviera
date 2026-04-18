@@ -1354,8 +1354,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     const imgUrlSuburban    = baseGH + "LUXURY%20VIP%20Desglose%20de%20Precios.webp";
     const imgUrlToyotaGL    = baseGH + "FAMILY%20VAN%20Desglose%20de%20Precios.webp";
 
-    // WHEEL PICKER ESTILO iOS — solo para Android
-    const isAndroid = /Android/i.test(navigator.userAgent);
+    // WHEEL PICKER ESTILO iOS — para todos los dispositivos móviles
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
     const WHEEL_ITEM_H = 44;
     const WHEEL_PAD = 2;
 
@@ -1411,7 +1411,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
     function replaceTimeInput(inputId) {
         const input = document.getElementById(inputId);
-        if (!input || !isAndroid) return;
+        if (!input) return;
 
         const uid = inputId;
         const hours12 = Array.from({length:12},(_,i)=>String(i+1).padStart(2,'0'));
@@ -1440,6 +1440,22 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 <span id="wd-title-${uid}" style="font-size:16px;font-weight:700;color:#333;font-family:var(--font-title);"></span>
                 <button id="wd-ok-${uid}" style="border:none;background:none;font-size:16px;font-weight:700;color:#007AFF;cursor:pointer;font-family:var(--font-body);"></button>
             </div>
+
+            <!-- Flechas arriba -->
+            <div style="display:flex;padding:6px 20px 0;gap:4px;">
+                <div style="flex:1;text-align:center;">
+                    <button id="wd-up-h-${uid}" style="border:none;background:none;font-size:20px;color:var(--navy-bg);cursor:pointer;padding:4px 16px;border-radius:6px;line-height:1;" onmouseover="this.style.background='#e8f0fb'" onmouseout="this.style.background='none'">&#9650;</button>
+                </div>
+                <div style="flex:0 0 12px;"></div>
+                <div style="flex:1;text-align:center;">
+                    <button id="wd-up-m-${uid}" style="border:none;background:none;font-size:20px;color:var(--navy-bg);cursor:pointer;padding:4px 16px;border-radius:6px;line-height:1;" onmouseover="this.style.background='#e8f0fb'" onmouseout="this.style.background='none'">&#9650;</button>
+                </div>
+                <div style="width:8px;"></div>
+                <div style="flex:1;text-align:center;">
+                    <button id="wd-up-ap-${uid}" style="border:none;background:none;font-size:20px;color:var(--navy-bg);cursor:pointer;padding:4px 16px;border-radius:6px;line-height:1;" onmouseover="this.style.background='#e8f0fb'" onmouseout="this.style.background='none'">&#9650;</button>
+                </div>
+            </div>
+
             <div style="position:relative;height:180px;overflow:hidden;background:#f9f9f9;">
                 <div style="position:absolute;top:0;left:0;right:0;height:60px;background:linear-gradient(to bottom,#f9f9f9,transparent);z-index:2;pointer-events:none;"></div>
                 <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(to top,#f9f9f9,transparent);z-index:2;pointer-events:none;"></div>
@@ -1450,6 +1466,21 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     <div id="wd-m-${uid}"  style="flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none;"></div>
                     <div style="width:8px;"></div>
                     <div id="wd-ap-${uid}" style="flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none;"></div>
+                </div>
+            </div>
+
+            <!-- Flechas abajo -->
+            <div style="display:flex;padding:0 20px 6px;gap:4px;">
+                <div style="flex:1;text-align:center;">
+                    <button id="wd-dn-h-${uid}" style="border:none;background:none;font-size:20px;color:var(--navy-bg);cursor:pointer;padding:4px 16px;border-radius:6px;line-height:1;" onmouseover="this.style.background='#e8f0fb'" onmouseout="this.style.background='none'">&#9660;</button>
+                </div>
+                <div style="flex:0 0 12px;"></div>
+                <div style="flex:1;text-align:center;">
+                    <button id="wd-dn-m-${uid}" style="border:none;background:none;font-size:20px;color:var(--navy-bg);cursor:pointer;padding:4px 16px;border-radius:6px;line-height:1;" onmouseover="this.style.background='#e8f0fb'" onmouseout="this.style.background='none'">&#9660;</button>
+                </div>
+                <div style="width:8px;"></div>
+                <div style="flex:1;text-align:center;">
+                    <button id="wd-dn-ap-${uid}" style="border:none;background:none;font-size:20px;color:var(--navy-bg);cursor:pointer;padding:4px 16px;border-radius:6px;line-height:1;" onmouseover="this.style.background='#e8f0fb'" onmouseout="this.style.background='none'">&#9660;</button>
                 </div>
             </div>
         </div>`;
@@ -1465,6 +1496,18 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         wheelBuildCol(colAP, ampmVals);
 
         [colH,colM,colAP].forEach(c=>c.addEventListener('scroll',()=>wheelHighlight(c)));
+
+        // Flechas ▲▼ para desktop
+        function wheelStep(col, dir) {
+            col.scrollBy({ top: dir * 44, behavior: 'smooth' });
+            setTimeout(() => wheelHighlight(col), 200);
+        }
+        overlay.querySelector('#wd-up-h-'+uid).addEventListener('click',  () => wheelStep(colH,  -1));
+        overlay.querySelector('#wd-dn-h-'+uid).addEventListener('click',  () => wheelStep(colH,  +1));
+        overlay.querySelector('#wd-up-m-'+uid).addEventListener('click',  () => wheelStep(colM,  -1));
+        overlay.querySelector('#wd-dn-m-'+uid).addEventListener('click',  () => wheelStep(colM,  +1));
+        overlay.querySelector('#wd-up-ap-'+uid).addEventListener('click', () => wheelStep(colAP, -1));
+        overlay.querySelector('#wd-dn-ap-'+uid).addEventListener('click', () => wheelStep(colAP, +1));
 
         display.addEventListener('click', ()=>{
             overlay.style.display = 'flex';
