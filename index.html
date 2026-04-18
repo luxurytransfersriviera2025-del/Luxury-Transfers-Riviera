@@ -46,6 +46,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     <link rel="preload" as="image" href="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/hero%201920%20x%201080%20px.webp">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- ══ STRIPE SDK ══ -->
+    <script src="https://js.stripe.com/v3/"></script>
+    <!-- ══ PAYPAL SDK ══
+         Reemplaza TU_PAYPAL_CLIENT_ID con tu Client ID (Sandbox para pruebas, Live para producción).
+         Lo encuentras en developer.paypal.com → My Apps & Credentials
+    ══ -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AcRsDfJPus_5Mur2K9O8DNC_yzH56wtqTyrRsWfVmK3JbWGbWKG0139Suix3Cv_jlRjen3LRgU14fL4UG&currency=USD&intent=capture&components=buttons" data-namespace="paypalSDK"></script>
 
     <style>
         /* ==========================================================================
@@ -1511,10 +1518,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     // --- CORRECCION 1: TYC EN FORMATO HTML DE NUEVO ---
     const tycHtmlES = `
         <h4>1. PROCESO DE RESERVACIÓN Y PAGOS</h4>
-        <p><strong>Número de Reserva:</strong> Al completar su solicitud en nuestro sitio web, el sistema generará un número de reserva. Este número es únicamente para seguimiento y no garantiza la confirmación del servicio. La reserva se considera confirmada únicamente al recibir el anticipo del 30% en efectivo o el pago total con tarjeta de crédito/débito.</p>
-        <p><strong>Pago en Efectivo:</strong> Se requiere un anticipo del 30% con tarjeta de crédito/débito al momento de confirmar la reserva. Este anticipo no es reembolsable. El 70% restante se paga en efectivo al abordar la unidad.</p>
-        <p><strong>Pago con Tarjeta de Crédito/Débito:</strong> Se requiere el 100% del pago con tarjeta al momento de reservar.</p>
-        <p><strong>Confirmación Oficial:</strong> Una vez recibido el pago correspondiente, nuestro equipo enviará la confirmación oficial y la unidad quedará bloqueada en agenda.</p>
+        <p><strong>Número de Reserva:</strong> Al completar su solicitud en nuestro sitio web, el sistema generará un número de reserva único. La reserva se considera confirmada únicamente al completarse el pago en línea al 100% mediante Stripe (tarjeta de crédito/débito) o PayPal.</p>
+        <p><strong>Pago en Línea (100%):</strong> Se requiere el pago total al momento de reservar a través de nuestros procesadores seguros: Stripe (Visa, Mastercard, Amex) o PayPal. No se aceptan pagos en efectivo ni depósitos parciales para confirmar la reserva.</p>
+        <p><strong>Seguridad del Pago:</strong> Todos los pagos son procesados con encriptación SSL. Luxury Transfers Riviera no almacena datos de tarjetas — los datos se procesan directamente por Stripe y PayPal, certificados PCI-DSS.</p>
+        <p><strong>Confirmación Oficial:</strong> Una vez procesado el pago, recibirás confirmación automática y nuestro equipo bloqueará la unidad en agenda. Recibirás un mensaje de WhatsApp de confirmación en breve.</p>
 
         <h4>2. POLÍTICAS DE CANCELACIÓN Y REEMBOLSOS</h4>
         <p><strong>Cancelación con más de 48 horas de anticipación:</strong> Aplica reembolso del 70% del monto pagado con tarjeta de crédito/débito.</p>
@@ -1548,10 +1555,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
     const tycHtmlEN = `
         <h4>1. BOOKING PROCESS AND PAYMENTS</h4>
-        <p><strong>Booking Number:</strong> Upon completing your request on our website, the system will generate a booking number. This number is for tracking purposes only and does not guarantee service confirmation. The booking is considered confirmed only upon receipt of the 30% cash deposit or full payment by credit/debit card.</p>
-        <p><strong>Cash Payment:</strong> A 30% deposit by credit/debit card is required at the time of booking confirmation. This deposit is non-refundable. The remaining 70% is paid in cash upon boarding the vehicle.</p>
-        <p><strong>Full Card Payment:</strong> Full payment (100%) by credit/debit card is required at the time of booking.</p>
-        <p><strong>Official Confirmation:</strong> Once payment is received, our team will send an official confirmation and the vehicle will be blocked on our schedule.</p>
+        <p><strong>Booking Number:</strong> Upon completing your request on our website, the system will generate a unique booking number. The booking is considered confirmed only upon successful 100% online payment via Stripe (credit/debit card) or PayPal.</p>
+        <p><strong>Online Payment (100%):</strong> Full payment is required at the time of booking through our secure processors: Stripe (Visa, Mastercard, Amex) or PayPal. Cash payments and partial deposits are not accepted to confirm a reservation.</p>
+        <p><strong>Payment Security:</strong> All payments are processed with SSL encryption. Luxury Transfers Riviera does not store card data — all payment data is handled directly by Stripe and PayPal, both PCI-DSS certified.</p>
+        <p><strong>Official Confirmation:</strong> Once payment is processed, you will receive automatic confirmation and our team will block the vehicle on our schedule. You will receive a WhatsApp confirmation message shortly.</p>
 
         <h4>2. CANCELLATION AND REFUND POLICIES</h4>
         <p><strong>Cancellations more than 48 hours in advance:</strong> A 70% refund of the amount paid by credit/debit card will be issued.</p>
@@ -1678,9 +1685,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             modalTitleSent: "¡Reserva Confirmada!",
             modalTextReceived: "¡Gracias! Hemos recibido tu solicitud de reserva. Uno de nuestros asesores se pondrá en contacto contigo en breve para confirmar los detalles de tu traslado y coordinar tu método de pago.",
             modalTextSent: "¡Gracias! Hemos recibido tu solicitud. Uno de nuestros asesores se pondrá en contacto contigo en breve para darte un precio personalizado.",
-            modalPayCard: "💳 Procesaremos tu pago con Tarjeta de Crédito/Débito de forma segura.",
-            modalPayPaypal: "💳 Te enviaremos una solicitud de pago por PayPal.",
-            modalPayCash: "💳 Coordinaremos tu depósito del 30% y el 70% restante en efectivo.",
+            modalPayCard: "💳 Tu pago con tarjeta fue procesado de forma segura por Stripe.",
+            modalPayPaypal: "✅ Tu pago fue completado exitosamente a través de PayPal.",
+            modalPayCash: "✅ Reserva confirmada. Pago procesado en línea.",
             modalCodeLabel: "NÚMERO DE RESERVA",
             modalWarningTitle: "IMPORTANTE:",
             modalWarningText: "Guarda tu número de reserva. También recibirás un correo de confirmación — revisa tu carpeta de SPAM si no lo ves.",
@@ -3038,21 +3045,91 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         <label>${isEN ? 'Notes / Luggage / Baby Seats' : 'Notas / Equipaje / Sillas de Bebé'}</label>
                         <textarea id="notas-${id}" rows="2" placeholder="${isEN ? 'Ex: 4 large suitcases...' : 'Ej: 4 maletas grandes, silla de bebé...'}"></textarea>
                     </div>
-                    <div class="input-wrapper">
-                        <label style="color:var(--gold);">${isEN ? 'Preferred Payment' : 'MÉTODO DE PAGO'}</label>
-                        <select id="pago-${id}" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; width:100%; font-family:var(--font-body);">
-                            <option value="Credit/Debit Card">${isEN ? 'Credit/Debit Card' : 'Tarjeta de Crédito/Débito'}</option>
-                            <option value="30% Credit/Debit + 70% Cash">${isEN ? '30% Credit/Debit + 70% Cash' : '30% Tarjeta + 70% Efectivo'}</option>
+
+                    <!-- ══ SELECTOR DE MÉTODO DE PAGO ══ -->
+                    <div class="input-wrapper" style="border:1.5px solid var(--gold); background:#fffdf4;">
+                        <label style="color:var(--gold);">
+                            🔒 ${isEN ? 'PAYMENT METHOD' : 'MÉTODO DE PAGO'}
+                        </label>
+                        <select id="pago-${id}"
+                            style="border:none; outline:none; background:transparent; font-size:14px;
+                                   font-weight:700; color:var(--navy-bg); width:100%;
+                                   font-family:var(--font-body); cursor:pointer; padding:4px 0;">
+                            <option value="card">💳 ${isEN ? 'Credit / Debit Card (Stripe)' : 'Tarjeta de Crédito / Débito (Stripe)'}</option>
+                            <option value="paypal">🅿️ PayPal</option>
                         </select>
                     </div>
                 </div>
+
                 <div class="terms-container" style="margin-bottom:16px;">
                     <input type="checkbox" id="terms-${id}">
-                    <span>${isEN ? 'I have read and agree to the' : 'He leído y acepto los'} <span class="terms-link" onclick="abrirTyC()">${isEN ? 'Terms & Conditions' : 'Términos y Condiciones'}</span></span>
+                    <span>${isEN ? 'I have read and agree to the' : 'He leído y acepto los'}
+                        <span class="terms-link" onclick="abrirTyC()">
+                            ${isEN ? 'Terms & Conditions' : 'Términos y Condiciones'}
+                        </span>
+                    </span>
                 </div>
-                <button class="btn-enviar-reserva" onclick="enviarDesdeCard('${id}', ${dataStr})">
-                    <i class="fas fa-paper-plane"></i> ${isEN ? 'SEND BOOKING REQUEST' : 'ENVIAR SOLICITUD DE RESERVA'}
+
+                <!-- ══ BOTÓN CONTINUAR — valida el form y activa el método elegido ══ -->
+                <button id="btn-continuar-${id}" class="btn-enviar-reserva"
+                    onclick="validarYMostrarPago('${id}', ${dataStr})">
+                    <i class="fas fa-lock"></i>
+                    ${isEN ? 'CONTINUE TO PAYMENT' : 'CONTINUAR AL PAGO'}
                 </button>
+
+                <!-- ══ BLOQUE DE PAGO — aparece tras validación ══ -->
+                <div id="payment-block-${id}" style="display:none; margin-top:18px;">
+
+                    <div style="text-align:center; font-size:10px; font-weight:800; color:#999;
+                                text-transform:uppercase; letter-spacing:1.5px; margin-bottom:14px;">
+                        🔒 ${isEN ? 'Secure Payment · SSL Encrypted' : 'Pago Seguro · Cifrado SSL'}
+                    </div>
+
+                    <!-- ── VISTA TARJETA (Stripe) ── -->
+                    <div id="stripe-view-${id}">
+                        <div style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:12px; padding:18px;">
+                            <div style="font-size:11px; font-weight:800; color:var(--navy-bg); text-transform:uppercase;
+                                        letter-spacing:1px; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                                <span>💳</span> ${isEN ? 'Credit / Debit Card' : 'Tarjeta de Crédito / Débito'}
+                                <span style="margin-left:auto; display:flex; gap:5px; align-items:center;">
+                                    <span style="background:#1a1f71;color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px;">VISA</span>
+                                    <span style="background:#eb001b;color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px;">MC</span>
+                                    <span style="background:#007bc1;color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px;">AMEX</span>
+                                </span>
+                            </div>
+                            <div id="card-element-${id}"
+                                style="padding:12px 14px; border:1.5px solid #cbd5e1; border-radius:8px;
+                                       background:#fff; min-height:42px;"></div>
+                            <div id="card-error-${id}"
+                                style="color:#e74c3c; font-size:12px; margin-top:6px; min-height:16px; font-weight:600;"></div>
+                            <button id="btn-stripe-${id}" onclick="pagarStripe('${id}', ${dataStr})"
+                                style="margin-top:14px; width:100%; background:var(--navy-bg); color:#fff; border:none;
+                                       border-radius:8px; padding:14px; font-size:14px; font-weight:800; cursor:pointer;
+                                       font-family:var(--font-title); text-transform:uppercase; letter-spacing:1px;
+                                       transition:background 0.25s, color 0.25s;"
+                                onmouseover="this.style.background='var(--gold)';this.style.color='#000'"
+                                onmouseout="this.style.background='var(--navy-bg)';this.style.color='#fff'">
+                                🔒 ${isEN ? 'PAY NOW' : 'PAGAR AHORA'}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ── VISTA PAYPAL ── -->
+                    <div id="paypal-view-${id}" style="display:none;">
+                        <div style="background:#fef9f0; border:1.5px solid #f0c040; border-radius:12px; padding:16px; text-align:center;">
+                            <p style="margin:0 0 12px 0; font-size:13px; color:#555; font-family:var(--font-body);">
+                                ${isEN
+                                    ? '🅿️ Click below to pay securely with your PayPal account.'
+                                    : '🅿️ Haz clic abajo para pagar de forma segura con tu cuenta PayPal.'}
+                            </p>
+                            <!-- Contenedor dinámico de botones PayPal -->
+                            <div id="paypal-button-container-${id}" style="min-height:50px;"></div>
+                            <div id="paypal-error-${id}"
+                                style="color:#e74c3c; font-size:12px; margin-top:8px; font-weight:600; display:none;"></div>
+                        </div>
+                    </div>
+
+                </div><!-- /payment-block -->
             </div>
         </div>`;
     }
@@ -3067,7 +3144,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const tel    = document.getElementById('tel-' + id);
         const bandera= document.getElementById('bandera-' + id);
         const notas  = document.getElementById('notas-' + id);
-        const pago   = document.getElementById('pago-' + id);
         const vuelo  = document.getElementById('vuelo-' + id);
         const vueloR = document.getElementById('vuelo-regreso-' + id);
         if (nombre && nombre.value) _savedFormData.nombre  = nombre.value;
@@ -3076,7 +3152,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         if (tel    && tel.value)    _savedFormData.tel     = tel.value;
         if (bandera&& bandera.value)_savedFormData.bandera = bandera.value;
         if (notas  && notas.value)  _savedFormData.notas   = notas.value;
-        if (pago   && pago.value)   _savedFormData.pago    = pago.value;
         if (vuelo  && vuelo.value)  _savedFormData.vuelo   = vuelo.value;
         if (vueloR && vueloR.value) _savedFormData.vueloR  = vueloR.value;
         // Guardar extras
@@ -3098,7 +3173,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const tel    = document.getElementById('tel-' + id);
         const bandera= document.getElementById('bandera-' + id);
         const notas  = document.getElementById('notas-' + id);
-        const pago   = document.getElementById('pago-' + id);
         const vuelo  = document.getElementById('vuelo-' + id);
         const vueloR = document.getElementById('vuelo-regreso-' + id);
         if (nombre && _savedFormData.nombre)  nombre.value  = _savedFormData.nombre;
@@ -3107,7 +3181,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         if (tel    && _savedFormData.tel)     tel.value     = _savedFormData.tel;
         if (bandera&& _savedFormData.bandera) { bandera.value = _savedFormData.bandera; cambiarPrefijoCard(id); }
         if (notas  && _savedFormData.notas)   notas.value   = _savedFormData.notas;
-        if (pago   && _savedFormData.pago)    pago.value    = _savedFormData.pago;
         if (vuelo  && _savedFormData.vuelo)   vuelo.value   = _savedFormData.vuelo;
         if (vueloR && _savedFormData.vueloR)  vueloR.value  = _savedFormData.vueloR;
         // Restaurar extras
@@ -3303,15 +3376,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             // Restaurar totales de extras si los había
             cambiarExtra(id, '_rt', 0);
             // Auto-guardar cuando el cliente escribe, sin esperar a cerrar
-            const camposAutoguardar = ['nombre','email','tel','notas','pago','vuelo','vuelo-regreso'];
+            const camposAutoguardar = ['nombre','email','tel','notas','vuelo','vuelo-regreso'];
             camposAutoguardar.forEach(campo => {
                 const el = document.getElementById(campo + '-' + id);
                 if (el) el.addEventListener('input', () => guardarDatosForm(id));
             });
             const bandera = document.getElementById('bandera-' + id);
             if (bandera) bandera.addEventListener('change', () => guardarDatosForm(id));
-            const pago = document.getElementById('pago-' + id);
-            if (pago) pago.addEventListener('change', () => guardarDatosForm(id));
             setTimeout(() => tarjeta.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
         }
     }
@@ -3329,18 +3400,18 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     }
 
     function enviarDesdeCard(id, datosCard) {
+        // Esta función ya no se llama directamente — el pago se inicia desde validarYMostrarPago()
+        // Se mantiene por compatibilidad interna
+    }
+
+    function _construirDatosVenta(id, datosCard, metodoPago) {
         const t = translations[currentLang];
-        if (!document.getElementById('terms-' + id).checked) { alert(t.alertTerms); return; }
         const nombre = document.getElementById('nombre-' + id).value.trim();
         const email  = document.getElementById('email-' + id).value.trim();
         const lada   = document.getElementById('lada-' + id).value.trim();
         const tel    = document.getElementById('tel-' + id).value.trim();
         const vuelo  = document.getElementById('vuelo-' + id).value.trim();
         const notas  = document.getElementById('notas-' + id).value.trim();
-        const pago   = document.getElementById('pago-' + id).value;
-        if (nombre.length < 2) { alert(t.alertName); return; }
-        if (email.length < 5)  { alert(t.alertEmail); return; }
-        if (!tel)               { alert(t.alertPhone); return; }
         guardarDatosForm(id);
         const codigoUnico = generarCodigo();
         const horaIda = convertirHora12h(document.getElementById('horaIda').value);
@@ -3353,8 +3424,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
         const extrasTexto = getExtrasText(id);
         const extrasTotal = getExtrasTotal(id);
-
-        // Capturar cantidades individuales de extras
         const extraAgua     = parseInt(document.getElementById('extra-water-' + id)  ? document.getElementById('extra-water-' + id).innerText  : 0) || 0;
         const extraCerveza  = parseInt(document.getElementById('extra-beer-' + id)   ? document.getElementById('extra-beer-' + id).innerText   : 0) || 0;
         const extraAguaR    = parseInt(document.getElementById('extra-waterR-' + id) ? document.getElementById('extra-waterR-' + id).innerText : 0) || 0;
@@ -3363,11 +3432,12 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const extraStopR    = parseInt(document.getElementById('extra-stopR-' + id)  ? document.getElementById('extra-stopR-' + id).innerText  : 0) || 0;
         const moneda = document.getElementById('moneda') ? document.getElementById('moneda').value : 'USD';
         const totalExtrasStr = extrasTotal > 0 ? ('$' + extrasTotal + ' ' + moneda) : '$0';
-
-        // Notas limpias — solo lo que el cliente escribió
-        const notasFinales = notas;
-
-        const datosVenta = {
+        const tipoActivo = document.getElementById('tipoServicio') ? document.getElementById('tipoServicio').value : 'SENCILLO';
+        const el = tipoActivo === 'REDONDO'
+            ? document.getElementById('codigoPromo')
+            : document.getElementById('codigoPromoOneWay');
+        const cupon = el ? el.value.trim().toUpperCase() : '';
+        return {
             esVenta: true, codigo: codigoUnico,
             nombre, telefono: lada + " " + tel, email,
             pasajeros: document.getElementById('pasajeros').value,
@@ -3376,7 +3446,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             destino: datosCard.destino || document.getElementById('destino').value,
             fecha: document.getElementById('fechaIda').value, hora: horaIda,
             fechaRegreso: fechaVueltaVal, horaRegreso: horaVueltaVal,
-            notas: notasFinales, vuelo,
+            notas, vuelo,
             vueloRegreso: document.getElementById('vuelo-regreso-' + id) ? document.getElementById('vuelo-regreso-' + id).value : "",
             vehiculo: datosCard.vehiculo, precio: datosCard.precio,
             precioTotal: (() => {
@@ -3384,18 +3454,308 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 const tot  = base + extrasTotal;
                 return "$" + tot + " " + moneda;
             })(),
-            zona: datosCard.zona, idioma: currentLang, pago,
+            zona: datosCard.zona, idioma: currentLang,
+            pago: metodoPago + ' ✅ Pagado en Línea',
             extraAgua, extraCerveza, extraAguaR, extraCervezaR, extraStop, extraStopR,
             totalExtras: totalExtrasStr,
-            cupon: (() => {
-                const tipoActivo = document.getElementById('tipoServicio') ? document.getElementById('tipoServicio').value : 'SENCILLO';
-                const el = tipoActivo === 'REDONDO'
-                    ? document.getElementById('codigoPromo')
-                    : document.getElementById('codigoPromoOneWay');
-                return el ? el.value.trim().toUpperCase() : '';
-            })()
+            cupon
         };
-        document.getElementById('codigoDisplay').innerText = codigoUnico;
+    }
+
+    // ════════════════════════════════════════════════════════════
+    //  CONFIGURACIÓN DE PAGOS
+    // ════════════════════════════════════════════════════════════
+    // Tu Cloudflare Worker de pagos
+    const WORKER_PAGOS_URL = 'https://checkout.luxurytransfersriviera.com.mx';
+
+    // Clave pública de Stripe (pk_test_... para pruebas, pk_live_... para producción)
+    const STRIPE_PUBLISHABLE_KEY = 'pk_test_51TN67lJjHdBIePeJ48T49veLxD0HxlXh9kJmTELedVm0I0GwQVsVsfyJS0VGXg4amdh2RLXlozKX2UzDsVRnsnjx00EIThWaVt';
+
+    // Instancia global de Stripe — se inicializa solo cuando el cliente paga (lazy)
+    let _stripe = null;
+    function getStripe() {
+        if (!_stripe) _stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+        return _stripe;
+    }
+    // Almacén de elementos Stripe montados por card id
+    const _stripeElements = {};
+    // Almacén de datos de venta pendientes de pago
+    const _datosPendientes = {};
+
+    // ─── PASO 1: Validar formulario → activar EventListener → mostrar método elegido ───
+    function validarYMostrarPago(id, datosCard) {
+        const t    = translations[currentLang];
+        const isEN = currentLang === 'en';
+
+        // — Validaciones del formulario —
+        if (!document.getElementById('terms-' + id).checked) { alert(t.alertTerms); return; }
+        const nombre = document.getElementById('nombre-' + id).value.trim();
+        const email  = document.getElementById('email-' + id).value.trim();
+        const tel    = document.getElementById('tel-' + id).value.trim();
+        if (nombre.length < 2) { alert(t.alertName);  return; }
+        if (email.length < 5)  { alert(t.alertEmail); return; }
+        if (!tel)               { alert(t.alertPhone); return; }
+
+        // — Ocultar botón "Continuar" una vez validado —
+        const btnContinuar = document.getElementById('btn-continuar-' + id);
+        if (btnContinuar) btnContinuar.style.display = 'none';
+
+        // — Mostrar bloque de pago —
+        const payBlock = document.getElementById('payment-block-' + id);
+        payBlock.style.display = 'block';
+        setTimeout(() => payBlock.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+
+        // — Calcular Total Final (Base + Extras) en la moneda seleccionada —
+        const moneda       = document.getElementById('moneda') ? document.getElementById('moneda').value : 'USD';
+        const basePrice    = parseFloat((datosCard.precio || '0').replace(/[^0-9.]/g, '')) || 0;
+        const extras       = getExtrasTotal(id);
+        const totalFinal   = Math.round((basePrice + extras) * 100) / 100;
+        const currencyCode = moneda === 'MXN' ? 'MXN' : moneda === 'CAD' ? 'CAD' : 'USD';
+
+        // ── Montar Stripe (lazy, una sola vez por tarjeta) ────────────
+        function _montarStripe() {
+            if (_stripeElements[id]) return;
+            try {
+                const elements = getStripe().elements();
+                const card = elements.create('card', {
+                    style: {
+                        base: {
+                            fontSize: '15px', color: '#1a1a1a',
+                            fontFamily: '"Open Sans", sans-serif',
+                            '::placeholder': { color: '#aab7c4' }
+                        },
+                        invalid: { color: '#e74c3c' }
+                    }
+                });
+                card.mount('#card-element-' + id);
+                card.on('change', (ev) => {
+                    document.getElementById('card-error-' + id).innerText =
+                        ev.error ? ev.error.message : '';
+                });
+                _stripeElements[id] = { elements, card };
+            } catch (e) {
+                document.getElementById('card-error-' + id).innerText =
+                    isEN ? 'Card field error: ' + e.message : 'Error en campo de tarjeta: ' + e.message;
+            }
+        }
+
+        // ── Montar botones PayPal (lazy, una sola vez por tarjeta) ────
+        function _montarPayPal() {
+            const container = document.getElementById('paypal-button-container-' + id);
+            if (!container || container.hasChildNodes()) return;
+
+            const sdkRef = typeof paypalSDK !== 'undefined' ? paypalSDK
+                         : typeof paypal    !== 'undefined' ? paypal : null;
+
+            if (!sdkRef) {
+                container.innerHTML = '<p style="color:#e74c3c;font-size:12px;text-align:center;">' +
+                    (isEN ? 'PayPal unavailable. Check Client ID.' : 'PayPal no disponible. Verifica tu Client ID.') + '</p>';
+                return;
+            }
+
+            sdkRef.Buttons({
+                style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 48 },
+
+                // createOrder → llama al Worker con el Total Final calculado
+                createOrder: async () => {
+                    _setPayPalError(id, '');
+                    try {
+                        const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
+                            method:  'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                method:      'paypal',
+                                action:      'create-order',
+                                amount:      totalFinal.toFixed(2),
+                                currency:    currencyCode,
+                                bookingCode: id,
+                                vehicle:     datosCard.vehiculo || '',
+                                description: 'Luxury Transfers Riviera'
+                            })
+                        });
+                        if (!res.ok) throw new Error('Worker HTTP ' + res.status);
+                        const json    = await res.json();
+                        const orderID = json.orderID || json.id;
+                        if (!orderID) throw new Error('No orderID received from Worker');
+                        _datosPendientes[id] = { datosCard, moneda, totalFinal };
+                        return orderID;
+                    } catch (e) {
+                        _setPayPalError(id, isEN
+                            ? '⚠️ Server error. Please try card payment.'
+                            : '⚠️ Error del servidor. Intenta pagar con tarjeta.');
+                        throw e;
+                    }
+                },
+
+                // onApprove → capturar en Worker → SOLO si COMPLETED ejecutar iniciarEnvio
+                onApprove: async (data) => {
+                    document.getElementById('loadingOverlay').style.display = 'flex';
+                    _setPayPalError(id, '');
+                    try {
+                        const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
+                            method:  'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                method:      'paypal',
+                                action:      'capture-order',
+                                orderID:     data.orderID,
+                                bookingCode: id
+                            })
+                        });
+                        if (!res.ok) throw new Error('Capture HTTP ' + res.status);
+                        const capture = await res.json();
+                        const captureStatus =
+                            capture.status ||
+                            capture.purchase_units?.[0]?.payments?.captures?.[0]?.status;
+                        if (captureStatus !== 'COMPLETED') {
+                            throw new Error('Capture status: ' + captureStatus);
+                        }
+                        // ✅ Pago verificado por el servidor → finalizar reserva
+                        _finalizarReserva(id, datosCard, 'PayPal');
+                    } catch (e) {
+                        document.getElementById('loadingOverlay').style.display = 'none';
+                        console.error('PayPal capture error:', e);
+                        _setPayPalError(id, isEN
+                            ? '⚠️ Payment not confirmed. Contact us via WhatsApp with your booking code.'
+                            : '⚠️ Pago no confirmado. Contáctanos por WhatsApp con tu código de reserva.');
+                    }
+                },
+
+                onCancel: () => {
+                    _setPayPalError(id, isEN
+                        ? 'Payment cancelled. You can try again.'
+                        : 'Pago cancelado. Puedes intentarlo de nuevo.');
+                },
+
+                onError: (err) => {
+                    console.error('PayPal SDK error:', err);
+                    _setPayPalError(id, isEN
+                        ? '⚠️ PayPal error. Please try card payment or contact us.'
+                        : '⚠️ Error de PayPal. Intenta con tarjeta o contáctanos.');
+                }
+            }).render('#paypal-button-container-' + id);
+        }
+
+        // ── Helper: mostrar / limpiar error en la vista PayPal ────────
+        function _setPayPalError(cardId, msg) {
+            const el = document.getElementById('paypal-error-' + cardId);
+            if (!el) return;
+            el.innerText     = msg;
+            el.style.display = msg ? 'block' : 'none';
+        }
+
+        // ── Cambiar vista según método elegido ────────────────────────
+        function _activarMetodo(metodo) {
+            const stripeView = document.getElementById('stripe-view-' + id);
+            const paypalView = document.getElementById('paypal-view-' + id);
+            if (metodo === 'paypal') {
+                stripeView.style.display = 'none';
+                paypalView.style.display = 'block';
+                _montarPayPal();
+            } else {
+                paypalView.style.display = 'none';
+                stripeView.style.display = 'block';
+                _montarStripe();
+            }
+        }
+
+        // ── EventListener en #pago-${id} (se registra una sola vez) ──
+        const selector = document.getElementById('pago-' + id);
+        if (selector && !selector._listenerAttached) {
+            selector.addEventListener('change', () => _activarMetodo(selector.value));
+            selector._listenerAttached = true;
+        }
+
+        // Activar el método que está seleccionado en este momento
+        _activarMetodo(selector ? selector.value : 'card');
+    }
+
+    // ─── PASO 2: Cobrar con Stripe ───────────────────────────────
+    async function pagarStripe(id, datosCard) {
+        const btn   = document.getElementById('btn-stripe-' + id);
+        const errEl = document.getElementById('card-error-' + id);
+        const isEN  = currentLang === 'en';
+
+        if (!_stripeElements[id]) {
+            errEl.innerText = isEN ? 'Card field not ready. Please wait.' : 'El campo de tarjeta no está listo.';
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = isEN ? '⏳ Processing...' : '⏳ Procesando...';
+        errEl.innerText = '';
+
+        const moneda     = document.getElementById('moneda') ? document.getElementById('moneda').value : 'USD';
+        const basePrice  = parseFloat((datosCard.precio || '0').replace(/[^0-9.]/g, '')) || 0;
+        const extras     = getExtrasTotal(id);
+        const totalFinal = Math.round((basePrice + extras) * 100) / 100;
+        const currencyCode = moneda === 'MXN' ? 'mxn' : moneda === 'CAD' ? 'cad' : 'usd';
+
+        try {
+            // 1. Pedir clientSecret al Worker en /process-payment
+            const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    method:      'stripe',
+                    amount:      totalFinal,
+                    currency:    currencyCode,
+                    bookingCode: id,
+                    vehicle:     datosCard.vehiculo || '',
+                })
+            });
+            if (!res.ok) throw new Error('Worker respondió con error: ' + res.status);
+            const { clientSecret, error: workerError } = await res.json();
+            if (workerError) throw new Error(workerError);
+
+            // 2. Confirmar el pago con Stripe.js (el cargo ocurre aquí)
+            const { paymentIntent, error } = await getStripe().confirmCardPayment(clientSecret, {
+                payment_method: { card: _stripeElements[id].card }
+            });
+
+            if (error) {
+                errEl.innerText = error.message;
+                btn.disabled = false;
+                btn.innerText = isEN ? '🔒 PAY NOW' : '🔒 PAGAR AHORA';
+                return;
+            }
+
+            if (paymentIntent.status === 'succeeded') {
+                // 3. Pago exitoso → registrar en Google Sheet + WhatsApp
+                _finalizarReserva(id, datosCard, 'Stripe');
+            } else {
+                throw new Error('Estado inesperado: ' + paymentIntent.status);
+            }
+        } catch (e) {
+            console.error('Stripe error:', e);
+            errEl.innerText = isEN
+                ? 'Connection error. Please try again or use PayPal.'
+                : 'Error de conexión. Intenta de nuevo o usa PayPal.';
+            btn.disabled = false;
+            btn.innerText = isEN ? '🔒 PAY NOW' : '🔒 PAGAR AHORA';
+        }
+    }
+
+    // ─── PASO 3: Finalizar reserva — SOLO tras pago verificado por el servidor ─────
+    function _finalizarReserva(id, datosCard, metodoPago) {
+        const datosVenta = _construirDatosVenta(id, datosCard, metodoPago);
+        document.getElementById('codigoDisplay').innerText = datosVenta.codigo;
+
+        // ✅ Evento Purchase de Meta CAPI — se dispara AQUÍ, no antes.
+        //    El servidor ya confirmó el cobro (Stripe succeeded / PayPal COMPLETED).
+        if (typeof fbq !== 'undefined' && datosVenta.precioTotal) {
+            const priceNum   = parseFloat(datosVenta.precioTotal.replace(/[^0-9.]/g, '')) || 0;
+            const currencyFb = datosVenta.precioTotal.includes('MXN') ? 'MXN'
+                             : datosVenta.precioTotal.includes('CAD') ? 'CAD' : 'USD';
+            fbq('track', 'Purchase',
+                { value: priceNum, currency: currencyFb, content_name: datosVenta.vehiculo },
+                { eventID: datosVenta.codigo }
+            );
+        }
+        // CAPI server-side con el mismo eventID (deduplicación automática de Meta)
+        enviarConversionsAPI(datosVenta, 'Purchase');
+
+        // Registrar en Google Sheet + abrir modal de confirmación
         iniciarEnvio(datosVenta);
     }
 
@@ -3458,19 +3818,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         if(SCRIPT_URL.includes("PEGAR")) { alert("Falta configurar la URL del Script."); return; }
         document.getElementById('loadingOverlay').style.display = 'flex';
 
-        // META PIXEL + CAPI — mismo evento y mismo eventID (paso 4: Send Booking Request)
-        // Purchase = reserva con precio confirmado | Lead = cotización personalizada
-        const metaEventName = data.esVenta ? 'Purchase' : 'Lead';
-        if(typeof fbq !== 'undefined') {
-            if (data.esVenta && data.precio) {
-                const priceNum = parseFloat(data.precioTotal || data.precio.replace(/[^0-9.]/g,'')) || 0;
-                const currency = data.precioTotal || data.precio.includes('MXN') ? 'MXN' : data.precioTotal || data.precio.includes('CAD') ? 'CAD' : 'USD';
-                fbq('track', 'Purchase', { value: priceNum, currency: currency }, { eventID: data.codigo });
-            } else {
-                fbq('track', 'Lead', {}, { eventID: data.codigo });
-            }
+        // META PIXEL + CAPI
+        // ⚠️  Purchase se dispara ÚNICAMENTE desde _finalizarReserva() — después de que
+        //     el servidor confirma el cobro. Aquí solo disparamos Lead para cotizaciones.
+        if (!data.esVenta) {
+            if (typeof fbq !== 'undefined') fbq('track', 'Lead', {}, { eventID: data.codigo });
+            enviarConversionsAPI(data, 'Lead');
         }
-        enviarConversionsAPI(data, metaEventName);
         
         const t = translations[currentLang]; 
         const l = t.waLabels; 
