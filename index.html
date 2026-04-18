@@ -52,7 +52,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
          Reemplaza TU_PAYPAL_CLIENT_ID con tu Client ID (Sandbox para pruebas, Live para producción).
          Lo encuentras en developer.paypal.com → My Apps & Credentials
     ══ -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AcRsDfJPus_5Mur2K9O8DNC_yzH56wtqTyrRsWfVmK3JbWGbWKG0139Suix3Cv_jlRjen3LRgU14fL4UG&currency=USD&intent=capture&components=buttons" data-namespace="paypalSDK"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AcRsDfJPus_5Mur2K9O8DNC_yzH56wtqTyrRsWfVmK3JbWGbWKG0139Suix3Cv_jlRjen3LRgU14fL4UG&currency=USD&intent=capture&components=buttons&enable-funding=paypal" data-namespace="paypalSDK"></script>
 
     <style>
         /* ==========================================================================
@@ -2837,6 +2837,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const precioOriginal = tieneDescuento ? Math.round(precio / descuentoPct) : precio;
 
         const dataStr = JSON.stringify({ esVenta: true, vehiculo: veh, precio: "$" + precio + " " + moneda, zona: zona, origen: document.getElementById('origen').value, destino: document.getElementById('destino').value }).replace(/"/g, "&quot;");
+        const precioDisplay = '<span style="font-size:26px;font-weight:900;color:var(--navy-bg);font-family:var(--font-title);">$' + precio + ' <small style="font-size:14px;font-weight:600;">' + moneda + '</small></span>';
         let tipoTexto = (tipo === 'SENCILLO') ? t.oneWay : t.roundTrip;
         let iconoTipo = (tipo === 'SENCILLO') ? "fa-arrow-right" : "fa-exchange-alt";
 
@@ -3066,48 +3067,89 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 <!-- ══ BLOQUE DE PAGO PROFESIONAL ══ -->
                 <div id="payment-block-${id}" style="display:none; margin-top:20px;">
 
-                    <div style="text-align:center; font-size:10px; font-weight:800; color:#999;
-                                text-transform:uppercase; letter-spacing:1.5px; margin-bottom:18px;">
-                        🔒 ${isEN ? 'Secure Payment · SSL Encrypted · Powered by Stripe & PayPal' : 'Pago Seguro · SSL · Procesado por Stripe y PayPal'}
+                    <!-- Resumen del cobro -->
+                    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px;
+                                padding:16px 20px; margin-bottom:18px; text-align:center;">
+                        <p style="font-size:10px; color:#999; text-transform:uppercase; letter-spacing:1.5px;
+                                  margin:0 0 4px; font-family:var(--font-title);">
+                            🔒 ${isEN ? 'Secure Payment · SSL' : 'Pago Seguro · SSL'}
+                        </p>
+                        <p id="pay-amount-${id}" style="font-size:26px; font-weight:900; color:var(--navy-bg);
+                                  margin:0 0 2px; font-family:var(--font-title); letter-spacing:-0.5px;">
+                            $${precio} <small style="font-size:14px; font-weight:600;">${moneda}</small>
+                        </p>
+                        <p style="font-size:12px; color:#888; margin:0; font-family:var(--font-body);">
+                            ${veh} · ${rutaLabel}
+                        </p>
                     </div>
 
-                    <!-- ── BOTÓN STRIPE → redirige a stripe.com ── -->
+                    <!-- Elegir método -->
+                    <p style="font-size:11px; font-weight:800; color:#999; text-transform:uppercase;
+                               letter-spacing:1px; margin:0 0 12px; font-family:var(--font-title);">
+                        ${isEN ? 'Choose how to pay' : 'Elige cómo pagar'}
+                    </p>
+
+                    <!-- ── BOTÓN STRIPE ── -->
                     <button id="btn-stripe-${id}" onclick="pagarConStripe('${id}', ${dataStr})"
                         style="width:100%; background:#002855; color:#fff; border:none; border-radius:10px;
-                               padding:17px 20px; font-size:15px; font-weight:800; cursor:pointer;
-                               font-family:var(--font-title); letter-spacing:1px;
-                               display:flex; align-items:center; justify-content:center; gap:12px;
-                               margin-bottom:14px; transition:background 0.3s; box-shadow: 0 4px 14px rgba(0,40,85,0.25);"
+                               padding:15px 20px; font-size:14px; font-weight:800; cursor:pointer;
+                               font-family:var(--font-title); letter-spacing:0.5px;
+                               display:flex; align-items:center; justify-content:space-between;
+                               margin-bottom:10px; transition:background 0.25s;"
                         onmouseover="this.style.background='#003a6e'"
                         onmouseout="this.style.background='#002855'">
-                        <span style="display:flex; gap:5px; align-items:center;">
-                            <span style="background:#1a1f71;color:#fff;font-size:10px;font-weight:900;padding:3px 7px;border-radius:3px;">VISA</span>
-                            <span style="background:#eb001b;color:#fff;font-size:10px;font-weight:900;padding:3px 7px;border-radius:3px;">MC</span>
-                            <span style="background:#007bc1;color:#fff;font-size:10px;font-weight:900;padding:3px 7px;border-radius:3px;">AMEX</span>
+                        <span style="display:flex; align-items:center; gap:10px;">
+                            <span style="display:flex; gap:4px;">
+                                <span style="background:#1a1f71;color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px;">VISA</span>
+                                <span style="background:#eb001b;color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px;">MC</span>
+                                <span style="background:#007bc1;color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px;">AMEX</span>
+                            </span>
+                            <span>${isEN ? 'Pay with Card' : 'Pagar con Tarjeta'}</span>
                         </span>
-                        ${isEN ? 'Pay with Credit / Debit Card' : 'Pagar con Tarjeta de Crédito / Débito'}
-                        <i class="fas fa-arrow-right" style="font-size:13px; opacity:0.8;"></i>
+                        <i class="fas fa-arrow-right" style="font-size:12px; opacity:0.7;"></i>
                     </button>
 
                     <!-- ── SEPARADOR ── -->
-                    <div style="display:flex; align-items:center; gap:12px; margin:14px 0;">
-                        <div style="flex:1; height:1px; background:#e2e8f0;"></div>
-                        <span style="color:#bbb; font-size:11px; font-weight:700; letter-spacing:2px;">${isEN ? 'OR' : 'O'}</span>
-                        <div style="flex:1; height:1px; background:#e2e8f0;"></div>
+                    <div style="display:flex; align-items:center; gap:10px; margin:12px 0;">
+                        <div style="flex:1; height:0.5px; background:#e2e8f0;"></div>
+                        <span style="color:#bbb; font-size:11px; font-weight:600; letter-spacing:1px;">
+                            ${isEN ? 'or pay with' : 'o paga con'}
+                        </span>
+                        <div style="flex:1; height:0.5px; background:#e2e8f0;"></div>
                     </div>
 
-                    <!-- ── BOTÓN PAYPAL → abre ventana de PayPal ── -->
-                    <div id="paypal-button-container-${id}" style="min-height:50px;"></div>
+                    <!-- ── PAYPAL — botón oficial estático ── -->
+                    <div id="paypal-button-container-${id}" style="min-height:55px; border-radius:8px; overflow:hidden;"></div>
+
+                    <!-- Fallback: botón estático PayPal si el SDK no carga -->
+                    <div id="paypal-fallback-${id}" style="display:none;">
+                        <button onclick="pagarConPayPal('${id}', ${dataStr})"
+                            style="width:100%; background:#FFC439; border:none; border-radius:8px;
+                                   padding:14px 20px; cursor:pointer; display:flex; align-items:center;
+                                   justify-content:center; gap:10px; transition:background 0.2s;"
+                            onmouseover="this.style.background='#e6b035'"
+                            onmouseout="this.style.background='#FFC439'">
+                            <svg width="80" height="20" viewBox="0 0 80 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <text x="0" y="16" font-family="Arial" font-size="14" font-weight="bold" fill="#003087">Pay</text>
+                                <text x="28" y="16" font-family="Arial" font-size="14" font-weight="bold" fill="#009cde">Pal</text>
+                            </svg>
+                            <span style="font-size:14px; font-weight:700; color:#003087;">
+                                ${isEN ? 'Pay with PayPal' : 'Pagar con PayPal'}
+                            </span>
+                        </button>
+                    </div>
+
                     <div id="paypal-error-${id}"
                         style="color:#e74c3c; font-size:12px; margin-top:8px; font-weight:600; display:none; text-align:center;">
                     </div>
 
                     <!-- Nota de seguridad -->
-                    <p style="text-align:center; font-size:10px; color:#bbb; margin-top:14px; font-family:var(--font-body);">
-                        <i class="fas fa-shield-alt"></i>
+                    <p style="text-align:center; font-size:10px; color:#bbb; margin-top:14px;
+                               font-family:var(--font-body); line-height:1.5;">
+                        <i class="fas fa-shield-alt" style="color:#00a651; margin-right:4px;"></i>
                         ${isEN
-                            ? 'Your payment is processed on Stripe or PayPal\'s secure servers. We never store your card data.'
-                            : 'Tu pago se procesa en los servidores seguros de Stripe o PayPal. Nunca almacenamos tus datos de tarjeta.'}
+                            ? 'Your payment is processed directly on Stripe or PayPal\'s secure servers. We never store your card data.'
+                            : 'Tu pago se procesa directamente en los servidores de Stripe o PayPal. Nunca almacenamos tus datos de tarjeta.'}
                     </p>
 
                 </div><!-- /payment-block -->
@@ -3563,15 +3605,90 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
                     onError: (err) => {
                         console.error('PayPal SDK error:', err);
-                        _setPayPalError(id, isEN
-                            ? '\u26a0\ufe0f PayPal error. Please try card payment.'
-                            : '\u26a0\ufe0f Error de PayPal. Intenta con tarjeta.');
+                        // SDK falló → mostrar botón estático de fallback
+                        container.style.display = 'none';
+                        const fb = document.getElementById('paypal-fallback-' + id);
+                        if (fb) fb.style.display = 'block';
                     }
-                }).render('#paypal-button-container-' + id);
+                }).render('#paypal-button-container-' + id).catch(() => {
+                    // render() falló → botón estático
+                    container.style.display = 'none';
+                    const fb = document.getElementById('paypal-fallback-' + id);
+                    if (fb) fb.style.display = 'block';
+                });
             } else {
-                container.innerHTML = '<p style="color:#e74c3c;font-size:12px;text-align:center;">' +
-                    (isEN ? 'PayPal unavailable. Check Client ID.' : 'PayPal no disponible. Verifica tu Client ID.') + '</p>';
+                // SDK no cargó → mostrar botón estático directamente
+                container.style.display = 'none';
+                const fb = document.getElementById('paypal-fallback-' + id);
+                if (fb) fb.style.display = 'block';
             }
+        }
+    }
+
+    // ─── PayPal estático: crea orden y redirige a PayPal ───────────────
+    async function pagarConPayPal(id, datosCard) {
+        const isEN = currentLang === 'en';
+
+        const moneda       = document.getElementById('moneda') ? document.getElementById('moneda').value : 'USD';
+        const basePrice    = parseFloat((datosCard.precio || '0').replace(/[^0-9.]/g, '')) || 0;
+        const extras       = getExtrasTotal(id);
+        const totalFinal   = Math.round((basePrice + extras) * 100) / 100;
+        const currencyCode = moneda === 'MXN' ? 'MXN' : moneda === 'CAD' ? 'CAD' : 'USD';
+
+        // Construir datos completos ANTES de salir de la página
+        const datosVenta = _construirDatosVenta(id, datosCard, 'PayPal Checkout');
+        datosVenta.precioTotal = '$' + totalFinal + ' ' + moneda.toUpperCase();
+        sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datosVenta));
+
+        document.getElementById('loadingOverlay').style.display = 'flex';
+
+        const siteUrl = window.location.origin + window.location.pathname;
+
+        try {
+            const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    method:           'paypal',
+                    action:           'create-order',
+                    amount:           totalFinal.toFixed(2),
+                    currency:         currencyCode,
+                    bookingCode:      datosVenta.codigo,
+                    vehicle:          datosCard.vehiculo || '',
+                    // URLs de retorno — PayPal regresará aquí tras el pago
+                    returnUrl:        siteUrl + '?payment=paypal-success&token=PAYPAL_TOKEN&PayerID=PAYER_ID',
+                    cancelPayPalUrl:  siteUrl + '?payment=cancelled'
+                })
+            });
+            if (!res.ok) throw new Error('Worker HTTP ' + res.status);
+            const json    = await res.json();
+            const orderID = json.orderID || json.id;
+            if (!orderID) throw new Error('No orderID from Worker');
+
+            // Redirigir al checkout oficial de PayPal (sandbox o producción)
+            const isSandbox = WORKER_PAGOS_URL.includes('sandbox') ||
+                              window.location.hostname.includes('localhost') ||
+                              document.querySelector('script[src*="sandbox.paypal"]') !== null;
+            // Detectar sandbox por el Client ID en el SDK
+            const sdkScript = document.querySelector('script[src*="paypal.com/sdk"]');
+            const clientId  = sdkScript ? new URL(sdkScript.src).searchParams.get('client-id') : '';
+            // Client IDs de sandbox empiezan con 'A' y son más largos; usamos la URL base del worker
+            const useSandbox = WORKER_PAGOS_URL.includes('sandbox') ||
+                               (typeof AcRsDfJPus !== 'undefined') ||
+                               clientId.startsWith('A'); // sandbox client IDs
+            const paypalBase = useSandbox
+                ? 'https://www.sandbox.paypal.com'
+                : 'https://www.paypal.com';
+
+            window.location.href = paypalBase + '/checkoutnow?token=' + orderID;
+
+        } catch (e) {
+            document.getElementById('loadingOverlay').style.display = 'none';
+            console.error('PayPal static error:', e);
+            sessionStorage.removeItem('ltr_pendingBooking');
+            alert(isEN
+                ? '⚠️ Connection error. Please try card payment or contact us.'
+                : '⚠️ Error de conexión. Intenta pagar con tarjeta o contáctanos.');
         }
     }
 
@@ -3667,13 +3784,16 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         iniciarEnvio(datosVenta);
     }
 
-    // ─── Al cargar la p\u00e1gina: detectar regreso desde Stripe ──────────
-    (function detectarRetornoStripe() {
+    // ─── Al cargar la p\u00e1gina: detectar regreso desde Stripe o PayPal ──
+    (function detectarRetornoPago() {
         const params  = new URLSearchParams(window.location.search);
         const payment = params.get('payment');
         if (!payment) return;
+
+        // Limpiar URL inmediatamente
         window.history.replaceState({}, '', window.location.pathname);
 
+        // ── Stripe regresó exitosamente ──────────────────────────────
         if (payment === 'success') {
             const raw = sessionStorage.getItem('ltr_pendingBooking');
             if (raw) {
@@ -3682,10 +3802,76 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     sessionStorage.removeItem('ltr_pendingBooking');
                     setTimeout(() => _finalizarDesdeStripe(datosVenta), 600);
                 } catch (e) {
-                    console.error('Error al procesar regreso de Stripe:', e);
+                    console.error('Error procesando regreso de Stripe:', e);
                 }
             }
-        } else if (payment === 'cancelled') {
+            return;
+        }
+
+        // ── PayPal regresó exitosamente ──────────────────────────────
+        if (payment === 'paypal-success') {
+            const token   = params.get('token');    // orderID de PayPal
+            const payerID = params.get('PayerID');  // ID del comprador
+
+            if (!token) {
+                console.error('PayPal return sin token');
+                return;
+            }
+
+            const raw = sessionStorage.getItem('ltr_pendingBooking');
+            if (!raw) {
+                console.error('No hay datos de reserva en sessionStorage');
+                return;
+            }
+
+            let datosVenta;
+            try {
+                datosVenta = JSON.parse(raw);
+                sessionStorage.removeItem('ltr_pendingBooking');
+            } catch (e) {
+                console.error('Error parseando datos de reserva:', e);
+                return;
+            }
+
+            // Capturar el pago en el Worker
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            setTimeout(async () => {
+                try {
+                    const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
+                        method:  'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            method:      'paypal',
+                            action:      'capture-order',
+                            orderID:     token,
+                            bookingCode: datosVenta.codigo
+                        })
+                    });
+                    if (!res.ok) throw new Error('Capture HTTP ' + res.status);
+                    const capture       = await res.json();
+                    const captureStatus = capture.status ||
+                        capture.purchase_units?.[0]?.payments?.captures?.[0]?.status;
+
+                    if (captureStatus === 'COMPLETED') {
+                        // ✅ Pago capturado — finalizar reserva
+                        _finalizarDesdeStripe(datosVenta); // misma función, reutilizamos
+                    } else {
+                        throw new Error('Capture status: ' + captureStatus);
+                    }
+                } catch (e) {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    console.error('PayPal capture al regresar:', e);
+                    alert(currentLang === 'en'
+                        ? '⚠️ Payment could not be confirmed. Please contact us via WhatsApp with your booking code: ' + datosVenta.codigo
+                        : '⚠️ El pago no pudo confirmarse. Contáctanos por WhatsApp con tu código: ' + datosVenta.codigo);
+                }
+            }, 500);
+            return;
+        }
+
+        // ── Pago cancelado ───────────────────────────────────────────
+        if (payment === 'cancelled') {
+            sessionStorage.removeItem('ltr_pendingBooking');
             setTimeout(() => {
                 alert(currentLang === 'en'
                     ? "Payment cancelled. You can try again whenever you're ready."
