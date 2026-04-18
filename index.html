@@ -92,8 +92,12 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             border: none; outline: none; background: transparent;
             font-size: 15px; font-weight: 600; color: #333;
             width: 100%; font-family: var(--font-body);
-            cursor: pointer; display: flex; align-items: center; gap: 4px;
+            cursor: pointer; display: flex; align-items: center;
+            justify-content: space-between;
             min-height: 25px;
+        }
+        .pax-display .pax-arrow {
+            color: #555; font-size: 12px; flex-shrink: 0;
         }
         .pax-dropdown {
             display: none;
@@ -598,30 +602,64 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             .tarjeta-price { border-left: none; padding-left: 0; border-top: 1px solid #eee; padding-top: 15px; text-align: right; flex-direction: column; align-items: flex-end; justify-content: flex-start; flex: auto; width: 100%; gap: 10px; } 
             .btn-reservar { width: 100%; padding: 14px 20px; margin-top: 0; font-size: 14px; }
             /* EXTRAS: carrusel horizontal en mobile */
+            .extras-carousel-wrapper {
+                position: relative;
+            }
+            .extras-carousel-btn {
+                display: flex;
+                position: absolute;
+                top: 50%; transform: translateY(-50%);
+                z-index: 10;
+                width: 30px; height: 30px;
+                border-radius: 50%;
+                background: var(--navy-bg);
+                color: #fff;
+                border: none;
+                cursor: pointer;
+                align-items: center;
+                justify-content: center;
+                font-size: 14px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            }
+            .extras-carousel-btn.prev { left: -14px; }
+            .extras-carousel-btn.next { right: -14px; }
             .extras-grid-4, .extras-ow-grid,
             div[style*="grid-template-columns:repeat(3,1fr)"],
             div[style*="grid-template-columns:1fr 1fr 1fr"] {
                 display: flex !important;
                 flex-direction: row !important;
                 overflow-x: auto !important;
-                gap: 8px !important;
+                gap: 10px !important;
                 scroll-snap-type: x mandatory !important;
                 -webkit-overflow-scrolling: touch !important;
-                padding-bottom: 6px !important;
+                padding-bottom: 4px !important;
                 scrollbar-width: none !important;
                 grid-template-columns: unset !important;
                 flex-wrap: nowrap !important;
+                scroll-behavior: smooth !important;
             }
             .extras-grid-4::-webkit-scrollbar,
             .extras-ow-grid::-webkit-scrollbar { display: none !important; }
             .extras-grid-4 > div, .extras-ow-grid > div,
             div[style*="grid-template-columns:repeat(3,1fr)"] > div,
             div[style*="grid-template-columns:1fr 1fr 1fr"] > div {
-                flex: 0 0 42vw !important;
+                flex: 0 0 44vw !important;
                 min-width: 130px !important;
-                max-width: 160px !important;
-                scroll-snap-align: start !important;
+                max-width: 165px !important;
+                scroll-snap-align: center !important;
                 box-sizing: border-box !important;
+                align-items: center !important;
+            }
+            /* Center card content on mobile */
+            .extras-grid-4 > div > div,
+            .extras-ow-grid > div > div,
+            div[style*="grid-template-columns:repeat(3,1fr)"] > div > div {
+                text-align: center !important;
+            }
+            .extras-grid-4 > div > div > div,
+            .extras-ow-grid > div > div > div,
+            div[style*="grid-template-columns:repeat(3,1fr)"] > div > div > div {
+                justify-content: center !important;
             }
             .extra-card-ow { flex-direction: column !important; align-items: flex-start !important; gap: 6px !important; padding: 8px 10px !important; }
             .extra-card-ow > div { width: 100% !important; justify-content: center !important; }
@@ -990,7 +1028,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                             <label id="label-pax-rt">PASSENGERS</label>
                             <div class="pax-wrapper">
                                 <div class="pax-display" onclick="togglePaxDropdown('pax-drop-rt', event)">
-                                    <span id="pax-val-rt">1</span> <span style="color:#aaa;font-size:11px;">▼</span>
+                                    <span id="pax-val-rt">1</span><span class="pax-arrow">&#8964;</span>
                                 </div>
                                 <select id="pasajeros" style="display:none;">
                                     <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16+">16+</option>
@@ -1042,7 +1080,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                             </select>
                             <div class="pax-wrapper">
                                 <div class="pax-display" onclick="togglePaxDropdown('pax-drop-ow', event)">
-                                    <span id="pax-val-ow">1</span> <span style="color:#aaa;font-size:11px;">▼</span>
+                                    <span id="pax-val-ow">1</span><span class="pax-arrow">&#8964;</span>
                                 </div>
                                 <div id="pax-drop-ow" class="pax-dropdown">
                                     <div class="pax-option selected" onclick="selectPax('pax-drop-ow','pasajerosOneWay','pax-val-ow',1)">1</div>
@@ -2159,10 +2197,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             btn.disabled = false;
             btn.innerHTML = '<span style="display:flex; align-items:center; gap:12px;">' +
                 '<span style="display:flex; gap:5px; align-items:center;">' +
-                '<svg width="38" height="24" viewBox="0 0 38 24" style="border:1px solid #e2e8f0;border-radius:4px;flex-shrink:0;"><rect width="38" height="24" rx="4" fill="#fff"/><text x="5" y="17" font-family="Arial" font-size="11" font-weight="900" fill="#1a1f71">VISA</text></svg>' +
-                '<svg width="38" height="24" viewBox="0 0 38 24" style="border:1px solid #e2e8f0;border-radius:4px;flex-shrink:0;"><rect width="38" height="24" rx="4" fill="#fff"/><circle cx="15" cy="12" r="7" fill="#eb001b"/><circle cx="23" cy="12" r="7" fill="#f79e1b"/><path d="M19 6.8a7 7 0 0 1 0 10.4A7 7 0 0 1 19 6.8z" fill="#ff5f00"/></svg>' +
-                '<svg width="38" height="24" viewBox="0 0 38 24" style="border:1px solid #e2e8f0;border-radius:4px;flex-shrink:0;"><rect width="38" height="24" rx="4" fill="#007bc1"/><text x="4" y="17" font-family="Arial" font-size="9" font-weight="900" fill="#fff">AMEX</text></svg>' +
-                '<svg width="38" height="24" viewBox="0 0 38 24" style="border:1px solid #e2e8f0;border-radius:4px;flex-shrink:0;"><rect width="38" height="24" rx="4" fill="#fff"/><circle cx="24" cy="12" r="7" fill="#f76f20"/><text x="3" y="16" font-family="Arial" font-size="7" font-weight="700" fill="#231f20">DISC</text></svg>' +
+                '<svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;"><rect width="38" height="24" rx="4" fill="#fff"/><text x="5" y="17" font-family="Arial" font-size="11" font-weight="900" fill="#1a1f71">VISA</text></svg>' +
+                '<svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;"><rect width="38" height="24" rx="4" fill="#fff"/><circle cx="15" cy="12" r="7" fill="#eb001b"/><circle cx="23" cy="12" r="7" fill="#f79e1b"/><path d="M19 6.8a7 7 0 0 1 0 10.4A7 7 0 0 1 19 6.8z" fill="#ff5f00"/></svg>' +
+                '<svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;"><rect width="38" height="24" rx="4" fill="#007bc1"/><text x="4" y="17" font-family="Arial" font-size="9" font-weight="900" fill="#fff">AMEX</text></svg>' +
+                '<svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;"><rect width="38" height="24" rx="4" fill="#fff"/><circle cx="24" cy="12" r="7" fill="#f76f20"/><text x="3" y="16" font-family="Arial" font-size="7" font-weight="700" fill="#231f20">DISC</text></svg>' +
                 '</span>' +
                 '<span style="color:#1a1a2e; font-weight:700;">' + (isEN ? 'Pay with Card' : 'Pagar con Tarjeta') + '</span>' +
                 '</span>' +
@@ -3317,21 +3355,21 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         <span style="display:flex; align-items:center; gap:12px;">
                             <!-- Logos reales de tarjetas -->
                             <span style="display:flex; gap:5px; align-items:center;">
-                                <svg width="38" height="24" viewBox="0 0 38 24" style="border:1px solid #e2e8f0;border-radius:4px;flex-shrink:0;">
+                                <svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;">
                                     <rect width="38" height="24" rx="4" fill="#fff"/>
                                     <text x="5" y="17" font-family="Arial" font-size="11" font-weight="900" fill="#1a1f71">VISA</text>
                                 </svg>
-                                <svg width="38" height="24" viewBox="0 0 38 24" style="border:1px solid #e2e8f0;border-radius:4px;flex-shrink:0;">
+                                <svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;">
                                     <rect width="38" height="24" rx="4" fill="#fff"/>
                                     <circle cx="15" cy="12" r="7" fill="#eb001b"/>
                                     <circle cx="23" cy="12" r="7" fill="#f79e1b"/>
                                     <path d="M19 6.8a7 7 0 0 1 0 10.4A7 7 0 0 1 19 6.8z" fill="#ff5f00"/>
                                 </svg>
-                                <svg width="38" height="24" viewBox="0 0 38 24" style="border:1px solid #e2e8f0;border-radius:4px;flex-shrink:0;">
+                                <svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;">
                                     <rect width="38" height="24" rx="4" fill="#007bc1"/>
                                     <text x="4" y="17" font-family="Arial" font-size="9" font-weight="900" fill="#fff">AMEX</text>
                                 </svg>
-                                <svg width="38" height="24" viewBox="0 0 38 24" style="border:1px solid #e2e8f0;border-radius:4px;flex-shrink:0;">
+                                <svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;">
                                     <rect width="38" height="24" rx="4" fill="#fff"/>
                                     <circle cx="24" cy="12" r="7" fill="#f76f20"/>
                                     <text x="3" y="16" font-family="Arial" font-size="7" font-weight="700" fill="#231f20">DISC</text>
@@ -4391,6 +4429,39 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             document.body.style.overflow = 'hidden';
         }
     }
+    // ── EXTRAS CAROUSEL ARROWS (mobile only) ─────────────────────────────────
+    function initExtrasCarousels() {
+        if (window.innerWidth > 600) return; // Only on mobile
+        document.querySelectorAll('.extras-grid-4, .extras-ow-grid, [style*="grid-template-columns:repeat(3,1fr)"]').forEach(function(grid) {
+            if (grid.closest('.extras-carousel-wrapper')) return; // Already wrapped
+            const wrapper = document.createElement('div');
+            wrapper.className = 'extras-carousel-wrapper';
+            grid.parentNode.insertBefore(wrapper, grid);
+            wrapper.appendChild(grid);
+
+            const btnPrev = document.createElement('button');
+            btnPrev.className = 'extras-carousel-btn prev';
+            btnPrev.innerHTML = '&#8592;';
+            btnPrev.setAttribute('type', 'button');
+            btnPrev.onclick = function() { grid.scrollBy({ left: -170, behavior: 'smooth' }); };
+
+            const btnNext = document.createElement('button');
+            btnNext.className = 'extras-carousel-btn next';
+            btnNext.innerHTML = '&#8594;';
+            btnNext.setAttribute('type', 'button');
+            btnNext.onclick = function() { grid.scrollBy({ left: 170, behavior: 'smooth' }); };
+
+            wrapper.appendChild(btnPrev);
+            wrapper.appendChild(btnNext);
+        });
+    }
+    // Re-init carousels whenever results render (MutationObserver on results container)
+    (function() {
+        const target = document.getElementById('resultados') || document.body;
+        const obs = new MutationObserver(function() { setTimeout(initExtrasCarousels, 100); });
+        obs.observe(target, { childList: true, subtree: true });
+    })();
+
     function cerrarCupon() {
         document.getElementById('cupon-overlay').style.display = 'none';
         document.body.style.overflow = '';
