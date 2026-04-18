@@ -312,17 +312,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             font-family: 'Open Sans', sans-serif;
             cursor: pointer;
         }
-        .time-wrapper { display:flex; align-items:center; gap:4px; width:100%; }
-        .time-wrapper input[type="time"] { flex:1; }
-        .time-arrows { display:flex; flex-direction:column; gap:1px; flex-shrink:0; }
-        .time-arrows button {
-            border:none; background:#f0f4f8; color:var(--navy-bg); cursor:pointer;
-            width:20px; height:18px; border-radius:3px; font-size:10px; line-height:1;
-            display:flex; align-items:center; justify-content:center;
-            transition:background 0.15s;
-        }
-        .time-arrows button:hover { background:var(--navy-bg); color:#fff; }
-        @media (max-width: 768px) { .time-arrows { display:none; } }
 
         /* WHEEL PICKER ESTILO iOS — Android only */
         .wheel-item {
@@ -1420,142 +1409,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         return { h: String(h).padStart(2,'0'), m, ap };
     }
 
-    function replaceTimeInput(inputId) {
-        const input = document.getElementById(inputId);
-        if (!input || !isMobile) return;
-
-        const uid = inputId;
-        const hours12 = Array.from({length:12},(_,i)=>String(i+1).padStart(2,'0'));
-        const mins5   = Array.from({length:12},(_,i)=>String(i*5).padStart(2,'0'));
-        const ampmVals = ['AM','PM'];
-
-        const init = input.value ? from24h(input.value) : {h:'06',m:'00',ap:'AM'};
-
-        const display = document.createElement('div');
-        display.id = 'wd-display-'+uid;
-        display.style.cssText = 'font-size:14px;font-weight:600;color:#333;cursor:pointer;font-family:var(--font-body);padding:4px 0;display:flex;align-items:center;gap:6px;';
-        display.innerHTML = `<span id="wd-txt-${uid}">${init.h}:${init.m} ${init.ap}</span> <i class="fas fa-clock" style="color:#aaa;font-size:12px;"></i>`;
-
-        const overlay = document.createElement('div');
-        overlay.id = 'wd-overlay-'+uid;
-        overlay.style.cssText = 'display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:99999;align-items:flex-end;justify-content:center;';
-
-        const lblCancel = () => currentLang === 'en' ? 'Cancel' : 'Cancelar';
-        const lblTitle  = () => currentLang === 'en' ? 'Time'   : 'Hora';
-        const lblOk     = () => currentLang === 'en' ? 'Done'   : 'Listo';
-
-        overlay.innerHTML = `
-        <div style="background:#f9f9f9;width:100%;border-radius:16px 16px 0 0;padding-bottom:env(safe-area-inset-bottom);">
-            <div style="display:flex;justify-content:space-between;padding:14px 20px;border-bottom:0.5px solid #ddd;">
-                <button id="wd-cancel-${uid}" style="border:none;background:none;font-size:16px;color:#888;cursor:pointer;font-family:var(--font-body);"></button>
-                <span id="wd-title-${uid}" style="font-size:16px;font-weight:700;color:#333;font-family:var(--font-title);"></span>
-                <button id="wd-ok-${uid}" style="border:none;background:none;font-size:16px;font-weight:700;color:#007AFF;cursor:pointer;font-family:var(--font-body);"></button>
-            </div>
-
-            <!-- Flechas arriba -->
-            <div style="display:flex;padding:6px 20px 0;gap:4px;">
-                <div style="flex:1;text-align:center;">
-                    <button id="wd-up-h-${uid}" style="border:none;background:none;font-size:20px;color:var(--navy-bg);cursor:pointer;padding:4px 16px;border-radius:6px;line-height:1;" onmouseover="this.style.background='#e8f0fb'" onmouseout="this.style.background='none'">&#9650;</button>
-                </div>
-                <div style="flex:0 0 12px;"></div>
-                <div style="flex:1;text-align:center;">
-                    <button id="wd-up-m-${uid}" style="border:none;background:none;font-size:20px;color:var(--navy-bg);cursor:pointer;padding:4px 16px;border-radius:6px;line-height:1;" onmouseover="this.style.background='#e8f0fb'" onmouseout="this.style.background='none'">&#9650;</button>
-                </div>
-                <div style="width:8px;"></div>
-                <div style="flex:1;text-align:center;">
-                    <button id="wd-up-ap-${uid}" style="border:none;background:none;font-size:20px;color:var(--navy-bg);cursor:pointer;padding:4px 16px;border-radius:6px;line-height:1;" onmouseover="this.style.background='#e8f0fb'" onmouseout="this.style.background='none'">&#9650;</button>
-                </div>
-            </div>
-
-            <div style="position:relative;height:180px;overflow:hidden;background:#f9f9f9;">
-                <div style="position:absolute;top:0;left:0;right:0;height:60px;background:linear-gradient(to bottom,#f9f9f9,transparent);z-index:2;pointer-events:none;"></div>
-                <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(to top,#f9f9f9,transparent);z-index:2;pointer-events:none;"></div>
-                <div style="position:absolute;top:50%;left:0;right:0;height:44px;transform:translateY(-50%);border-top:0.5px solid #ccc;border-bottom:0.5px solid #ccc;z-index:1;pointer-events:none;"></div>
-                <div style="display:flex;height:100%;padding:0 20px;gap:4px;">
-                    <div id="wd-h-${uid}"  style="flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none;"></div>
-                    <div style="display:flex;align-items:center;font-size:22px;font-weight:500;color:#333;z-index:3;">:</div>
-                    <div id="wd-m-${uid}"  style="flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none;"></div>
-                    <div style="width:8px;"></div>
-                    <div id="wd-ap-${uid}" style="flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none;"></div>
-                </div>
-            </div>
-
-            <!-- Flechas abajo -->
-            <div style="display:flex;padding:0 20px 6px;gap:4px;">
-                <div style="flex:1;text-align:center;">
-                    <button id="wd-dn-h-${uid}" style="border:none;background:none;font-size:20px;color:var(--navy-bg);cursor:pointer;padding:4px 16px;border-radius:6px;line-height:1;" onmouseover="this.style.background='#e8f0fb'" onmouseout="this.style.background='none'">&#9660;</button>
-                </div>
-                <div style="flex:0 0 12px;"></div>
-                <div style="flex:1;text-align:center;">
-                    <button id="wd-dn-m-${uid}" style="border:none;background:none;font-size:20px;color:var(--navy-bg);cursor:pointer;padding:4px 16px;border-radius:6px;line-height:1;" onmouseover="this.style.background='#e8f0fb'" onmouseout="this.style.background='none'">&#9660;</button>
-                </div>
-                <div style="width:8px;"></div>
-                <div style="flex:1;text-align:center;">
-                    <button id="wd-dn-ap-${uid}" style="border:none;background:none;font-size:20px;color:var(--navy-bg);cursor:pointer;padding:4px 16px;border-radius:6px;line-height:1;" onmouseover="this.style.background='#e8f0fb'" onmouseout="this.style.background='none'">&#9660;</button>
-                </div>
-            </div>
-        </div>`;
-
-        document.body.appendChild(overlay);
-
-        const colH  = overlay.querySelector('#wd-h-'+uid);
-        const colM  = overlay.querySelector('#wd-m-'+uid);
-        const colAP = overlay.querySelector('#wd-ap-'+uid);
-
-        wheelBuildCol(colH,  hours12);
-        wheelBuildCol(colM,  mins5);
-        wheelBuildCol(colAP, ampmVals);
-
-        [colH,colM,colAP].forEach(c=>c.addEventListener('scroll',()=>wheelHighlight(c)));
-
-        // Flechas ▲▼ para desktop
-        function wheelStep(col, dir) {
-            col.scrollBy({ top: dir * 44, behavior: 'smooth' });
-            setTimeout(() => wheelHighlight(col), 200);
-        }
-        overlay.querySelector('#wd-up-h-'+uid).addEventListener('click',  () => wheelStep(colH,  -1));
-        overlay.querySelector('#wd-dn-h-'+uid).addEventListener('click',  () => wheelStep(colH,  +1));
-        overlay.querySelector('#wd-up-m-'+uid).addEventListener('click',  () => wheelStep(colM,  -1));
-        overlay.querySelector('#wd-dn-m-'+uid).addEventListener('click',  () => wheelStep(colM,  +1));
-        overlay.querySelector('#wd-up-ap-'+uid).addEventListener('click', () => wheelStep(colAP, -1));
-        overlay.querySelector('#wd-dn-ap-'+uid).addEventListener('click', () => wheelStep(colAP, +1));
-
-        display.addEventListener('click', ()=>{
-            overlay.style.display = 'flex';
-            // Actualizar labels según idioma actual
-            overlay.querySelector('#wd-cancel-'+uid).textContent = lblCancel();
-            overlay.querySelector('#wd-title-'+uid).textContent  = lblTitle();
-            overlay.querySelector('#wd-ok-'+uid).textContent     = lblOk();
-            // Bloquear scroll del fondo
-            document.body.style.overflow = 'hidden';
-            const cur = from24h(input.value || '06:00');
-            wheelScrollToIdx(colH,  hours12.indexOf(cur.h));
-            wheelScrollToIdx(colM,  mins5.indexOf(cur.m) > -1 ? mins5.indexOf(cur.m) : 0);
-            wheelScrollToIdx(colAP, ampmVals.indexOf(cur.ap));
-            setTimeout(()=>{[colH,colM,colAP].forEach(c=>wheelHighlight(c));},50);
-        });
-
-        overlay.querySelector('#wd-cancel-'+uid).addEventListener('click',()=>{
-            overlay.style.display='none';
-            document.body.style.overflow='';
-        });
-        overlay.querySelector('#wd-ok-'+uid).addEventListener('click',()=>{
-            const h  = wheelGetSelected(colH);
-            const m  = wheelGetSelected(colM);
-            const ap = wheelGetSelected(colAP);
-            const h24 = to24h(h, ap);
-            input.value = h24+':'+m;
-            input.dispatchEvent(new Event('input',{bubbles:true}));
-            input.dispatchEvent(new Event('change',{bubbles:true}));
-            document.querySelector('#wd-txt-'+uid).textContent = h+':'+m+' '+ap;
-            overlay.style.display='none';
-            document.body.style.overflow='';
-        });
-
-        input.style.display = 'none';
-        input.parentNode.insertBefore(display, input.nextSibling);
-    }
-
+    function replaceTimeInput(inputId) { /* usa picker nativo */ }
     function adjustScrollMargin() {
         const header = document.querySelector('header');
         if(header) {
@@ -2160,22 +2014,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         // Reemplazar todos los inputs de hora con selector personalizado (móvil)
         ['horaIda', 'horaIdaRT', 'horaVuelta', 'custom-hora', 'custom-hora-regreso'].forEach(replaceTimeInput);
-
-        // Agregar flechas ▲▼ para desktop (ocultas en móvil via CSS)
-        ['horaIda', 'horaIdaRT', 'horaVuelta', 'custom-hora', 'custom-hora-regreso'].forEach(function(inputId) {
-            const input = document.getElementById(inputId);
-            if (!input || input.parentElement.classList.contains('time-wrapper')) return;
-            const wrapper = document.createElement('div');
-            wrapper.className = 'time-wrapper';
-            input.parentNode.insertBefore(wrapper, input);
-            wrapper.appendChild(input);
-            const arrows = document.createElement('div');
-            arrows.className = 'time-arrows';
-            arrows.innerHTML =
-                '<button type="button" title="+" onclick="(function(i){var p=i.value.split(\':\');var h=parseInt(p[0])||0;var m=parseInt(p[1])||0;h=(h+1)%24;i.value=(h<10?\'0\'+h:h)+\':\'+(m<10?\'0\'+m:m);i.dispatchEvent(new Event(\'input\'));})(document.getElementById(\''+inputId+'\'))">&#9650;</button>' +
-                '<button type="button" title="-" onclick="(function(i){var p=i.value.split(\':\');var h=parseInt(p[0])||0;var m=parseInt(p[1])||0;h=(h+23)%24;i.value=(h<10?\'0\'+h:h)+\':\'+(m<10?\'0\'+m:m);i.dispatchEvent(new Event(\'input\'));})(document.getElementById(\''+inputId+'\'))">&#9660;</button>';
-            wrapper.appendChild(arrows);
-        });
     };
 
     function initSlider() {
