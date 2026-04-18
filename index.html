@@ -83,6 +83,16 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         html { scroll-behavior: smooth; }
 
+        /* Hover glow on PayPal SDK button */
+        [id^="paypal-button-container-"] {
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            border-radius: 8px;
+        }
+        [id^="paypal-button-container-"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 0 3px rgba(255,196,57,0.45), 0 8px 24px rgba(0,0,0,0.15) !important;
+        }
+
         body {
             font-family: var(--font-body);
             margin: 0; padding: 0; color: var(--dark-gray); background-color: var(--white);
@@ -234,7 +244,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         /* CALCULADORA */
         #seccion-quote { 
-            position: relative; background-color: #f4f4f4; min-height: 100vh;
+            position: relative;
+            background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.35)),
+                url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&auto=format&fit=crop&q=80');
+            background-size: cover; background-position: center center; background-attachment: fixed;
+            min-height: 100vh;
             display: flex; align-items: center; justify-content: center; flex-direction: column;
             padding: 30px 0 50px 0; z-index: 1;
         }
@@ -245,11 +259,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             color: var(--gold); text-align: center; font-size: 32px; margin-bottom: 25px;
             font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase;
             line-height: 1.2; font-family: var(--font-title);
+            text-shadow: 0 2px 12px rgba(0,0,0,0.6);
         }
 
         #calc-subtitle {
             font-size: 18px; font-weight: 400; text-transform: none; display: block;
-            margin-top: 5px; color: #555; font-family: var(--font-body);
+            margin-top: 5px; color: rgba(255,255,255,0.85); font-family: var(--font-body);
+            text-shadow: 0 1px 6px rgba(0,0,0,0.5);
         }
         
         .search-box-container { 
@@ -2989,7 +3005,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                                 <span style="position:absolute; top:8px; left:8px; background:var(--navy-bg); color:#fff; font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; padding:3px 7px; border-radius:20px; font-family:var(--font-title);">${isEN ? 'Trip' : 'Ida'}</span>
                             </div>
                             <div style="padding:12px 12px 14px;">
-                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:8px;">${isEN ? 'Premium Glass Water Bottle' : 'Botella de Agua Premium'}</div>
+                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:8px;">${isEN ? 'Bottled Water' : 'Botella de Agua'}</div>
                                 <div style="display:flex; align-items:center; justify-content:space-between;">
                                     <span style="font-size:16px; font-weight:800; color:var(--text-dark); font-family:var(--font-title);">${formatExtraPrice(2)}</span>
                                     <div style="display:flex; align-items:center; gap:6px;">
@@ -3008,7 +3024,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                                 <span style="position:absolute; top:8px; left:8px; background:var(--navy-bg); color:#fff; font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; padding:3px 7px; border-radius:20px; font-family:var(--font-title);">${isEN ? 'Trip' : 'Ida'}</span>
                             </div>
                             <div style="padding:12px 12px 14px;">
-                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:8px;">${isEN ? 'Local Craft Beer Pint' : 'Cerveza Artesanal Local'}</div>
+                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:8px;">${isEN ? 'Ice-Cold Beer' : 'Cerveza Fría'}</div>
                                 <div style="display:flex; align-items:center; justify-content:space-between;">
                                     <span style="font-size:16px; font-weight:800; color:var(--text-dark); font-family:var(--font-title);">${formatExtraPrice(4)}</span>
                                     <div style="display:flex; align-items:center; gap:6px;">
@@ -3034,7 +3050,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                                 <span style="position:absolute; top:8px; left:8px; background:var(--navy-bg); color:#fff; font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; padding:3px 7px; border-radius:20px; font-family:var(--font-title);">${isEN ? 'Trip' : 'Ida'}</span>
                             </div>
                             <div style="padding:12px 12px 14px;">
-                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:8px;">${isEN ? 'Strategic 20-Min Local Stop' : 'Parada Estratégica 20 Min'}</div>
+                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:8px;">${isEN ? 'Quick 20-Minute Stop' : 'Parada Rápida 20 Min'}</div>
                                 <div style="display:flex; align-items:center; justify-content:space-between;">
                                     <span style="font-size:16px; font-weight:800; color:var(--text-dark); font-family:var(--font-title);">${formatExtraPrice(25)}</span>
                                     <div style="display:flex; align-items:center; gap:6px;">
@@ -3053,7 +3069,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                                 <span style="position:absolute; top:8px; left:8px; background:#555; color:#fff; font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; padding:3px 7px; border-radius:20px; font-family:var(--font-title);">${isEN ? 'Return' : 'Regreso'}</span>
                             </div>
                             <div style="padding:12px 12px 14px;">
-                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:8px;">${isEN ? 'Premium Glass Water Bottle' : 'Botella de Agua Premium'}</div>
+                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:8px;">${isEN ? 'Bottled Water' : 'Botella de Agua'}</div>
                                 <div style="display:flex; align-items:center; justify-content:space-between;">
                                     <span style="font-size:16px; font-weight:800; color:var(--text-dark); font-family:var(--font-title);">${formatExtraPrice(2)}</span>
                                     <div style="display:flex; align-items:center; gap:6px;">
@@ -3072,7 +3088,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                                 <span style="position:absolute; top:8px; left:8px; background:#555; color:#fff; font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; padding:3px 7px; border-radius:20px; font-family:var(--font-title);">${isEN ? 'Return' : 'Regreso'}</span>
                             </div>
                             <div style="padding:12px 12px 14px;">
-                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:8px;">${isEN ? 'Local Craft Beer Pint' : 'Cerveza Artesanal Local'}</div>
+                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:8px;">${isEN ? 'Ice-Cold Beer' : 'Cerveza Fría'}</div>
                                 <div style="display:flex; align-items:center; justify-content:space-between;">
                                     <span style="font-size:16px; font-weight:800; color:var(--text-dark); font-family:var(--font-title);">${formatExtraPrice(4)}</span>
                                     <div style="display:flex; align-items:center; gap:6px;">
@@ -3098,7 +3114,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                                 <span style="position:absolute; top:8px; left:8px; background:#555; color:#fff; font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; padding:3px 7px; border-radius:20px; font-family:var(--font-title);">${isEN ? 'Return' : 'Regreso'}</span>
                             </div>
                             <div style="padding:12px 12px 14px;">
-                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:8px;">${isEN ? 'Strategic 20-Min Local Stop' : 'Parada Estratégica 20 Min'}</div>
+                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:8px;">${isEN ? 'Quick 20-Minute Stop' : 'Parada Rápida 20 Min'}</div>
                                 <div style="display:flex; align-items:center; justify-content:space-between;">
                                     <span style="font-size:16px; font-weight:800; color:var(--text-dark); font-family:var(--font-title);">${formatExtraPrice(25)}</span>
                                     <div style="display:flex; align-items:center; gap:6px;">
@@ -3119,7 +3135,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         <div style="background:#fff; border-radius:12px; border:1px solid #e0e0e0; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.06); display:flex; flex-direction:column;">
                             <img src="https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&h=180&fit=crop&auto=format" alt="Water Bottle" loading="lazy" style="width:100%; height:90px; object-fit:cover; display:block;">
                             <div style="padding:12px 12px 14px; flex:1; display:flex; flex-direction:column; justify-content:space-between;">
-                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:10px;">${isEN ? 'Premium Glass Water Bottle' : 'Botella de Agua Premium'}</div>
+                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:10px;">${isEN ? 'Bottled Water' : 'Botella de Agua'}</div>
                                 <div style="display:flex; align-items:center; justify-content:space-between;">
                                     <span style="font-size:16px; font-weight:800; color:var(--text-dark); font-family:var(--font-title);">${formatExtraPrice(2)}</span>
                                     <div style="display:flex; align-items:center; gap:7px;">
@@ -3135,7 +3151,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         <div style="background:#fff; border-radius:12px; border:1px solid #e0e0e0; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.06); display:flex; flex-direction:column;">
                             <img src="https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&h=180&fit=crop&auto=format" alt="Craft Beer" loading="lazy" style="width:100%; height:90px; object-fit:cover; display:block;">
                             <div style="padding:12px 12px 14px; flex:1; display:flex; flex-direction:column; justify-content:space-between;">
-                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:10px;">${isEN ? 'Local Craft Beer Pint' : 'Cerveza Artesanal Local'}</div>
+                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:10px;">${isEN ? 'Ice-Cold Beer' : 'Cerveza Fría'}</div>
                                 <div style="display:flex; align-items:center; justify-content:space-between;">
                                     <span style="font-size:16px; font-weight:800; color:var(--text-dark); font-family:var(--font-title);">${formatExtraPrice(4)}</span>
                                     <div style="display:flex; align-items:center; gap:7px;">
@@ -3160,7 +3176,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                                 </svg>
                             </div>
                             <div style="padding:12px 12px 14px; flex:1; display:flex; flex-direction:column; justify-content:space-between;">
-                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:10px;">${isEN ? 'Strategic 20-Min Local Stop' : 'Parada Estratégica 20 Min'}</div>
+                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:10px;">${isEN ? 'Quick 20-Minute Stop' : 'Parada Rápida 20 Min'}</div>
                                 <div style="display:flex; align-items:center; justify-content:space-between;">
                                     <span style="font-size:16px; font-weight:800; color:var(--text-dark); font-family:var(--font-title);">${formatExtraPrice(25)}</span>
                                     <div style="display:flex; align-items:center; gap:7px;">
@@ -3222,9 +3238,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
                     <!-- BOTON TARJETA: fondo BLANCO, borde sutil, logos reales -->
                     <button id="btn-stripe-${id}" onclick="pagarConStripe('${id}', ${dataStr})"
-                        style="width:100%; background:#0a0a0a; color:#fff; border:none; border-radius:10px; padding:14px 18px; font-size:14px; font-weight:700; cursor:pointer; font-family:var(--font-body); display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; transition:all 0.2s; box-shadow:0 4px 12px rgba(0,0,0,0.25);"
-                        onmouseover="this.style.background='#222222';this.style.boxShadow='0 6px 18px rgba(0,0,0,0.35)'"
-                        onmouseout="this.style.background='#0a0a0a';this.style.boxShadow='0 4px 12px rgba(0,0,0,0.25)'">
+                        style="width:100%; background:#0a0a0a; color:#fff; border:2px solid transparent; border-radius:10px; padding:14px 18px; font-size:14px; font-weight:700; cursor:pointer; font-family:var(--font-body); display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; transition:all 0.25s ease; box-shadow:0 4px 12px rgba(0,0,0,0.25);"
+                        onmouseover="this.style.background='#1a1a1a';this.style.boxShadow='0 0 0 3px var(--gold), 0 6px 20px rgba(0,0,0,0.4)';this.style.borderColor='var(--gold)';this.style.transform='translateY(-1px)'"
+                        onmouseout="this.style.background='#0a0a0a';this.style.boxShadow='0 4px 12px rgba(0,0,0,0.25)';this.style.borderColor='transparent';this.style.transform='translateY(0)'">
                         <span style="display:flex; align-items:center; gap:12px;">
                             <!-- Logos reales de tarjetas -->
                             <span style="display:flex; gap:5px; align-items:center;">
@@ -3266,9 +3282,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     <!-- PAYPAL FALLBACK con logo SVG oficial -->
                     <div id="paypal-fallback-${id}" style="display:none;">
                         <button onclick="pagarConPayPal('${id}', ${dataStr})"
-                            style="width:100%; background:#FFC439; border:none; border-radius:8px; padding:14px 20px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:background 0.2s; box-shadow:0 2px 6px rgba(0,0,0,0.12);"
-                            onmouseover="this.style.background='#e6b035'"
-                            onmouseout="this.style.background='#FFC439'">
+                            style="width:100%; background:#FFC439; border:none; border-radius:8px; padding:14px 20px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.25s ease; box-shadow:0 2px 6px rgba(0,0,0,0.12);"
+                            onmouseover="this.style.background='#e6b035';this.style.transform='translateY(-2px)';this.style.boxShadow='0 0 0 3px rgba(255,196,57,0.4), 0 8px 24px rgba(0,0,0,0.2)'"
+                            onmouseout="this.style.background='#FFC439';this.style.transform='translateY(0)';this.style.boxShadow='0 2px 6px rgba(0,0,0,0.12)'">
                             <!-- Logo PayPal SVG oficial (azul oscuro + azul claro) -->
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 101 32" width="90" height="28">
                                 <path fill="#003087" d="M12.237 2.8L4.437 2.8C3.937 2.8 3.437 3.2 3.337 3.7L0.237 23.7C0.137 24.1 0.437 24.4 0.837 24.4L4.537 24.4C5.037 24.4 5.537 24 5.637 23.5L6.437 18.1C6.537 17.6 6.937 17.2 7.537 17.2L10.037 17.2C15.137 17.2 18.137 14.7 18.937 9.8C19.237 7.7 18.937 6 17.937 4.8C16.837 3.5 14.837 2.8 12.237 2.8ZM13.137 10.1C12.737 12.9 10.537 12.9 8.537 12.9L7.337 12.9L8.137 7.7C8.137 7.4 8.437 7.2 8.737 7.2L9.237 7.2C10.637 7.2 11.937 7.2 12.637 8C13.137 8.4 13.237 9.1 13.137 10.1Z"/>
