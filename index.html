@@ -3407,6 +3407,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const nombre = document.getElementById('nombre-' + id);
         const email  = document.getElementById('email-' + id);
         const lada   = document.getElementById('lada-' + id);
+        const ladaVal = lada ? (lada.value !== undefined ? lada.value : lada.textContent) : '';
         const tel    = document.getElementById('tel-' + id);
         const bandera= document.getElementById('bandera-' + id);
         const notas  = document.getElementById('notas-' + id);
@@ -3414,7 +3415,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const vueloR = document.getElementById('vuelo-regreso-' + id);
         if (nombre && nombre.value) _savedFormData.nombre  = nombre.value;
         if (email  && email.value)  _savedFormData.email   = email.value;
-        if (lada   && lada.value)   _savedFormData.lada    = lada.value;
+        if (lada)   _savedFormData.lada = ladaVal.trim();
         if (tel    && tel.value)    _savedFormData.tel     = tel.value;
         if (bandera&& bandera.value)_savedFormData.bandera = bandera.value;
         if (notas  && notas.value)  _savedFormData.notas   = notas.value;
@@ -3443,7 +3444,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const vueloR = document.getElementById('vuelo-regreso-' + id);
         if (nombre && _savedFormData.nombre)  nombre.value  = _savedFormData.nombre;
         if (email  && _savedFormData.email)   email.value   = _savedFormData.email;
-        if (lada   && _savedFormData.lada)    lada.value    = _savedFormData.lada;
+        if (lada && _savedFormData.lada) { if (lada.value !== undefined) lada.value = _savedFormData.lada; else lada.textContent = _savedFormData.lada; }
         if (tel    && _savedFormData.tel)     tel.value     = _savedFormData.tel;
         if (bandera&& _savedFormData.bandera) { bandera.value = _savedFormData.bandera; cambiarPrefijoCard(id); }
         if (notas  && _savedFormData.notas)   notas.value   = _savedFormData.notas;
@@ -3703,6 +3704,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     function cambiarPrefijoCard(id) {
         const sel = document.getElementById('bandera-' + id);
         const cod = document.getElementById('lada-' + id);
+        const codVal = cod ? (cod.value !== undefined ? cod.value : cod.textContent).trim() : '';
         const tel = document.getElementById('tel-' + id);
         if (!sel || !cod) return;
         if (sel.value === 'OTRO') {
@@ -3721,7 +3723,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const t = translations[currentLang];
         const nombre = document.getElementById('nombre-' + id).value.trim();
         const email  = document.getElementById('email-' + id).value.trim();
-        const lada   = document.getElementById('lada-' + id).value.trim();
+        const ladaEl2 = document.getElementById('lada-' + id); const lada = ladaEl2 ? (ladaEl2.value !== undefined ? ladaEl2.value : ladaEl2.textContent).trim() : '';
         const tel    = document.getElementById('tel-' + id).value.trim();
         const vuelo  = document.getElementById('vuelo-' + id).value.trim();
         const notas  = document.getElementById('notas-' + id).value.trim();
