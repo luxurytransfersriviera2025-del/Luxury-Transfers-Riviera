@@ -4370,7 +4370,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         let page = parseInt(track.dataset.page || '0');
         page = Math.max(0, Math.min(totalPages - 1, page + direction));
         track.dataset.page = page;
-        track.style.transform = `translateX(-${{page * pageW}}px)`;
+        track.style.transform = "translateX(-" + (page * pageW) + "px)";
     }
 
     function initExtrasCarousels() {
