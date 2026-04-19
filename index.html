@@ -3657,16 +3657,24 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const name = el.dataset.name;
         document.getElementById('country-drop-' + id).style.display = 'none';
         document.getElementById('country-name-' + id).textContent = name;
-        document.getElementById('lada-' + id).textContent = code === 'OTRO' ? '+' : code;
+        const ladaEl = document.getElementById('lada-' + id);
         // Sync hidden select
         const sel = document.getElementById('bandera-' + id);
         if (sel) { sel.value = code; }
-        // Focus phone input
-        const tel = document.getElementById('tel-' + id);
-        if (tel && code !== 'OTRO') tel.focus();
-        else if (code === 'OTRO') {
-            const lada = document.getElementById('lada-' + id);
-            lada.contentEditable = 'true'; lada.focus();
+        if (code === 'OTRO') {
+            // Replace span with editable input for custom code
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = '+';
+            input.id = 'lada-' + id;
+            input.style.cssText = 'width:44px;border:none;outline:none;background:transparent;font-weight:800;color:var(--action-green);font-size:13px;text-align:center;padding:0 8px 0 2px;';
+            ladaEl.parentNode.replaceChild(input, ladaEl);
+            input.focus();
+        } else {
+            ladaEl.textContent = code;
+            // Focus phone input
+            const tel = document.getElementById('tel-' + id);
+            if (tel) tel.focus();
         }
     }
     // Close country drop on outside click
