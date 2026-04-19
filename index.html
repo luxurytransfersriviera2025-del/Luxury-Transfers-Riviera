@@ -603,7 +603,17 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             .btn-reservar { width: 100%; padding: 14px 20px; margin-top: 0; font-size: 14px; }
             /* RT carousel mobile: switch to horizontal scroll */
             @media (max-width: 700px) {
-                button[onclick*="rtSlide"] { display: none !important; }
+                /* RT arrows on mobile: styled like OW */
+                button[onclick*="rtSlide"] {
+                    width: 34px !important;
+                    height: 34px !important;
+                    background: #fff !important;
+                    color: #000 !important;
+                    border: 2px solid #ddd !important;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+                    font-size: 20px !important;
+                }
+                /* RT viewport scrollable on mobile */
                 div[style*="overflow:hidden; padding:2px"] {
                     overflow-x: auto !important;
                     -webkit-overflow-scrolling: touch !important;
@@ -636,10 +646,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 position: absolute;
                 top: 50%; transform: translateY(-50%);
                 z-index: 10;
-                width: 30px; height: 30px;
+                width: 34px; height: 34px;
                 border-radius: 50%;
-                background: #000;
-                color: #fff;
+                background: #fff;
+                color: #000;
+                border: 2px solid #ddd;
                 border: none;
                 cursor: pointer;
                 align-items: center;
@@ -3135,7 +3146,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     <div style="position:relative; display:flex; align-items:center; gap:0;">
 
                         <!-- Flecha izquierda -->
-                        <button type="button" onclick="rtSlide('rt-track-${id}',-1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#000;color:#fff;border:none;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.25);z-index:2;margin-right:8px;">&#8249;</button>
+                        <button type="button" onclick="rtSlide('rt-track-${id}',-1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:2px solid #ddd;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);z-index:2;margin-right:8px;flex-shrink:0;">&#8249;</button>
 
                         <!-- Viewport: overflow hidden -->
                         <div style="flex:1; overflow:hidden; padding:2px;">
@@ -3176,7 +3187,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         </div>
 
                         <!-- Flecha derecha -->
-                        <button type="button" onclick="rtSlide('rt-track-${id}',1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#000;color:#fff;border:none;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.25);z-index:2;margin-left:8px;">&#8250;</button>
+                        <button type="button" onclick="rtSlide('rt-track-${id}',1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:2px solid #ddd;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);z-index:2;margin-left:8px;flex-shrink:0;">&#8250;</button>
 
                     </div>` : `
                     <!-- ONE WAY: 3 tarjetas con imagen -->
@@ -4388,13 +4399,20 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         if (!track) return;
         const cards = track.children;
         if (!cards.length) return;
-        const cardW = cards[0].offsetWidth + 12; // card + gap
-        const pageW = cardW * 3; // 3 cards per page
-        let page = parseInt(track.dataset.page || '0');
-        // Toggle between page 0 (Trip) and page 1 (Return)
-        page = page === 0 ? 1 : 0;
-        track.dataset.page = page;
-        track.style.transform = "translateX(-" + (page * pageW) + "px)";
+        const isMobile = window.innerWidth <= 700;
+        if (isMobile) {
+            // On mobile: use native scrollBy (track is overflow-x:auto)
+            const cardW = cards[0].offsetWidth + 10;
+            track.scrollBy({ left: direction * cardW * 3, behavior: 'smooth' });
+        } else {
+            // Desktop: translateX toggle between page 0 (Trip) and page 1 (Return)
+            const cardW = cards[0].offsetWidth + 12;
+            const pageW = cardW * 3;
+            let page = parseInt(track.dataset.page || '0');
+            page = page === 0 ? 1 : 0;
+            track.dataset.page = page;
+            track.style.transform = "translateX(-" + (page * pageW) + "px)";
+        }
     }
 
     function initExtrasCarousels() {
