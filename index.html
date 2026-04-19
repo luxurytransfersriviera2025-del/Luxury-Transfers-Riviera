@@ -3115,10 +3115,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                             <option value="OTRO">${isEN?'Other':'Otro'}</option>
                         </select>
                         <div style="display:flex; align-items:stretch; border:1px solid #ccc; border-radius:6px; overflow:visible; background:#fff; position:relative;">
-                            <!-- Country trigger: clicking US or +1 opens dropdown -->
-                            <div id="country-trigger-${id}" onclick="toggleCountryDrop('${id}')" style="display:flex;align-items:center;gap:0;background:#f8f9fa;border-right:1px solid #eee;flex-shrink:0;cursor:pointer;position:relative;user-select:none;">
-                                <span id="country-name-${id}" style="font-size:13px;font-weight:700;color:var(--navy-bg);padding:10px 6px 10px 10px;">US</span>
-                                <span id="lada-${id}" style="font-size:13px;font-weight:800;color:var(--action-green);padding:10px 8px 10px 2px;">+1</span>
+                            <!-- Country trigger: only clicking country name opens dropdown -->
+                            <div id="country-trigger-${id}" style="display:flex;align-items:center;gap:0;background:#f8f9fa;border-right:1px solid #eee;flex-shrink:0;position:relative;">
+                                <span id="country-name-${id}" onclick="toggleCountryDrop('${id}')" style="font-size:13px;font-weight:700;color:var(--navy-bg);padding:10px 6px 10px 10px;cursor:pointer;user-select:none;">US</span>
+                                <div style="width:1px;height:100%;background:#eee;"></div>
+                                <span id="lada-${id}" style="font-size:13px;font-weight:800;color:var(--action-green);padding:10px 8px 10px 8px;">+1</span>
                                 <!-- Custom dropdown -->
                                 <div id="country-drop-${id}" style="display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:9999;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.18);border:1px solid #e8e8e8;min-width:160px;max-height:240px;overflow-y:auto;scrollbar-width:thin;">
                                     <div class="country-option" data-code="+1" data-name="US" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">US</span><span style="color:var(--action-green);font-weight:700;">+1</span></div>
