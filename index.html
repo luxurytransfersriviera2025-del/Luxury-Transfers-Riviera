@@ -642,7 +642,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 position: relative;
             }
             .extras-carousel-btn {
-                display: flex;
+                display: none; /* replaced by ow-flex-wrapper */
                 position: absolute;
                 top: 50%; transform: translateY(-50%);
                 z-index: 10;
@@ -4416,30 +4416,40 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     }
 
     function initExtrasCarousels() {
-        // Apply to ALL screen sizes for RT carousel; mobile only for OW
-        const isMobile = window.innerWidth <= 600;
-        document.querySelectorAll('.extras-grid-4, .extras-ow-grid, .extras-rt-carousel, [style*="grid-template-columns:repeat(3,1fr)"]').forEach(function(grid) {
-            const isRT = grid.classList.contains('extras-rt-carousel');
-            if (!isRT && !isMobile) return; // OW arrows only on mobile
-            if (grid.closest('.extras-carousel-wrapper')) return; // Already wrapped
+        if (window.innerWidth > 700) return; // Only on mobile
+        document.querySelectorAll('.extras-grid-4, .extras-ow-grid, [style*="grid-template-columns:repeat(3,1fr)"]').forEach(function(grid) {
+            if (grid.closest('.extras-ow-flex-wrapper')) return; // Already wrapped
+            // Build flanking flex layout: [← btn] [scrollable grid] [→ btn]
             const wrapper = document.createElement('div');
-            wrapper.className = 'extras-carousel-wrapper';
+            wrapper.className = 'extras-ow-flex-wrapper';
+            wrapper.style.cssText = 'display:flex;align-items:center;gap:6px;width:100%;';
             grid.parentNode.insertBefore(wrapper, grid);
-            wrapper.appendChild(grid);
 
             const btnPrev = document.createElement('button');
-            btnPrev.className = 'extras-carousel-btn prev';
-            btnPrev.innerHTML = '&#8592;';
             btnPrev.setAttribute('type', 'button');
-            btnPrev.onclick = function() { grid.scrollBy({ left: -170, behavior: 'smooth' }); };
+            btnPrev.innerHTML = '&#8249;';
+            btnPrev.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fff;color:#000;border:2px solid #ddd;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);';
+            btnPrev.onclick = function() {
+                const cardW = grid.children[0] ? grid.children[0].offsetWidth + 10 : 150;
+                grid.scrollBy({ left: -cardW, behavior: 'smooth' });
+            };
+
+            const scrollWrap = document.createElement('div');
+            scrollWrap.style.cssText = 'flex:1;overflow:hidden;padding:2px;';
+            grid.parentNode.insertBefore(scrollWrap, grid);
+            scrollWrap.appendChild(grid);
 
             const btnNext = document.createElement('button');
-            btnNext.className = 'extras-carousel-btn next';
-            btnNext.innerHTML = '&#8594;';
             btnNext.setAttribute('type', 'button');
-            btnNext.onclick = function() { grid.scrollBy({ left: 170, behavior: 'smooth' }); };
+            btnNext.innerHTML = '&#8250;';
+            btnNext.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fff;color:#000;border:2px solid #ddd;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);';
+            btnNext.onclick = function() {
+                const cardW = grid.children[0] ? grid.children[0].offsetWidth + 10 : 150;
+                grid.scrollBy({ left: cardW, behavior: 'smooth' });
+            };
 
             wrapper.appendChild(btnPrev);
+            wrapper.appendChild(scrollWrap);
             wrapper.appendChild(btnNext);
         });
     }
