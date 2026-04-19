@@ -82,6 +82,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
 
         html { scroll-behavior: smooth; }
+        input[type="date"] { text-align: left !important; }
+        input[type="date"]::-webkit-date-and-time-value { text-align: left !important; }
 
         /* Custom PAX dropdown */
         .pax-wrapper {
@@ -1116,7 +1118,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     <div class="row-bottom-ow" id="rowBottomOneWay">
                         <div class="input-wrapper">
                             <label id="label-fecha">SERVICE DATE</label>
-                            <input type="date" id="fechaIda" onclick="try{this.showPicker()}catch(e){}" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%;">
+                            <input type="date" id="fechaIda" onclick="try{this.showPicker()}catch(e){}" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%; text-align:left;">
                         </div>
                         <div class="input-wrapper">
                             <label id="label-hora">SERVICE TIME</label>
@@ -3662,13 +3664,27 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const sel = document.getElementById('bandera-' + id);
         if (sel) { sel.value = code; }
         if (code === 'OTRO') {
-            // Replace span with editable input for custom code
+            // Build: fixed "+" label + numbers-only input
+            const wrapper = document.createElement('span');
+            wrapper.style.cssText = 'display:flex;align-items:center;';
+
+            const plus = document.createElement('span');
+            plus.textContent = '+';
+            plus.style.cssText = 'font-weight:800;color:var(--action-green);font-size:13px;padding-left:2px;user-select:none;';
+
             const input = document.createElement('input');
-            input.type = 'text';
-            input.value = '+';
+            input.type = 'tel';
+            input.inputMode = 'numeric';
+            input.pattern = '[0-9]*';
+            input.placeholder = '00';
             input.id = 'lada-' + id;
-            input.style.cssText = 'width:44px;border:none;outline:none;background:transparent;font-weight:800;color:var(--action-green);font-size:13px;text-align:center;padding:0 8px 0 2px;';
-            ladaEl.parentNode.replaceChild(input, ladaEl);
+            input.maxLength = 4;
+            input.style.cssText = 'width:36px;border:none;outline:none;background:transparent;font-weight:800;color:var(--action-green);font-size:13px;text-align:left;padding:0 6px 0 2px;';
+            input.oninput = function() { this.value = this.value.replace(/[^0-9]/g, ''); };
+
+            wrapper.appendChild(plus);
+            wrapper.appendChild(input);
+            ladaEl.parentNode.replaceChild(wrapper, ladaEl);
             input.focus();
         } else {
             ladaEl.textContent = code;
@@ -4445,6 +4461,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         if (!sessionStorage.getItem('cuponVisto')) {
             overlay.style.display = 'flex';
             document.body.style.overflow = 'hidden';
+            // Disable all inputs behind the overlay
+            document.querySelectorAll('input, textarea, select').forEach(function(el) {
+                el.setAttribute('tabindex', '-1');
+            });
         }
     }
     // ── EXTRAS CAROUSEL ARROWS (mobile only) ─────────────────────────────────
@@ -4537,6 +4557,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         document.getElementById('cupon-overlay').style.display = 'none';
         document.body.style.overflow = '';
         sessionStorage.setItem('cuponVisto', '1');
+        // Re-enable all inputs
+        document.querySelectorAll('input, textarea, select').forEach(function(el) {
+            el.removeAttribute('tabindex');
+        });
     }
     function copiarCupon(el) {
         navigator.clipboard.writeText('LTR-10').then(() => {
@@ -4546,6 +4570,16 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         });
     }
     function irACotizar() {
+        // Auto-apply coupon code to all promo fields
+        const code = 'LTR-10';
+        ['codigoPromoOneWay', 'codigoPromoRT'].forEach(function(id) {
+            const el = document.getElementById(id);
+            if (el) el.value = code;
+        });
+        // Also fill any dynamic promo inputs in booking cards
+        document.querySelectorAll('[id^="promo-"]').forEach(function(el) {
+            el.value = code;
+        });
         cerrarCupon();
         document.getElementById('seccion-quote').scrollIntoView({ behavior: 'smooth' });
     }
@@ -4557,7 +4591,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             ? 'Use this coupon when quoting your transfer and get a <strong style="color:var(--gold);">10% discount</strong> on your booking.'
             : 'Usa este cupón al cotizar tu transfer y obtén un <strong style="color:var(--gold);">10% de descuento</strong> en tu reserva.';
         document.getElementById('cupon-hint').textContent   = isEN ? '🖱️ Click the code to copy it' : '🖱️ Haz clic en el código para copiarlo';
-        document.getElementById('cupon-btn').textContent    = isEN ? 'Quote Now' : 'Cotizar Ahora';
+        document.getElementById('cupon-btn').textContent    = isEN ? 'Apply Coupon' : 'Aplicar Cupón';
     }
     // Mostrar cupón a los 4 segundos
     setTimeout(mostrarCupon, 4000);
