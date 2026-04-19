@@ -4490,9 +4490,21 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         if (!cards.length) return;
         const isMobile = window.innerWidth <= 700;
         if (isMobile) {
-            // On mobile: use native scrollBy (track is overflow-x:auto)
-            const cardW = cards[0].offsetWidth + 10;
-            track.scrollBy({ left: direction * cardW, behavior: 'smooth' });
+            // On mobile: clamp page between 0 and total cards - 1
+            const total = cards.length;
+            let page = parseInt(track.dataset.mobilePage || '0');
+            page = Math.max(0, Math.min(total - 1, page + direction));
+            track.dataset.mobilePage = page;
+            const cardW = cards[0].offsetWidth;
+            track.scrollTo({ left: page * cardW, behavior: 'smooth' });
+            // Dim arrows at boundaries
+            const wrapper = track.closest('[style*="position:relative"]');
+            if (wrapper) {
+                wrapper.querySelectorAll('button[onclick*="rtSlide"]').forEach(function(btn) {
+                    const isNext = btn.getAttribute('onclick').includes(',1)');
+                    btn.style.opacity = (isNext && page === total-1) || (!isNext && page === 0) ? '0.3' : '1';
+                });
+            }
         } else {
             // Desktop: translateX toggle between page 0 (Trip) and page 1 (Return)
             const cardW = cards[0].offsetWidth + 12;
@@ -4520,10 +4532,16 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             btnPrev.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fff;color:#000;border:2px solid #ccc;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);transition:all 0.2s;';
             btnPrev.onmouseover = function(){ this.style.background='#000'; this.style.color='#fff'; this.style.borderColor='#000'; };
             btnPrev.onmouseout  = function(){ this.style.background='#fff'; this.style.color='#000'; this.style.borderColor='#ccc'; };
-            btnPrev.onclick = function() {
+            let owPage = 0;
+            const owTotal = grid.children.length;
+            function owScroll(dir) {
+                owPage = Math.max(0, Math.min(owTotal - 1, owPage + dir));
                 const cardW = grid.children[0] ? grid.children[0].offsetWidth : scrollWrap.offsetWidth;
-                grid.scrollBy({ left: -cardW, behavior: 'smooth' });
-            };
+                grid.scrollTo({ left: owPage * cardW, behavior: 'smooth' });
+                btnPrev.style.opacity = owPage === 0 ? '0.3' : '1';
+                btnNext.style.opacity = owPage === owTotal - 1 ? '0.3' : '1';
+            }
+            btnPrev.onclick = function() { owScroll(-1); };
 
             const scrollWrap = document.createElement('div');
             scrollWrap.style.cssText = 'flex:1;overflow:hidden;';
@@ -4536,10 +4554,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             btnNext.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fff;color:#000;border:2px solid #ccc;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);transition:all 0.2s;';
             btnNext.onmouseover = function(){ this.style.background='#000'; this.style.color='#fff'; this.style.borderColor='#000'; };
             btnNext.onmouseout  = function(){ this.style.background='#fff'; this.style.color='#000'; this.style.borderColor='#ccc'; };
-            btnNext.onclick = function() {
-                const cardW = grid.children[0] ? grid.children[0].offsetWidth : scrollWrap.offsetWidth;
-                grid.scrollBy({ left: cardW, behavior: 'smooth' });
-            };
+            btnNext.onclick = function() { owScroll(1); };
 
             wrapper.appendChild(btnPrev);
             wrapper.appendChild(scrollWrap);
