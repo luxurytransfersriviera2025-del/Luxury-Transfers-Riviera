@@ -4461,10 +4461,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         if (!sessionStorage.getItem('cuponVisto')) {
             overlay.style.display = 'flex';
             document.body.style.overflow = 'hidden';
-            // Disable all inputs behind the overlay
-            document.querySelectorAll('input, textarea, select').forEach(function(el) {
-                el.setAttribute('tabindex', '-1');
-            });
         }
     }
     // ── EXTRAS CAROUSEL ARROWS (mobile only) ─────────────────────────────────
@@ -4572,10 +4568,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         document.getElementById('cupon-overlay').style.display = 'none';
         document.body.style.overflow = '';
         sessionStorage.setItem('cuponVisto', '1');
-        // Re-enable all inputs
-        document.querySelectorAll('input, textarea, select').forEach(function(el) {
-            el.removeAttribute('tabindex');
-        });
     }
     function copiarCupon(el) {
         navigator.clipboard.writeText('LTR-10').then(() => {
