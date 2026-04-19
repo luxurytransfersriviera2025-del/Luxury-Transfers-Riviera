@@ -1044,7 +1044,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         .tarjeta-booking-form.open { display: block; }
                         @keyframes slideDownBF { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
                         .tarjeta.expanded { border-color: var(--action-green) !important; box-shadow: 0 5px 25px rgba(0,166,81,0.15) !important; overflow: hidden; }
-                        .form-card-grid { display: grid; grid-template-columns: repeat(4,1fr); gap:12px; margin-bottom:14px; }
+                        .form-card-grid { display: grid; grid-template-columns: 1fr 1fr 1.35fr 0.65fr; gap:12px; margin-bottom:14px; }
                         .form-card-notes { display: grid; grid-template-columns: 1fr; gap:12px; margin-bottom:16px; }
                         .btn-enviar-reserva { background:var(--action-green); color:white; border:none; border-radius:8px; padding:15px 40px; font-size:16px; font-weight:800; cursor:pointer; font-family:var(--font-title); text-transform:uppercase; letter-spacing:1px; transition:all 0.2s; width:100%; box-shadow:0 5px 0 #007a3d; }
                         .btn-enviar-reserva:hover { background:var(--action-green-hover); transform:translateY(2px); box-shadow:0 3px 0 #007a3d; }
@@ -1592,13 +1592,14 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const hours12  = Array.from({length:12}, (_,i) => String(i+1).padStart(2,'0'));
         const mins5    = Array.from({length:12}, (_,i) => String(i*5).padStart(2,'0'));
         const ampmVals = ['AM','PM'];
-        const init     = input.value ? from24h(input.value) : {h:'06',m:'00',ap:'AM'};
+        const init     = input.value ? from24h(input.value) : null;
 
         // Display que reemplaza el input nativo
         const display = document.createElement('div');
         display.id = 'wd-display-'+uid;
         display.style.cssText = 'font-size:14px;font-weight:600;color:#333;cursor:pointer;font-family:var(--font-body);padding:4px 0;';
-        display.innerHTML = '<span id="wd-txt-'+uid+'">'+init.h+':'+init.m+' '+init.ap+'</span>';
+        const placeholder = currentLang === 'en' ? '--:-- --' : '--:-- --';
+        display.innerHTML = '<span id="wd-txt-'+uid+'" style="color:'+(init?'#333':'#aaa')+'">'+(init ? init.h+':'+init.m+' '+init.ap : placeholder)+'</span>';
 
         // Overlay fondo oscuro
         const overlay = document.createElement('div');
@@ -1647,7 +1648,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             overlay.querySelector('#wd-cancel-'+uid).textContent = lblCancel();
             overlay.querySelector('#wd-ok-'+uid).textContent     = lblOk();
             document.body.style.overflow = 'hidden';
-            const cur = from24h(input.value || '06:00');
+            const cur = from24h(input.value || '12:00');
             wheelScrollToIdx(colH,  hours12.indexOf(cur.h));
             wheelScrollToIdx(colM,  mins5.indexOf(cur.m) > -1 ? mins5.indexOf(cur.m) : 0);
             wheelScrollToIdx(colAP, ampmVals.indexOf(cur.ap));
@@ -1669,7 +1670,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             if (ap === 'PM' && h24 !== 12) h24 += 12;
             input.value = String(h24).padStart(2,'0') + ':' + m;
             input.dispatchEvent(new Event('input'));
-            document.getElementById('wd-txt-'+uid).textContent = h + ':' + m + ' ' + ap;
+            const txtEl = document.getElementById('wd-txt-'+uid); txtEl.textContent = h + ':' + m + ' ' + ap; txtEl.style.color = '#333';
             overlay.style.display = 'none';
             document.body.style.overflow = '';
         });
