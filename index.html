@@ -608,15 +608,16 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     width: 34px !important;
                     height: 34px !important;
                     background: #fff !important;
-                    color: #D4AF37 !important;
-                    border: 2px solid #D4AF37 !important;
-                    box-shadow: 0 2px 8px rgba(212,175,55,0.2) !important;
+                    color: #000 !important;
+                    border: 2px solid #ccc !important;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.12) !important;
                     font-size: 20px !important;
                     transition: all 0.2s !important;
                 }
                 button[onclick*="rtSlide"]:hover {
-                    background: #D4AF37 !important;
+                    background: #000 !important;
                     color: #fff !important;
+                    border-color: #000 !important;
                 }
                 /* RT viewport scrollable on mobile */
                 div[style*="overflow:hidden; padding:2px"] {
@@ -3098,44 +3099,58 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         <label>${isEN ? 'Email Address' : 'Correo Electrónico'}</label>
                         <input type="email" id="email-${id}" placeholder="${isEN ? 'email@example.com' : 'correo@ejemplo.com'}">
                     </div>
-                    <div class="input-wrapper" style="padding:8px 10px;">
+                    <div class="input-wrapper" style="padding:8px 10px; overflow:visible;">
                         <label style="font-weight:800; color:var(--navy-bg); margin-bottom:5px; display:block;">${isEN ? 'WHATSAPP *' : 'WHATSAPP *'}</label>
-                        <div style="display:flex; align-items:stretch; border:1px solid #ccc; border-radius:6px; overflow:hidden; background:#fff;">
-                            <div style="display:flex; align-items:center; background:#f8f9fa; border-right:1px solid #eee; flex-shrink:0;">
-                                <select id="bandera-${id}" onchange="cambiarPrefijoCard('${id}')" style="border:none; outline:none; background:transparent; cursor:pointer; font-size:13px; font-weight:700; color:var(--navy-bg); padding:8px 6px; appearance:none; -webkit-appearance:none; width:48px; text-align:center;">
-                                    <option value="+1"   selected>US</option>
-                                    <option value="+52"         >MX</option>
-                                    <option value="+1"          >CA</option>
-                                    <option value="+44"         >GB</option>
-                                    <option value="+49"         >DE</option>
-                                    <option value="+33"         >FR</option>
-                                    <option value="+34"         >ES</option>
-                                    <option value="+39"         >IT</option>
-                                    <option value="+31"         >NL</option>
-                                    <option value="+55"         >BR</option>
-                                    <option value="+54"         >AR</option>
-                                    <option value="+57"         >CO</option>
-                                    <option value="+56"         >CL</option>
-                                    <option value="+51"         >PE</option>
-                                    <option value="+58"         >VE</option>
-                                    <option value="+502"        >GT</option>
-                                    <option value="+507"        >PA</option>
-                                    <option value="+53"         >CU</option>
-                                    <option value="+61"         >AU</option>
-                                    <option value="+81"         >JP</option>
-                                    <option value="+86"         >CN</option>
-                                    <option value="+91"         >IN</option>
-                                    <option value="+7"          >RU</option>
-                                    <option value="+972"        >IL</option>
-                                    <option value="+971"        >AE</option>
-                                    <option disabled>──</option>
-                                    <option value="OTRO"        >${isEN ? 'Other' : 'Otro'}</option>
-                                </select>
-                                <div style="width:1px; height:100%; background:#eee;"></div>
-                                <input type="text" id="lada-${id}" value="+1" style="width:38px; border:none; outline:none; background:transparent; font-weight:800; color:var(--action-green); font-size:13px; text-align:center; padding:0;" readonly>
+                        <!-- Hidden native select (keeps cambiarPrefijoCard logic working) -->
+                        <select id="bandera-${id}" onchange="cambiarPrefijoCard('${id}')" style="display:none;">
+                            <option value="+1" selected>US</option>
+                            <option value="+52">MX</option><option value="+1">CA</option><option value="+44">GB</option>
+                            <option value="+49">DE</option><option value="+33">FR</option><option value="+34">ES</option>
+                            <option value="+39">IT</option><option value="+31">NL</option><option value="+55">BR</option>
+                            <option value="+54">AR</option><option value="+57">CO</option><option value="+56">CL</option>
+                            <option value="+51">PE</option><option value="+58">VE</option><option value="+502">GT</option>
+                            <option value="+507">PA</option><option value="+53">CU</option><option value="+61">AU</option>
+                            <option value="+81">JP</option><option value="+86">CN</option><option value="+91">IN</option>
+                            <option value="+7">RU</option><option value="+972">IL</option><option value="+971">AE</option>
+                            <option value="OTRO">${isEN?'Other':'Otro'}</option>
+                        </select>
+                        <div style="display:flex; align-items:stretch; border:1px solid #ccc; border-radius:6px; overflow:visible; background:#fff; position:relative;">
+                            <!-- Country trigger: clicking US or +1 opens dropdown -->
+                            <div id="country-trigger-${id}" onclick="toggleCountryDrop('${id}')" style="display:flex;align-items:center;gap:0;background:#f8f9fa;border-right:1px solid #eee;flex-shrink:0;cursor:pointer;position:relative;user-select:none;">
+                                <span id="country-name-${id}" style="font-size:13px;font-weight:700;color:var(--navy-bg);padding:10px 6px 10px 10px;">US</span>
+                                <span id="lada-${id}" style="font-size:13px;font-weight:800;color:var(--action-green);padding:10px 8px 10px 2px;">+1</span>
+                                <!-- Custom dropdown -->
+                                <div id="country-drop-${id}" style="display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:9999;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.18);border:1px solid #e8e8e8;min-width:160px;max-height:240px;overflow-y:auto;scrollbar-width:thin;">
+                                    <div class="country-option" data-code="+1" data-name="US" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">US</span><span style="color:var(--action-green);font-weight:700;">+1</span></div>
+<div class="country-option" data-code="+52" data-name="MX" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">MX</span><span style="color:var(--action-green);font-weight:700;">+52</span></div>
+<div class="country-option" data-code="+1" data-name="CA" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">CA</span><span style="color:var(--action-green);font-weight:700;">+1</span></div>
+<div class="country-option" data-code="+44" data-name="GB" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">GB</span><span style="color:var(--action-green);font-weight:700;">+44</span></div>
+<div class="country-option" data-code="+49" data-name="DE" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">DE</span><span style="color:var(--action-green);font-weight:700;">+49</span></div>
+<div class="country-option" data-code="+33" data-name="FR" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">FR</span><span style="color:var(--action-green);font-weight:700;">+33</span></div>
+<div class="country-option" data-code="+34" data-name="ES" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">ES</span><span style="color:var(--action-green);font-weight:700;">+34</span></div>
+<div class="country-option" data-code="+39" data-name="IT" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">IT</span><span style="color:var(--action-green);font-weight:700;">+39</span></div>
+<div class="country-option" data-code="+31" data-name="NL" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">NL</span><span style="color:var(--action-green);font-weight:700;">+31</span></div>
+<div class="country-option" data-code="+55" data-name="BR" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">BR</span><span style="color:var(--action-green);font-weight:700;">+55</span></div>
+<div class="country-option" data-code="+54" data-name="AR" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">AR</span><span style="color:var(--action-green);font-weight:700;">+54</span></div>
+<div class="country-option" data-code="+57" data-name="CO" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">CO</span><span style="color:var(--action-green);font-weight:700;">+57</span></div>
+<div class="country-option" data-code="+56" data-name="CL" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">CL</span><span style="color:var(--action-green);font-weight:700;">+56</span></div>
+<div class="country-option" data-code="+51" data-name="PE" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">PE</span><span style="color:var(--action-green);font-weight:700;">+51</span></div>
+<div class="country-option" data-code="+58" data-name="VE" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">VE</span><span style="color:var(--action-green);font-weight:700;">+58</span></div>
+<div class="country-option" data-code="+502" data-name="GT" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">GT</span><span style="color:var(--action-green);font-weight:700;">+502</span></div>
+<div class="country-option" data-code="+507" data-name="PA" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">PA</span><span style="color:var(--action-green);font-weight:700;">+507</span></div>
+<div class="country-option" data-code="+53" data-name="CU" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">CU</span><span style="color:var(--action-green);font-weight:700;">+53</span></div>
+<div class="country-option" data-code="+61" data-name="AU" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">AU</span><span style="color:var(--action-green);font-weight:700;">+61</span></div>
+<div class="country-option" data-code="+81" data-name="JP" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">JP</span><span style="color:var(--action-green);font-weight:700;">+81</span></div>
+<div class="country-option" data-code="+86" data-name="CN" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">CN</span><span style="color:var(--action-green);font-weight:700;">+86</span></div>
+<div class="country-option" data-code="+91" data-name="IN" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">IN</span><span style="color:var(--action-green);font-weight:700;">+91</span></div>
+<div class="country-option" data-code="+7" data-name="RU" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">RU</span><span style="color:var(--action-green);font-weight:700;">+7</span></div>
+<div class="country-option" data-code="+972" data-name="IL" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">IL</span><span style="color:var(--action-green);font-weight:700;">+972</span></div>
+<div class="country-option" data-code="+971" data-name="AE" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">AE</span><span style="color:var(--action-green);font-weight:700;">+971</span></div>
+<div class="country-option" data-code="OTRO" data-name="Other" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:var(--gold);border-top:1px solid #eee;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''">Other / Otro</div>
+                                </div>
                             </div>
-                            <div style="width:1px; background:#eee; flex-shrink:0;"></div>
-                            <input type="tel" id="tel-${id}" placeholder="987 654 3210" style="flex:1; border:none; outline:none; background:transparent; padding:10px; font-size:15px; width:100%; min-width:50px;">
+                            <div style="width:1px;background:#eee;flex-shrink:0;"></div>
+                            <input type="tel" id="tel-${id}" placeholder="987 654 3210" style="flex:1;border:none;outline:none;background:transparent;padding:10px;font-size:15px;width:100%;min-width:50px;">
                         </div>
                     </div>
                     <div class="input-wrapper">
@@ -3159,7 +3174,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     <div style="position:relative; display:flex; align-items:center; gap:0;">
 
                         <!-- Flecha izquierda -->
-                        <button type="button" onclick="rtSlide('rt-track-${id}',-1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#fff;color:#D4AF37;border:2px solid #D4AF37;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(212,175,55,0.2);z-index:2;margin-right:8px;transition:all 0.2s;" onmouseover="this.style.background='#D4AF37';this.style.color='#fff';" onmouseout="this.style.background='#fff';this.style.color='#D4AF37';">&#8249;</button>
+                        <button type="button" onclick="rtSlide('rt-track-${id}',-1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:2px solid #ccc;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);z-index:2;margin-right:8px;transition:all 0.2s;" onmouseover="this.style.background='#000';this.style.color='#fff';this.style.borderColor='#000';" onmouseout="this.style.background='#fff';this.style.color='#000';this.style.borderColor='#ccc';">&#8249;</button>
 
                         <!-- Viewport: overflow hidden -->
                         <div style="flex:1; overflow:hidden;">
@@ -3200,7 +3215,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         </div>
 
                         <!-- Flecha derecha -->
-                        <button type="button" onclick="rtSlide('rt-track-${id}',1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#fff;color:#D4AF37;border:2px solid #D4AF37;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(212,175,55,0.2);z-index:2;margin-left:8px;transition:all 0.2s;" onmouseover="this.style.background='#D4AF37';this.style.color='#fff';" onmouseout="this.style.background='#fff';this.style.color='#D4AF37';">&#8250;</button>
+                        <button type="button" onclick="rtSlide('rt-track-${id}',1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:2px solid #ccc;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);z-index:2;margin-left:8px;transition:all 0.2s;" onmouseover="this.style.background='#000';this.style.color='#fff';this.style.borderColor='#000';" onmouseout="this.style.background='#fff';this.style.color='#000';this.style.borderColor='#ccc';">&#8250;</button>
 
                     </div>` : `
                     <!-- ONE WAY: 3 tarjetas con imagen -->
@@ -3627,6 +3642,38 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             setTimeout(() => tarjeta.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
         }
     }
+
+    function toggleCountryDrop(id) {
+        const drop = document.getElementById('country-drop-' + id);
+        if (!drop) return;
+        const isOpen = drop.style.display !== 'none';
+        // Close all open country drops first
+        document.querySelectorAll('[id^="country-drop-"]').forEach(d => d.style.display = 'none');
+        if (!isOpen) drop.style.display = 'block';
+    }
+    function selectCountry(el, id) {
+        const code = el.dataset.code;
+        const name = el.dataset.name;
+        document.getElementById('country-drop-' + id).style.display = 'none';
+        document.getElementById('country-name-' + id).textContent = name;
+        document.getElementById('lada-' + id).textContent = code === 'OTRO' ? '+' : code;
+        // Sync hidden select
+        const sel = document.getElementById('bandera-' + id);
+        if (sel) { sel.value = code; }
+        // Focus phone input
+        const tel = document.getElementById('tel-' + id);
+        if (tel && code !== 'OTRO') tel.focus();
+        else if (code === 'OTRO') {
+            const lada = document.getElementById('lada-' + id);
+            lada.contentEditable = 'true'; lada.focus();
+        }
+    }
+    // Close country drop on outside click
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('[id^="country-trigger-"]')) {
+            document.querySelectorAll('[id^="country-drop-"]').forEach(d => d.style.display = 'none');
+        }
+    });
 
     function cambiarPrefijoCard(id) {
         const sel = document.getElementById('bandera-' + id);
@@ -4441,9 +4488,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             const btnPrev = document.createElement('button');
             btnPrev.setAttribute('type', 'button');
             btnPrev.innerHTML = '&#8249;';
-            btnPrev.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fff;color:#D4AF37;border:2px solid #D4AF37;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(212,175,55,0.2);transition:all 0.2s;';
-            btnPrev.onmouseover = function(){ this.style.background='#D4AF37'; this.style.color='#fff'; };
-            btnPrev.onmouseout  = function(){ this.style.background='#fff'; this.style.color='#D4AF37'; };
+            btnPrev.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fff;color:#000;border:2px solid #ccc;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);transition:all 0.2s;';
+            btnPrev.onmouseover = function(){ this.style.background='#000'; this.style.color='#fff'; this.style.borderColor='#000'; };
+            btnPrev.onmouseout  = function(){ this.style.background='#fff'; this.style.color='#000'; this.style.borderColor='#ccc'; };
             btnPrev.onclick = function() {
                 const cardW = grid.children[0] ? grid.children[0].offsetWidth : scrollWrap.offsetWidth;
                 grid.scrollBy({ left: -cardW, behavior: 'smooth' });
@@ -4457,9 +4504,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             const btnNext = document.createElement('button');
             btnNext.setAttribute('type', 'button');
             btnNext.innerHTML = '&#8250;';
-            btnNext.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fff;color:#D4AF37;border:2px solid #D4AF37;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(212,175,55,0.2);transition:all 0.2s;';
-            btnNext.onmouseover = function(){ this.style.background='#D4AF37'; this.style.color='#fff'; };
-            btnNext.onmouseout  = function(){ this.style.background='#fff'; this.style.color='#D4AF37'; };
+            btnNext.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fff;color:#000;border:2px solid #ccc;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);transition:all 0.2s;';
+            btnNext.onmouseover = function(){ this.style.background='#000'; this.style.color='#fff'; this.style.borderColor='#000'; };
+            btnNext.onmouseout  = function(){ this.style.background='#fff'; this.style.color='#000'; this.style.borderColor='#ccc'; };
             btnNext.onclick = function() {
                 const cardW = grid.children[0] ? grid.children[0].offsetWidth : scrollWrap.offsetWidth;
                 grid.scrollBy({ left: cardW, behavior: 'smooth' });
