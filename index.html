@@ -608,10 +608,15 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     width: 34px !important;
                     height: 34px !important;
                     background: #fff !important;
-                    color: #000 !important;
-                    border: 2px solid #ddd !important;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+                    color: #D4AF37 !important;
+                    border: 2px solid #D4AF37 !important;
+                    box-shadow: 0 2px 8px rgba(212,175,55,0.2) !important;
                     font-size: 20px !important;
+                    transition: all 0.2s !important;
+                }
+                button[onclick*="rtSlide"]:hover {
+                    background: #D4AF37 !important;
+                    color: #fff !important;
                 }
                 /* RT viewport scrollable on mobile */
                 div[style*="overflow:hidden; padding:2px"] {
@@ -630,10 +635,17 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 }
                 div[id^="rt-track-"]::-webkit-scrollbar { display: none; }
                 div[id^="rt-track-"] > div {
-                    flex: 0 0 44vw !important;
-                    min-width: 130px !important;
-                    max-width: 165px !important;
+                    flex: 0 0 100% !important;
+                    min-width: 0 !important;
+                    max-width: none !important;
                     scroll-snap-align: start !important;
+                    text-align: center !important;
+                }
+                div[id^="rt-track-"] > div > div {
+                    text-align: center !important;
+                }
+                div[id^="rt-track-"] > div > div > div {
+                    justify-content: center !important;
                 }
             }
 
@@ -3146,7 +3158,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     <div style="position:relative; display:flex; align-items:center; gap:0;">
 
                         <!-- Flecha izquierda -->
-                        <button type="button" onclick="rtSlide('rt-track-${id}',-1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:2px solid #ddd;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);z-index:2;margin-right:8px;flex-shrink:0;">&#8249;</button>
+                        <button type="button" onclick="rtSlide('rt-track-${id}',-1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#fff;color:#D4AF37;border:2px solid #D4AF37;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(212,175,55,0.2);z-index:2;margin-right:8px;transition:all 0.2s;" onmouseover="this.style.background='#D4AF37';this.style.color='#fff';" onmouseout="this.style.background='#fff';this.style.color='#D4AF37';">&#8249;</button>
 
                         <!-- Viewport: overflow hidden -->
                         <div style="flex:1; overflow:hidden;">
@@ -3187,7 +3199,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         </div>
 
                         <!-- Flecha derecha -->
-                        <button type="button" onclick="rtSlide('rt-track-${id}',1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:2px solid #ddd;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);z-index:2;margin-left:8px;flex-shrink:0;">&#8250;</button>
+                        <button type="button" onclick="rtSlide('rt-track-${id}',1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#fff;color:#D4AF37;border:2px solid #D4AF37;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(212,175,55,0.2);z-index:2;margin-left:8px;transition:all 0.2s;" onmouseover="this.style.background='#D4AF37';this.style.color='#fff';" onmouseout="this.style.background='#fff';this.style.color='#D4AF37';">&#8250;</button>
 
                     </div>` : `
                     <!-- ONE WAY: 3 tarjetas con imagen -->
@@ -4428,7 +4440,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             const btnPrev = document.createElement('button');
             btnPrev.setAttribute('type', 'button');
             btnPrev.innerHTML = '&#8249;';
-            btnPrev.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fff;color:#000;border:2px solid #ddd;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);';
+            btnPrev.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fff;color:#D4AF37;border:2px solid #D4AF37;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(212,175,55,0.2);transition:all 0.2s;';
+            btnPrev.onmouseover = function(){ this.style.background='#D4AF37'; this.style.color='#fff'; };
+            btnPrev.onmouseout  = function(){ this.style.background='#fff'; this.style.color='#D4AF37'; };
             btnPrev.onclick = function() {
                 const cardW = grid.children[0] ? grid.children[0].offsetWidth : scrollWrap.offsetWidth;
                 grid.scrollBy({ left: -cardW, behavior: 'smooth' });
@@ -4442,7 +4456,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             const btnNext = document.createElement('button');
             btnNext.setAttribute('type', 'button');
             btnNext.innerHTML = '&#8250;';
-            btnNext.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fff;color:#000;border:2px solid #ddd;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);';
+            btnNext.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fff;color:#D4AF37;border:2px solid #D4AF37;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(212,175,55,0.2);transition:all 0.2s;';
+            btnNext.onmouseover = function(){ this.style.background='#D4AF37'; this.style.color='#fff'; };
+            btnNext.onmouseout  = function(){ this.style.background='#fff'; this.style.color='#D4AF37'; };
             btnNext.onclick = function() {
                 const cardW = grid.children[0] ? grid.children[0].offsetWidth : scrollWrap.offsetWidth;
                 grid.scrollBy({ left: cardW, behavior: 'smooth' });
