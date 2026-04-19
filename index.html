@@ -3112,7 +3112,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         <button type="button" onclick="rtSlide('rt-track-${id}',-1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:var(--navy-bg);color:#fff;border:none;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.18);z-index:2;margin-right:8px;">&#8249;</button>
 
                         <!-- Viewport: overflow hidden -->
-                        <div style="flex:1; overflow:hidden;">
+                        <div style="flex:1; overflow:hidden; padding:2px;">
                             <div id="rt-track-${id}" data-page="0" style="display:flex;gap:10px;transition:transform 0.35s ease;will-change:transform;">
 
                                 <!-- TRIP: Agua -->
@@ -4360,15 +4360,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     function rtSlide(trackId, direction) {
         const track = document.getElementById(trackId);
         if (!track) return;
-        const viewport = track.parentElement;
         const cards = track.children;
         if (!cards.length) return;
-        const cardW = cards[0].offsetWidth + 10; // card + gap
-        const visibleCards = 3;
-        const pageW = cardW * visibleCards;
-        const totalPages = 2; // 2 pages: Trip(0-2) and Return(3-5)
+        const cardW = cards[0].offsetWidth + 12; // card + gap
+        const pageW = cardW * 3; // 3 cards per page
         let page = parseInt(track.dataset.page || '0');
-        page = Math.max(0, Math.min(totalPages - 1, page + direction));
+        // Toggle between page 0 (Trip) and page 1 (Return)
+        page = page === 0 ? 1 : 0;
         track.dataset.page = page;
         track.style.transform = "translateX(-" + (page * pageW) + "px)";
     }
