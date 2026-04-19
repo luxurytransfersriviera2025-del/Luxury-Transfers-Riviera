@@ -601,7 +601,33 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             .tarjeta-info h3 { font-size: 18px; }
             .tarjeta-price { border-left: none; padding-left: 0; border-top: 1px solid #eee; padding-top: 15px; text-align: right; flex-direction: column; align-items: flex-end; justify-content: flex-start; flex: auto; width: 100%; gap: 10px; } 
             .btn-reservar { width: 100%; padding: 14px 20px; margin-top: 0; font-size: 14px; }
-            /* EXTRAS: carrusel horizontal en mobile */
+            /* RT carousel mobile: switch to horizontal scroll */
+            @media (max-width: 700px) {
+                button[onclick*="rtSlide"] { display: none !important; }
+                div[style*="overflow:hidden; padding:2px"] {
+                    overflow-x: auto !important;
+                    -webkit-overflow-scrolling: touch !important;
+                    scrollbar-width: none !important;
+                }
+                div[style*="overflow:hidden; padding:2px"]::-webkit-scrollbar { display: none; }
+                div[id^="rt-track-"] {
+                    transform: none !important;
+                    transition: none !important;
+                    overflow-x: auto !important;
+                    -webkit-overflow-scrolling: touch !important;
+                    scroll-snap-type: x mandatory !important;
+                    scrollbar-width: none !important;
+                }
+                div[id^="rt-track-"]::-webkit-scrollbar { display: none; }
+                div[id^="rt-track-"] > div {
+                    flex: 0 0 44vw !important;
+                    min-width: 130px !important;
+                    max-width: 165px !important;
+                    scroll-snap-align: start !important;
+                }
+            }
+
+  /* EXTRAS: carrusel horizontal en mobile */
             .extras-carousel-wrapper {
                 position: relative;
             }
@@ -612,7 +638,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 z-index: 10;
                 width: 30px; height: 30px;
                 border-radius: 50%;
-                background: var(--navy-bg);
+                background: #000;
                 color: #fff;
                 border: none;
                 cursor: pointer;
@@ -3109,7 +3135,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     <div style="position:relative; display:flex; align-items:center; gap:0;">
 
                         <!-- Flecha izquierda -->
-                        <button type="button" onclick="rtSlide('rt-track-${id}',-1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:var(--navy-bg);color:#fff;border:none;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.18);z-index:2;margin-right:8px;">&#8249;</button>
+                        <button type="button" onclick="rtSlide('rt-track-${id}',-1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#000;color:#fff;border:none;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.25);z-index:2;margin-right:8px;">&#8249;</button>
 
                         <!-- Viewport: overflow hidden -->
                         <div style="flex:1; overflow:hidden; padding:2px;">
@@ -3150,7 +3176,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         </div>
 
                         <!-- Flecha derecha -->
-                        <button type="button" onclick="rtSlide('rt-track-${id}',1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:var(--navy-bg);color:#fff;border:none;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.18);z-index:2;margin-left:8px;">&#8250;</button>
+                        <button type="button" onclick="rtSlide('rt-track-${id}',1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#000;color:#fff;border:none;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.25);z-index:2;margin-left:8px;">&#8250;</button>
 
                     </div>` : `
                     <!-- ONE WAY: 3 tarjetas con imagen -->
