@@ -665,10 +665,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 display: flex !important;
                 flex-direction: row !important;
                 overflow-x: auto !important;
-                gap: 10px !important;
+                gap: 0 !important;
                 scroll-snap-type: x mandatory !important;
                 -webkit-overflow-scrolling: touch !important;
-                padding-bottom: 4px !important;
+                padding-bottom: 0 !important;
                 scrollbar-width: none !important;
                 grid-template-columns: unset !important;
                 flex-wrap: nowrap !important;
@@ -679,10 +679,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
             .extras-grid-4 > div, .extras-ow-grid > div,
             div[style*="grid-template-columns:repeat(3,1fr)"] > div {
-                flex: 0 0 44vw !important;
-                min-width: 130px !important;
-                max-width: 165px !important;
-                scroll-snap-align: center !important;
+                flex: 0 0 100% !important;
+                min-width: 0 !important;
+                max-width: none !important;
+                scroll-snap-align: start !important;
                 box-sizing: border-box !important;
                 align-items: center !important;
             }
@@ -3149,7 +3149,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         <button type="button" onclick="rtSlide('rt-track-${id}',-1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:2px solid #ddd;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);z-index:2;margin-right:8px;flex-shrink:0;">&#8249;</button>
 
                         <!-- Viewport: overflow hidden -->
-                        <div style="flex:1; overflow:hidden; padding:2px;">
+                        <div style="flex:1; overflow:hidden;">
                             <div id="rt-track-${id}" data-page="0" style="display:flex;gap:10px;transition:transform 0.35s ease;will-change:transform;">
 
                                 <!-- TRIP: Agua -->
@@ -4403,7 +4403,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         if (isMobile) {
             // On mobile: use native scrollBy (track is overflow-x:auto)
             const cardW = cards[0].offsetWidth + 10;
-            track.scrollBy({ left: direction * cardW * 3, behavior: 'smooth' });
+            track.scrollBy({ left: direction * cardW, behavior: 'smooth' });
         } else {
             // Desktop: translateX toggle between page 0 (Trip) and page 1 (Return)
             const cardW = cards[0].offsetWidth + 12;
@@ -4430,12 +4430,12 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             btnPrev.innerHTML = '&#8249;';
             btnPrev.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fff;color:#000;border:2px solid #ddd;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);';
             btnPrev.onclick = function() {
-                const cardW = grid.children[0] ? grid.children[0].offsetWidth + 10 : 150;
+                const cardW = grid.children[0] ? grid.children[0].offsetWidth : scrollWrap.offsetWidth;
                 grid.scrollBy({ left: -cardW, behavior: 'smooth' });
             };
 
             const scrollWrap = document.createElement('div');
-            scrollWrap.style.cssText = 'flex:1;overflow:hidden;padding:2px;';
+            scrollWrap.style.cssText = 'flex:1;overflow:hidden;';
             grid.parentNode.insertBefore(scrollWrap, grid);
             scrollWrap.appendChild(grid);
 
@@ -4444,7 +4444,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             btnNext.innerHTML = '&#8250;';
             btnNext.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fff;color:#000;border:2px solid #ddd;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);';
             btnNext.onclick = function() {
-                const cardW = grid.children[0] ? grid.children[0].offsetWidth + 10 : 150;
+                const cardW = grid.children[0] ? grid.children[0].offsetWidth : scrollWrap.offsetWidth;
                 grid.scrollBy({ left: cardW, behavior: 'smooth' });
             };
 
