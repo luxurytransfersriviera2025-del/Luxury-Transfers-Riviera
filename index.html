@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" translate="no" class="notranslate">
 <head>
     <!-- Google tag (gtag.js) -->
@@ -1723,7 +1723,80 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     const airportNameES = "Aeropuerto Internacional de Cancún";
     const airportNameEN = "Cancun International Airport";
 
-    // Contenido de T&C cargado desde tyc-content.js (async)
+    // --- CORRECCION 1: TYC EN FORMATO HTML DE NUEVO ---
+    const tycHtmlES = `
+        <h4>1. PROCESO DE RESERVACIÓN Y PAGOS</h4>
+        <p><strong>Número de Reserva:</strong> Al completar su solicitud en nuestro sitio web, el sistema generará un número de reserva único. La reserva se considera confirmada únicamente al completarse el pago en línea al 100% mediante Stripe (tarjeta de crédito/débito) o PayPal.</p>
+        <p><strong>Pago en Línea (100%):</strong> Se requiere el pago total al momento de reservar a través de nuestros procesadores seguros: Stripe (Visa, Mastercard, Amex) o PayPal. No se aceptan pagos en efectivo ni depósitos parciales para confirmar la reserva.</p>
+        <p><strong>Seguridad del Pago:</strong> Todos los pagos son procesados con encriptación SSL. <span translate="no">Luxury Transfers Riviera</span> no almacena datos de tarjetas — los datos se procesan directamente por Stripe y PayPal, certificados PCI-DSS.</p>
+        <p><strong>Confirmación Oficial:</strong> Una vez procesado el pago, recibirás confirmación automática y nuestro equipo bloqueará la unidad en agenda. Recibirás un mensaje de WhatsApp de confirmación en breve.</p>
+
+        <h4>2. POLÍTICAS DE CANCELACIÓN Y REEMBOLSOS</h4>
+        <p><strong>Cancelación con más de 48 horas de anticipación:</strong> Aplica reembolso del 70% del monto pagado con tarjeta de crédito/débito.</p>
+        <p><strong>Cancelación con menos de 48 horas o No-Show:</strong> No aplica reembolso ni crédito bajo ninguna circunstancia.</p>
+        <p><strong>Fuerza Mayor:</strong> No nos responsabilizamos por retrasos o cancelaciones debidos a tráfico, accidentes de terceros, bloqueos viales, clima extremo, huracanes u otros fenómenos naturales propios de la región del Caribe Mexicano.</p>
+
+        <h4>3. PRIVACIDAD Y PROTECCIÓN DE DATOS</h4>
+        <p><strong>Confidencialidad:</strong> Luxury Transfers Riviera utilizará su información personal (nombre, teléfono y correo electrónico) para la gestión de su traslado y, ocasionalmente, para el envío de promociones y ofertas especiales relacionadas con nuestros servicios. Asimismo, sus datos podrán ser utilizados en plataformas de publicidad digital como Meta (Facebook e Instagram) para la creación de audiencias personalizadas y audiencias similares con fines de marketing, de forma segura y sin que sean visibles para terceros. Sus datos nunca serán vendidos. Si desea dejar de recibir comunicaciones, puede solicitarlo en cualquier momento por WhatsApp.</p>
+        <p><strong>Seguridad:</strong> Sus datos son tratados con total discreción y no serán compartidos con terceros ajenos a la operación, garantizando la privacidad de su itinerario en todo momento.</p>
+
+        <h4>4. SEGUROS Y DESLINDE DE RESPONSABILIDAD MÉDICA</h4>
+        <p><strong>Seguro de Viajero:</strong> Nuestras unidades cuentan con Póliza de Responsabilidad Civil vigente conforme a la ley federal mexicana por accidente de tránsito.</p>
+        <p><strong>Exclusión:</strong> La empresa queda exenta de responsabilidad en caso de complicaciones de salud o fallecimiento derivados de causas naturales o condiciones médicas preexistentes del pasajero.</p>
+
+        <h4>5. TIEMPOS DE ESPERA Y TOLERANCIA</h4>
+        <p><strong>Aeropuerto:</strong> El tiempo máximo de espera es de 60 minutos tras el aterrizaje real del vuelo. Al minuto 61 sin contacto del pasajero, la unidad podrá retirarse y el servicio se marcará como No-Show sin derecho a reembolso.</p>
+        <p><strong>Hotel o Airbnb:</strong> La tolerancia es de 20 minutos a partir de la hora acordada. Tras este tiempo, la unidad podrá retirarse. Tiempo adicional solicitado por el cliente podría generar un cargo extra sujeto a disponibilidad.</p>
+
+        <h4>6. EQUIPAJE, OBJETOS DE VALOR Y SUSTANCIAS</h4>
+        <p><strong>Responsabilidad:</strong> El pasajero es el único responsable de sus pertenencias. No nos hacemos responsables por objetos olvidados o daños menores al equipaje por manejo normal.</p>
+        <p><strong>Sustancias Ilícitas:</strong> Prohibido el transporte de drogas o armas. El incumplimiento causará la interrupción inmediata del servicio sin reembolso.</p>
+
+        <h4>7. CARGOS POR LIMPIEZA Y DAÑOS</h4>
+        <p><strong>Multa por Higiene:</strong> El cliente acepta un cargo de $300 MXN ($17 USD) por limpieza profunda en caso de vómito, derrames de comida o manchas graves en la tapicería.</p>
+        <p><strong>Daños Físicos:</strong> Cualquier daño intencional o accidental a la unidad será facturado al costo total de reparación.</p>
+
+        <h4>8. VEHÍCULOS Y CONDUCTA</h4>
+        <p><strong>Referencia Visual:</strong> Las imágenes son ilustrativas. Se garantiza la categoría contratada, pero el modelo o color pueden variar. Ante un imprevisto técnico, se enviará una unidad de apoyo para garantizar su llegada al destino.</p>
+        <p><strong>Derecho de Admisión:</strong> El chofer podrá negar el servicio ante conductas agresivas o estado inconveniente de los pasajeros que ponga en riesgo la seguridad.</p>
+    `;
+
+    const tycHtmlEN = `
+        <h4>1. BOOKING PROCESS AND PAYMENTS</h4>
+        <p><strong>Booking Number:</strong> Upon completing your request on our website, the system will generate a unique booking number. The booking is considered confirmed only upon successful 100% online payment via Stripe (credit/debit card) or PayPal.</p>
+        <p><strong>Online Payment (100%):</strong> Full payment is required at the time of booking through our secure processors: Stripe (Visa, Mastercard, Amex) or PayPal. Cash payments and partial deposits are not accepted to confirm a reservation.</p>
+        <p><strong>Payment Security:</strong> All payments are processed with SSL encryption. <span translate="no">Luxury Transfers Riviera</span> does not store card data — all payment data is handled directly by Stripe and PayPal, both PCI-DSS certified.</p>
+        <p><strong>Official Confirmation:</strong> Once payment is processed, you will receive automatic confirmation and our team will block the vehicle on our schedule. You will receive a WhatsApp confirmation message shortly.</p>
+
+        <h4>2. CANCELLATION AND REFUND POLICIES</h4>
+        <p><strong>Cancellations more than 48 hours in advance:</strong> A 70% refund of the amount paid by credit/debit card will be issued.</p>
+        <p><strong>Cancellations less than 48 hours or No-Show:</strong> No refund or credit will apply under any circumstances.</p>
+        <p><strong>Force Majeure:</strong> We are not responsible for delays or cancellations due to traffic, third-party accidents, road blockades, extreme weather, hurricanes, or other natural phenomena common to the Mexican Caribbean region.</p>
+
+        <h4>3. PRIVACY AND DATA PROTECTION</h4>
+        <p><strong>Confidentiality:</strong> Luxury Transfers Riviera will use your personal information (name, phone number, and email address) to manage your transfer and, occasionally, to send promotions and special offers related to our services. Additionally, your data may be used on digital advertising platforms such as Meta (Facebook and Instagram) for the creation of custom audiences and lookalike audiences for marketing purposes, in a secure manner and without being visible to third parties. Your data will never be sold. If you wish to stop receiving communications, you may request this at any time via WhatsApp.</p>
+        <p><strong>Security:</strong> Your data is handled with total discretion and will not be shared with third parties outside of our operations, guaranteeing the privacy of your itinerary at all times.</p>
+
+        <h4>4. INSURANCE AND MEDICAL LIABILITY DISCLAIMER</h4>
+        <p><strong>Traveler Insurance:</strong> Our vehicles carry active Civil Liability Insurance as required by Mexican federal law for traffic accidents.</p>
+        <p><strong>Exclusion:</strong> The company is exempt from liability for health complications or death resulting from natural causes or pre-existing medical conditions of the passenger.</p>
+
+        <h4>5. WAITING TIMES AND TOLERANCE</h4>
+        <p><strong>Airport Arrivals:</strong> Maximum waiting time is 60 minutes after the actual flight landing. If there is no contact from the passenger after 61 minutes, the vehicle may depart and the service will be marked as a No-Show with no right to a refund.</p>
+        <p><strong>Hotel or Airbnb Pickups:</strong> Maximum tolerance is 20 minutes from the agreed pickup time. After this time, the vehicle may depart. Additional waiting time requested by the client may incur an extra charge, subject to availability.</p>
+
+        <h4>6. LUGGAGE, VALUABLES, AND SUBSTANCES</h4>
+        <p><strong>Responsibility:</strong> Passengers are solely responsible for their belongings. We are not responsible for forgotten or lost items (jewelry, electronics, cash) or minor luggage damage from normal handling.</p>
+        <p><strong>Illegal Substances:</strong> Transporting drugs or weapons is strictly prohibited. Non-compliance will result in immediate termination of service without a refund.</p>
+
+        <h4>7. CLEANING FEES AND VEHICLE DAMAGE</h4>
+        <p><strong>Sanitation Fee:</strong> The client agrees to an automatic charge of $300 MXN ($17 USD) for deep cleaning in the event of vomiting, food/drink spills, or severe upholstery stains.</p>
+        <p><strong>Physical Damage:</strong> Any intentional or accidental damage to the vehicle will be billed at the full cost of repair at an authorized shop.</p>
+
+        <h4>8. VEHICLES AND CONDUCT</h4>
+        <p><strong>Visual Reference:</strong> Website images are illustrative. We guarantee the booked category, but the specific make, model, or color may vary. In the event of a technical issue, a support unit will be dispatched to guarantee your arrival at the destination.</p>
+        <p><strong>Right of Admission:</strong> The driver may refuse service or interrupt the journey due to aggressive behavior or intoxication that jeopardizes the safety of the staff or the vehicle.</p>
+    `;
 
     /* --- HELPER PARA OBTENER TEXTO PLANO DE TÉRMINOS Y CONDICIONES (Solo para el Script si lo requiere) --- */
     function getTycPlainText(lang) {
@@ -1796,7 +1869,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             // MODALES Y TYC ESPAÑOL
             tycTitle: "Términos y Condiciones",
             btnClose: "Cerrar <i class='fas fa-times'></i>",
-            get tycContent() { return window.tycHtmlES || ''; },
+            tycContent: tycHtmlES, // USA EL HTML BONITO
             btnAcceptTyc: "HE LEÍDO Y ACEPTO",
             
             // ALERTAS TRADUCIDAS
@@ -1924,7 +1997,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
             tycTitle: "Terms & Conditions",
             btnClose: "Close <i class='fas fa-times'></i>",
-            get tycContent() { return window.tycHtmlEN || ''; },
+            tycContent: tycHtmlEN, // USA EL HTML BONITO
             btnAcceptTyc: "I HAVE READ AND AGREE",
             
             // ALERTAS TRADUCIDAS
@@ -3207,10 +3280,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 </button>
 
                 <!-- BLOQUE DE PAGO -->
-                <div id="payment-block-${id}" style="display:none; margin-top:10px;">
+                <div id="payment-block-${id}" style="display:none; margin-top:20px;">
 
                     <!-- Solo el monto — sin repetir vehículo ni ruta -->
-                    <div style="background:#f0f4ff; border:2.5px solid var(--navy-bg); border-radius:10px; padding:14px 20px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 10px rgba(0,40,85,0.10);">
+                    <div style="background:#f0f4ff; border:2.5px solid var(--navy-bg); border-radius:10px; padding:14px 20px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 10px rgba(0,40,85,0.10);">
                         <span style="font-size:11px; color:var(--navy-bg); text-transform:uppercase; letter-spacing:1.5px; font-family:var(--font-title); font-weight:800;">
                             ${isEN ? 'Total to pay' : 'Total a pagar'}
                         </span>
@@ -4516,6 +4589,5 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdK5yLQ20SQrLc_0rOuo7oxxHVQ233Bh0&libraries=places&callback=initAutocomplete" async defer></script>
-    <script src="tyc-content.js" async></script>
 </body>
 </html>
