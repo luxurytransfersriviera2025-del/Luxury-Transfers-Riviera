@@ -1480,19 +1480,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         <p id="loadingTextDisplay" style="margin-top: 15px; font-weight: 700; color: #333; font-size: 14px;">GENERANDO RESERVA...</p>
     </div>
 
-    <div class="modal-overlay" id="modalTyC">
-        <div class="modal-box">
-            <div class="modal-header-fixed">
-                <h2 class="modal-title-fixed" id="tyc-title">Términos y Condiciones</h2>
-                <button class="btn-close-fixed" id="btn-close-tyc" onclick="cerrarTyC()">Cerrar <i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-scrollable-content" style="background:#fff;">
-                <div class="tyc-content" id="tyc-body"></div>
-                <button class="btn-reservar" onclick="cerrarTyC()" style="margin-top: 20px; width: 100%;" id="btn-accept-tyc">HE LEÍDO Y ACEPTO</button>
-            </div>
-        </div>
-    </div>
-
     <div class="modal-overlay" id="modalConfirmacion">
         <div class="modal-box">
             <div class="modal-header-fixed">
@@ -1810,7 +1797,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             labelReturnTime: "HORA DE REGRESO",
             labelAerolinea: "Aerolínea (Opcional)", labelVuelo: "No. Vuelo (Opcional)",
             labelNotas: "Notas / Equipaje / Sillas de Bebé",
-            labelTerms: 'He leído y acepto los <span class="terms-link" onclick="abrirTyC()">Términos y Condiciones</span>',
+            labelTerms: 'He leído y acepto los <a href="terminos.html" target="_blank" class="terms-link">Términos y Condiciones</a>',
             btnAccion: "Buscar Precios",
             btnQuoteCustom: "Solicitar Cotización",
             serviciosTitle: "Nuestros Servicios",
@@ -1939,7 +1926,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             labelReturnTime: "RETURN TIME",
             labelAerolinea: "Airline (Optional)", labelVuelo: "Flight No. (Optional)",
             labelNotas: "Notes / Luggage / Baby Seats",
-            labelTerms: 'I have read and agree to the <span class="terms-link" onclick="abrirTyC()">Terms & Conditions</span>',
+            labelTerms: 'I have read and agree to the <a href="terminos.html" target="_blank" class="terms-link">Terms &amp; Conditions</a>',
             btnAccion: "Search Prices",
             btnQuoteCustom: "Request Quote",
             serviciosTitle: "Our Services",
@@ -2197,12 +2184,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         document.getElementById('btn-quote-5').innerText = t.btnQuote;
 
         // ACTUALIZACIÓN DE TEXTOS EN MODALES Y BOTONES CERRAR
-        document.getElementById('tyc-title').innerText = t.tycTitle;
-        // Solo actualizar el contenido si tenemos el texto completo, usamos el helper
-        document.getElementById('tyc-body').innerHTML = t.tycContent;
-
-        document.getElementById('btn-accept-tyc').innerText = t.btnAcceptTyc;
-        document.getElementById('btn-close-tyc').innerHTML = t.btnClose; 
         document.getElementById('btn-close-confirm').innerHTML = t.btnClose; 
 
         // CORRECCION 1: ACTUALIZAR TEXTO LOADING DINÁMICO
@@ -2326,13 +2307,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         });
         window.addEventListener('resize', updateSlider);
     }
-
-    function abrirTyC() { 
-        document.getElementById('tyc-body').innerHTML = translations[currentLang].tycContent;
-        document.getElementById('modalTyC').style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    }
-    function cerrarTyC() { document.getElementById('modalTyC').style.display = 'none'; document.body.style.overflow = ''; }
 
     function generarCodigo() {
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -3249,9 +3223,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 <div class="terms-container" style="margin-bottom:16px;">
                     <input type="checkbox" id="terms-${id}">
                     <span>${isEN ? 'I have read and agree to the' : 'He leído y acepto los'}
-                        <span class="terms-link" onclick="abrirTyC()">
+                        <a href="terminos.html" target="_blank" class="terms-link">
                             ${isEN ? 'Terms & Conditions' : 'Términos y Condiciones'}
-                        </span>
+                        </a>
                     </span>
                 </div>
 
