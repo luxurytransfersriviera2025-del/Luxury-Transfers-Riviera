@@ -771,33 +771,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             .custom-form-grid { grid-template-columns: 1fr !important; }
             .ltr-social-link { width: 34px; height: 34px; font-size: 15px; }
         }
-        body.lang-loading { visibility: hidden; }
-        body.lang-loading #splash-loader { visibility: visible; }
-
-        /* SPLASH LOADER */
-        #splash-loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #0a0a0a; z-index: 999999;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center; gap: 20px;
-            transition: opacity 0.4s ease;
-        }
-        #splash-loader img { width: 60px; height: 60px; object-fit: contain; }
-        #splash-loader .splash-brand {
-            font-family: var(--font-title); font-size: 1.3rem; font-weight: 800;
-            color: var(--gold); text-transform: uppercase; letter-spacing: 3px;
-            white-space: nowrap;
-        }
-        #splash-loader .splash-bar-wrap {
-            width: 140px; height: 3px; background: rgba(212,175,55,0.2);
-            border-radius: 10px; overflow: hidden;
-        }
-        #splash-loader .splash-bar {
-            height: 100%; width: 0%; background: var(--gold);
-            border-radius: 10px;
-            animation: splashFill 1.5s ease forwards;
-        }
-        @keyframes splashFill { from { width: 0%; } to { width: 100%; } }
         /* CUPÓN EMERGENTE */
         #cupon-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -840,9 +813,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             user-select: all;
         }
         #cupon-box .cupon-codigo:hover { transform: scale(1.05); }
-        #cupon-box .cupon-hint {
-            font-size: 0.78rem; color: #888; margin-bottom: 22px;
-        }
         #cupon-box .cupon-btn {
             background: var(--gold); color: var(--black);
             font-family: var(--font-title); font-weight: 800;
@@ -851,6 +821,18 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             cursor: pointer; width: 100%; transition: background 0.3s;
         }
         #cupon-box .cupon-btn:hover { background: var(--gold-hover); }
+
+        /* FOOTER LINKS BAR */
+        .footer-links-bar {
+            display: flex; gap: 24px; justify-content: center; align-items: center;
+            flex-wrap: wrap; margin-bottom: 14px;
+        }
+        .footer-links-bar a {
+            color: rgba(255,255,255,0.6); text-transform: uppercase;
+            letter-spacing: 1px; font-size: 12px; font-family: var(--font-title);
+            font-weight: 700; transition: color 0.2s;
+        }
+        .footer-links-bar a:hover { color: var(--gold); }
     </style>
     <!-- SCHEMA MARKUP — Structured Data para Google -->
     <script type="application/ld+json">
@@ -961,14 +943,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     }
     </script>
 </head>
-<body class="lang-loading">
-
-    <!-- SPLASH LOADER -->
-    <div id="splash-loader">
-        <img src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Favicon%20200%20x%20200%20px.webp" alt="Luxury Transfers">
-        <div class="splash-brand" translate="no" translate="no">Luxury Transfers</div>
-        <div class="splash-bar-wrap"><div class="splash-bar"></div></div>
-    </div>
+<body>
 
     <!-- CUPÓN EMERGENTE -->
     <div id="cupon-overlay">
@@ -978,7 +953,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             <div class="cupon-titulo" id="cupon-titulo">¡Oferta Exclusiva!</div>
             <div class="cupon-desc" id="cupon-desc">Usa este cupón al cotizar tu transfer y obtén un <strong style="color:var(--gold);">10% de descuento</strong> en tu reserva.</div>
             <div class="cupon-codigo" onclick="copiarCupon(this)" title="Clic para copiar">LTR-10</div>
-            <div class="cupon-hint" id="cupon-hint">🖱️ Haz clic en el código para copiarlo</div>
             <button class="cupon-btn" onclick="irACotizar()" id="cupon-btn">Cotizar Ahora</button>
         </div>
     </div>
@@ -1490,6 +1464,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         Transfer privado aeropuerto Cancún. Transfer privado aeropuerto Tulum. Traslado hotel a hotel Riviera Maya. Transporte privado Playa del Carmen. Vehículos propios sin intermediarios.
         Private transfer Cancun Airport. Tulum Airport transfer. Hotel to hotel Riviera Maya. Own vehicles no agencies. Private transportation Riviera Maya.
     </p>
+    <div class="footer-links-bar">
+        <a href="index.html" id="fl-home">Home</a>
+        <a href="terminos.html" id="fl-tyc">Terms &amp; Conditions</a>
+        <a href="privacidad.html" id="fl-priv">Privacy Policy</a>
+    </div>
     <p style="margin-bottom: 5px;" id="footer-copy">&copy; 2026 Luxury Transfers Riviera. All rights reserved.</p>
     
     <p style="margin: 0;" id="footer-op">Operated by <strong>SILVER'S SHUTTLE'S SERVICES S.A. DE C.V.</strong> <br> RFC: SSS210817PQ6</p>
@@ -2184,6 +2163,15 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         document.getElementById('flota-subtitle').innerText = t.flotaSubtitle;
         document.getElementById('footer-copy').innerHTML = t.footerCopy;
         document.getElementById('footer-op').innerHTML = t.footerOp;
+        if (lang === 'es') {
+            document.getElementById('fl-home').textContent = 'Inicio';
+            document.getElementById('fl-tyc').textContent = 'Términos y Condiciones';
+            document.getElementById('fl-priv').textContent = 'Política de Privacidad';
+        } else {
+            document.getElementById('fl-home').textContent = 'Home';
+            document.getElementById('fl-tyc').textContent = 'Terms & Conditions';
+            document.getElementById('fl-priv').textContent = 'Privacy Policy';
+        }
 
         document.getElementById('serv-title-1').innerText = t.servTitle1; document.getElementById('serv-desc-1').innerText = t.servDesc1;
         document.getElementById('serv-title-2').innerText = t.servTitle2; document.getElementById('serv-desc-2').innerText = t.servDesc2;
@@ -2302,11 +2290,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         setLang('en');
         document.body.classList.remove('lang-loading');
         document.body.style.opacity = '1';
-        const splash = document.getElementById('splash-loader');
-        if (splash) {
-            splash.style.opacity = '0';
-            setTimeout(() => splash.style.display = 'none', 400);
-        }
 
         // Restaurar modo correcto sin re-llenar el campo
         direccionMode = 'desdeAero';
@@ -4528,11 +4511,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         sessionStorage.setItem('cuponVisto', '1');
     }
     function copiarCupon(el) {
-        navigator.clipboard.writeText('LTR-10').then(() => {
-            const hint = document.getElementById('cupon-hint');
-            hint.textContent = currentLang === 'en' ? '✅ Code copied!' : '✅ ¡Código copiado!';
-            hint.style.color = 'var(--gold)';
-        });
+        navigator.clipboard.writeText('LTR-10');
     }
     function irACotizar() {
         // Auto-apply coupon code to all promo fields
@@ -4555,7 +4534,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         document.getElementById('cupon-desc').innerHTML      = isEN
             ? 'Use this coupon when quoting your transfer and get a <strong style="color:var(--gold);">10% discount</strong> on your booking.'
             : 'Usa este cupón al cotizar tu transfer y obtén un <strong style="color:var(--gold);">10% de descuento</strong> en tu reserva.';
-        document.getElementById('cupon-hint').textContent   = isEN ? '🖱️ Click the code to copy it' : '🖱️ Haz clic en el código para copiarlo';
         document.getElementById('cupon-btn').textContent    = isEN ? 'Apply Coupon' : 'Aplicar Cupón';
     }
     // Mostrar cupón a los 4 segundos
