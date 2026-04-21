@@ -53,7 +53,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
          Reemplaza TU_PAYPAL_CLIENT_ID con tu Client ID (Sandbox para pruebas, Live para producción).
          Lo encuentras en developer.paypal.com → My Apps & Credentials
     ══ -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AcRsDfJPus_5Mur2K9O8DNC_yzH56wtqTyrRsWfVmK3JbWGbWKG0139Suix3Cv_jlRjen3LRgU14fL4UG&currency=USD&intent=capture&components=buttons&enable-funding=paypal" data-namespace="paypalSDK"></script>
+    <!-- PayPal SDK se carga dinámicamente al momento del pago -->
 
     <style>
         /* ==========================================================================
@@ -3797,6 +3797,21 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     const _datosPendientes = {};
 
     // ─── PASO 1: Validar formulario y mostrar botones de pago ────────
+    // ── Carga PayPal SDK dinámicamente (solo cuando el usuario llega al pago) ──
+    let _paypalSDKLoading = false;
+    let _paypalSDKLoaded  = false;
+    function loadPayPalSDK(callback) {
+        if (_paypalSDKLoaded) { callback(); return; }
+        if (_paypalSDKLoading) { setTimeout(() => loadPayPalSDK(callback), 200); return; }
+        _paypalSDKLoading = true;
+        const script = document.createElement('script');
+        script.src = 'https://www.paypal.com/sdk/js?client-id=AcRsDfJPus_5Mur2K9O8DNC_yzH56wtqTyrRsWfVmK3JbWGbWKG0139Suix3Cv_jlRjen3LRgU14fL4UG&currency=USD&intent=capture&components=buttons&enable-funding=paypal';
+        script.setAttribute('data-namespace', 'paypalSDK');
+        script.onload  = () => { _paypalSDKLoaded = true; _paypalSDKLoading = false; callback(); };
+        script.onerror = () => { _paypalSDKLoading = false; callback(); };
+        document.body.appendChild(script);
+    }
+
     function validarYMostrarPago(id, datosCard) {
         const t    = translations[currentLang];
         const isEN = currentLang === 'en';
@@ -3822,9 +3837,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const totalFinal   = Math.round((basePrice + extras) * 100) / 100;
         const currencyCode = moneda === 'MXN' ? 'MXN' : moneda === 'CAD' ? 'CAD' : 'USD';
 
-        // Montar botones PayPal (lazy)
+        // Montar botones PayPal (lazy — carga SDK si aún no está)
         const container = document.getElementById('paypal-button-container-' + id);
         if (container && !container.hasChildNodes()) {
+            loadPayPalSDK(function() {
             const sdkRef = typeof paypalSDK !== 'undefined' ? paypalSDK
                          : typeof paypal    !== 'undefined' ? paypal : null;
 
@@ -3913,6 +3929,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 const fb = document.getElementById('paypal-fallback-' + id);
                 if (fb) fb.style.display = 'block';
             }
+            }); // end loadPayPalSDK callback
         }
     }
 
