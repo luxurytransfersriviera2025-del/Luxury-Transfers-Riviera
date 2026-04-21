@@ -552,7 +552,8 @@
     }
 
     const saved = localStorage.getItem('ltr-lang');
-    if (saved && saved !== currentLang) { currentLang = saved; applyLang(); }
+    if (saved) { currentLang = saved; }
+    applyLang();
 </script>
 </body>
 </html>
