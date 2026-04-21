@@ -3304,9 +3304,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
                 <div class="terms-container" style="margin-bottom:16px;">
                     <input type="checkbox" id="terms-${id}">
-                    <span>${isEN ? 'I have read and agree to the' : 'He leído y acepto los'}
+                    <span>${isEN ? 'I have read and accept the' : 'He leído y acepto los'}
                         <span class="terms-link" onclick="abrirTyC()">
-                            ${isEN ? 'Terms & Conditions' : 'Términos y Condiciones'}
+                            ${isEN ? 'Terms & Conditions and Privacy Policy' : 'Términos y Condiciones y la Política de Privacidad'}
                         </span>
                     </span>
                 </div>
@@ -4162,57 +4162,124 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         // ── Pago cancelado ───────────────────────────────────────────
         if (payment === 'cancelled') {
-            // NO borramos sessionStorage — conservamos los datos del formulario
+            // NO borramos sessionStorage — conservamos los datos
+            const raw = sessionStorage.getItem('ltr_pendingBooking');
+            if (!raw) return;
+
+            let datosVenta;
+            try { datosVenta = JSON.parse(raw); } catch(e) { return; }
+
+            const isEN = currentLang === 'en';
+
             setTimeout(() => {
-                const isEN = currentLang === 'en';
+                // 1. Rellenar el formulario con los datos guardados
+                try {
+                    if (datosVenta.origen)  { document.getElementById('origen').value  = datosVenta.origen;  }
+                    if (datosVenta.destino) { document.getElementById('destino').value = datosVenta.destino; }
+                    if (datosVenta.fecha)   { document.getElementById('fechaIda').value = datosVenta.fecha;  }
+                    if (datosVenta.hora) {
+                        // Convertir hora 12h a 24h para el input
+                        const hora12 = datosVenta.hora;
+                        const match = hora12.match(/(\d+):(\d+)\s*(AM|PM)/i);
+                        if (match) {
+                            let h = parseInt(match[1]);
+                            const m = match[2];
+                            const ampm = match[3].toUpperCase();
+                            if (ampm === 'PM' && h !== 12) h += 12;
+                            if (ampm === 'AM' && h === 12) h = 0;
+                            document.getElementById('horaIda').value = String(h).padStart(2,'0') + ':' + m;
+                        }
+                    }
+                    if (datosVenta.pasajeros) {
+                        const paxEl = document.getElementById('pasajerosOneWay');
+                        if (paxEl) paxEl.value = datosVenta.pasajeros;
+                        const paxEl2 = document.getElementById('pasajeros');
+                        if (paxEl2) paxEl2.value = datosVenta.pasajeros;
+                        // Update pax display
+                        document.querySelectorAll('.pax-display').forEach(el => {
+                            el.querySelector('span:first-child') && (el.querySelector('span:first-child').textContent = datosVenta.pasajeros + (isEN ? ' Pax' : ' Pax'));
+                        });
+                    }
+                } catch(e) { console.warn('Restore form error:', e); }
 
-                // Crear banner de error elegante
-                const banner = document.createElement('div');
-                banner.id = 'payment-error-banner';
-                banner.style.cssText = `
-                    position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
-                    z-index: 9999; width: 90%; max-width: 560px;
-                    background: #fff; border-radius: 12px;
-                    border-left: 5px solid #e74c3c;
-                    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-                    padding: 20px 24px; display: flex; gap: 16px; align-items: flex-start;
-                    animation: slideDown 0.4s ease;
-                `;
-                banner.innerHTML = `
-                    <div style="font-size:32px;line-height:1;">⚠️</div>
-                    <div style="flex:1;">
-                        <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:15px;color:#c0392b;margin-bottom:4px;">
-                            ${isEN ? 'Payment not completed' : 'Pago no completado'}
-                        </div>
-                        <div style="font-family:'Open Sans',sans-serif;font-size:13px;color:#555;line-height:1.5;margin-bottom:12px;">
-                            ${isEN
-                                ? 'Your payment was cancelled or could not be processed. Your booking details are still saved — please try again with a different method.'
-                                : 'Tu pago fue cancelado o no pudo procesarse. Tus datos de reserva siguen guardados — intenta de nuevo con otro método de pago.'}
-                        </div>
-                        <button onclick="document.getElementById('payment-error-banner').remove(); document.getElementById('seccion-quote').scrollIntoView({behavior:'smooth'});"
-                            style="background:var(--gold);color:#000;border:none;border-radius:6px;padding:8px 18px;font-family:'Montserrat',sans-serif;font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:1px;cursor:pointer;">
-                            ${isEN ? 'Try Again' : 'Intentar de nuevo'}
-                        </button>
-                    </div>
-                    <button onclick="this.parentElement.remove();"
-                        style="background:none;border:none;font-size:20px;cursor:pointer;color:#aaa;line-height:1;padding:0;margin-top:-4px;">✕</button>
-                `;
+                // 2. Re-ejecutar cotizar para mostrar resultados
+                cotizar(false);
 
-                // Añadir animación CSS si no existe
-                if (!document.getElementById('payment-banner-style')) {
-                    const style = document.createElement('style');
-                    style.id = 'payment-banner-style';
-                    style.textContent = `@keyframes slideDown { from { opacity:0; transform:translateX(-50%) translateY(-20px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }`;
-                    document.head.appendChild(style);
-                }
+                // 3. Después de que carguen los resultados, abrir el bloque de pago correcto e inyectar el error
+                setTimeout(() => {
+                    const vehBuscado = (datosVenta.vehiculo || '').toUpperCase();
+                    let cardIdTarget = null;
 
-                document.body.appendChild(banner);
+                    // Buscar la tarjeta que coincide con el vehículo
+                    document.querySelectorAll('[id^="payment-block-"]').forEach(function(block) {
+                        const cardId = block.id.replace('payment-block-', '');
+                        const btnStripe = document.getElementById('btn-stripe-' + cardId);
+                        if (btnStripe) {
+                            const cardHtml = btnStripe.closest('.tarjeta') || btnStripe.closest('[class*="card"]') || btnStripe.parentElement;
+                            const cardText = cardHtml ? cardHtml.innerHTML.toUpperCase() : '';
+                            // Match by vehicle name
+                            const vehMatch = vehBuscado.split(' ')[0]; // e.g. "CLASSIC", "COMFORT", "FAMILY", "GRAND", "LUXURY"
+                            if (cardText.includes(vehMatch) || vehBuscado === '') {
+                                if (!cardIdTarget) cardIdTarget = cardId;
+                            }
+                        }
+                    });
 
-                // Scroll al cotizador
-                document.getElementById('seccion-quote').scrollIntoView({ behavior: 'smooth' });
+                    // Fallback: usar la primera tarjeta disponible
+                    if (!cardIdTarget) {
+                        const first = document.querySelector('[id^="payment-block-"]');
+                        if (first) cardIdTarget = first.id.replace('payment-block-', '');
+                    }
 
-                // Auto-cerrar después de 12 segundos
-                setTimeout(() => { if (banner.parentElement) banner.remove(); }, 12000);
+                    if (!cardIdTarget) return;
+
+                    // Mostrar el bloque de pago
+                    const payBlock = document.getElementById('payment-block-' + cardIdTarget);
+                    const btnCont  = document.getElementById('btn-continuar-' + cardIdTarget);
+                    if (payBlock) {
+                        payBlock.style.display = 'block';
+                        if (btnCont) btnCont.style.display = 'none';
+                    }
+
+                    // Inyectar mensaje de error inline — arriba del bloque de pago
+                    const errorId = 'inline-payment-error';
+                    if (!document.getElementById(errorId) && payBlock) {
+                        const errorDiv = document.createElement('div');
+                        errorDiv.id = errorId;
+                        errorDiv.style.cssText = `
+                            background:#fff5f5;
+                            border:1.5px solid #e74c3c;
+                            border-radius:10px;
+                            padding:16px 18px;
+                            margin-bottom:16px;
+                            display:flex;
+                            align-items:flex-start;
+                            gap:12px;
+                        `;
+                        errorDiv.innerHTML = `
+                            <div style="font-size:22px;line-height:1;margin-top:2px;">⚠️</div>
+                            <div style="flex:1;">
+                                <div style="font-family:'Montserrat',sans-serif;font-weight:800;font-size:13px;color:#c0392b;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">
+                                    ${isEN ? 'Payment not completed' : 'Pago no completado'}
+                                </div>
+                                <div style="font-family:'Open Sans',sans-serif;font-size:13px;color:#7b2020;line-height:1.5;">
+                                    ${isEN
+                                        ? 'Your payment was cancelled. Please choose a payment method below to try again.'
+                                        : 'Tu pago fue cancelado. Por favor elige un método de pago a continuación para intentarlo de nuevo.'}
+                                </div>
+                            </div>
+                            <button onclick="document.getElementById('${errorId}').remove();"
+                                style="background:none;border:none;font-size:18px;cursor:pointer;color:#aaa;line-height:1;padding:0;flex-shrink:0;">✕</button>
+                        `;
+                        payBlock.insertBefore(errorDiv, payBlock.firstChild);
+                    }
+
+                    // Scroll a la tarjeta
+                    if (payBlock) {
+                        payBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+
+                }, 900);
             }, 400);
         }
     })();
