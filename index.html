@@ -836,7 +836,12 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             font-family: var(--font-title); font-size: 1.6rem; font-weight: 900;
             letter-spacing: 4px; padding: 14px 30px; border-radius: 10px;
             display: inline-block; margin-bottom: 18px;
-            transition: transform 0.2s;
+            cursor: pointer; transition: transform 0.2s;
+            user-select: all;
+        }
+        #cupon-box .cupon-codigo:hover { transform: scale(1.05); }
+        #cupon-box .cupon-hint {
+            font-size: 0.78rem; color: #888; margin-bottom: 22px;
         }
         #cupon-box .cupon-btn {
             background: var(--gold); color: var(--black);
@@ -972,7 +977,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             <div class="cupon-icon"><img src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Favicon%20200%20x%20200%20px.webp" alt="Luxury Transfers" style="width:70px;height:70px;object-fit:contain;"></div>
             <div class="cupon-titulo" id="cupon-titulo">¡Oferta Exclusiva!</div>
             <div class="cupon-desc" id="cupon-desc">Usa este cupón al cotizar tu transfer y obtén un <strong style="color:var(--gold);">10% de descuento</strong> en tu reserva.</div>
-            <div class="cupon-codigo">LTR-10</div>
+            <div class="cupon-codigo" onclick="copiarCupon(this)" title="Clic para copiar">LTR-10</div>
+            <div class="cupon-hint" id="cupon-hint">🖱️ Haz clic en el código para copiarlo</div>
             <button class="cupon-btn" onclick="irACotizar()" id="cupon-btn">Cotizar Ahora</button>
         </div>
     </div>
@@ -1484,10 +1490,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         Transfer privado aeropuerto Cancún. Transfer privado aeropuerto Tulum. Traslado hotel a hotel Riviera Maya. Transporte privado Playa del Carmen. Vehículos propios sin intermediarios.
         Private transfer Cancun Airport. Tulum Airport transfer. Hotel to hotel Riviera Maya. Own vehicles no agencies. Private transportation Riviera Maya.
     </p>
-    <div style="display:flex; justify-content:center; gap:24px; flex-wrap:wrap; margin:12px 0 6px; font-family:'Montserrat',sans-serif; font-size:11px;">
-        <a href="terminos.html" id="fl-tyc" style="color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:1px; text-decoration:none; transition:color 0.2s;">Términos y Condiciones</a>
-        <a href="privacidad.html" id="fl-priv" style="color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:1px; text-decoration:none; transition:color 0.2s;">Política de Privacidad</a>
-    </div>
     <p style="margin-bottom: 5px;" id="footer-copy">&copy; 2026 Luxury Transfers Riviera. All rights reserved.</p>
     
     <p style="margin: 0;" id="footer-op">Operated by <strong>SILVER'S SHUTTLE'S SERVICES S.A. DE C.V.</strong> <br> RFC: SSS210817PQ6</p>
@@ -1728,7 +1730,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         <h4>1. PROCESO DE RESERVACIÓN Y PAGOS</h4>
         <p><strong>Número de Reserva:</strong> Al completar su solicitud en nuestro sitio web, el sistema generará un número de reserva único. La reserva se considera confirmada únicamente al completarse el pago en línea al 100% mediante Stripe (tarjeta de crédito/débito) o PayPal.</p>
         <p><strong>Pago en Línea (100%):</strong> Se requiere el pago total al momento de reservar a través de nuestros procesadores seguros: Stripe (Visa, Mastercard, Amex) o PayPal. No se aceptan pagos en efectivo ni depósitos parciales para confirmar la reserva.</p>
-        <p><strong>Seguridad del Pago:</strong> Todos los pagos son procesados con encriptación SSL. <span translate="no">Luxury Transfers Riviera</span> no almacena datos de tarjetas — los datos se procesan directamente por Stripe y PayPal, certificados PCI-DSS.</p>
+        <p><strong>Seguridad del Pago:</strong> Todos los pagos son procesados con encriptación SSL. Luxury Transfers Riviera no almacena datos de tarjetas — los datos se procesan directamente por Stripe y PayPal, certificados PCI-DSS.</p>
         <p><strong>Confirmación Oficial:</strong> Una vez procesado el pago, recibirás confirmación automática y nuestro equipo bloqueará la unidad en agenda. Recibirás un mensaje de WhatsApp de confirmación en breve.</p>
 
         <h4>2. POLÍTICAS DE CANCELACIÓN Y REEMBOLSOS</h4>
@@ -1765,7 +1767,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         <h4>1. BOOKING PROCESS AND PAYMENTS</h4>
         <p><strong>Booking Number:</strong> Upon completing your request on our website, the system will generate a unique booking number. The booking is considered confirmed only upon successful 100% online payment via Stripe (credit/debit card) or PayPal.</p>
         <p><strong>Online Payment (100%):</strong> Full payment is required at the time of booking through our secure processors: Stripe (Visa, Mastercard, Amex) or PayPal. Cash payments and partial deposits are not accepted to confirm a reservation.</p>
-        <p><strong>Payment Security:</strong> All payments are processed with SSL encryption. <span translate="no">Luxury Transfers Riviera</span> does not store card data — all payment data is handled directly by Stripe and PayPal, both PCI-DSS certified.</p>
+        <p><strong>Payment Security:</strong> All payments are processed with SSL encryption. Luxury Transfers Riviera does not store card data — all payment data is handled directly by Stripe and PayPal, both PCI-DSS certified.</p>
         <p><strong>Official Confirmation:</strong> Once payment is processed, you will receive automatic confirmation and our team will block the vehicle on our schedule. You will receive a WhatsApp confirmation message shortly.</p>
 
         <h4>2. CANCELLATION AND REFUND POLICIES</h4>
@@ -1851,7 +1853,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             placeholderAirline: "Ej: Volaris", placeholderFlight: "Ej: Y4 123",
             placeholderItinerary: "Ej: Ir a Tulum Ruinas, luego un cenote y terminar a comer en...",
             placeholderNotes: "Ej: Llevamos 4 maletas grandes, necesitamos silla de bebé...",
-            footerCopy: "&copy; 2026 <span translate='no'>Luxury Transfers Riviera</span>. Todos los derechos reservados.",
+            footerCopy: "&copy; 2026 Luxury Transfers Riviera. Todos los derechos reservados.",
             footerOp: "Operado por <strong>SILVER'S SHUTTLE'S SERVICES S.A. DE C.V.</strong> <br> RFC: SSS210817PQ6",
             resultsFor: "Resultados para",
             socialTitle: "Síguenos y contáctanos",
@@ -1980,7 +1982,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             placeholderAirline: "Ex: Delta", placeholderFlight: "Ex: AA 123",
             placeholderItinerary: "Ex: Go to Tulum Ruins, then a cenote...",
             placeholderNotes: "Ex: We have 4 large suitcases...",
-            footerCopy: "&copy; 2026 <span translate='no'>Luxury Transfers Riviera</span>. All rights reserved.",
+            footerCopy: "&copy; 2026 Luxury Transfers Riviera. All rights reserved.",
             footerOp: "Operated by <strong>SILVER'S SHUTTLE'S SERVICES S.A. DE C.V.</strong> <br> RFC: SSS210817PQ6",
             resultsFor: "Results for",
             socialTitle: "Follow us & Contact us",
@@ -2182,8 +2184,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         document.getElementById('flota-subtitle').innerText = t.flotaSubtitle;
         document.getElementById('footer-copy').innerHTML = t.footerCopy;
         document.getElementById('footer-op').innerHTML = t.footerOp;
-        document.getElementById('fl-tyc').textContent  = currentLang === 'en' ? 'Terms & Conditions' : 'Términos y Condiciones';
-        document.getElementById('fl-priv').textContent = currentLang === 'en' ? 'Privacy Policy'     : 'Política de Privacidad';
 
         document.getElementById('serv-title-1').innerText = t.servTitle1; document.getElementById('serv-desc-1').innerText = t.servDesc1;
         document.getElementById('serv-title-2').innerText = t.servTitle2; document.getElementById('serv-desc-2').innerText = t.servDesc2;
@@ -4527,6 +4527,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         document.body.style.overflow = '';
         sessionStorage.setItem('cuponVisto', '1');
     }
+    function copiarCupon(el) {
+        navigator.clipboard.writeText('LTR-10').then(() => {
+            const hint = document.getElementById('cupon-hint');
+            hint.textContent = currentLang === 'en' ? '✅ Code copied!' : '✅ ¡Código copiado!';
+            hint.style.color = 'var(--gold)';
+        });
+    }
     function irACotizar() {
         // Auto-apply coupon code to all promo fields
         const code = 'LTR-10';
@@ -4548,6 +4555,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         document.getElementById('cupon-desc').innerHTML      = isEN
             ? 'Use this coupon when quoting your transfer and get a <strong style="color:var(--gold);">10% discount</strong> on your booking.'
             : 'Usa este cupón al cotizar tu transfer y obtén un <strong style="color:var(--gold);">10% de descuento</strong> en tu reserva.';
+        document.getElementById('cupon-hint').textContent   = isEN ? '🖱️ Click the code to copy it' : '🖱️ Haz clic en el código para copiarlo';
         document.getElementById('cupon-btn').textContent    = isEN ? 'Apply Coupon' : 'Aplicar Cupón';
     }
     // Mostrar cupón a los 4 segundos
