@@ -12,7 +12,7 @@
     gtag('config', 'AW-17859609175');
 </script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>Luxury Transfers Riviera | Transfer Privado Cancún, Tulum y Riviera Maya — Aeropuerto y Hotel a Hotel</title>
     <meta name="description" content="Transfers privados en la Riviera Maya — aeropuerto Cancún, aeropuerto Tulum y hotel a hotel. Vehículos propios, sin intermediarios. Servicio VIP puntual y seguro. | Private transfers in the Riviera Maya — Cancun & Tulum airports and hotel to hotel. Own vehicles, no agencies. VIP, punctual and safe service." />
     <meta name="keywords" content="transfer cancun, transfer tulum, transfer riviera maya, transporte privado cancun, hotel a hotel riviera maya, airport transfer cancun, private transfer tulum, luxury transfer cancun playa del carmen, cancun airport transfer, tulum airport transfer, cancun airport transportation, tulum airport transportation" />
@@ -46,6 +46,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     <link rel="preload" as="image" href="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/hero%201920%20x%201080%20px.webp">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- ══ STRIPE SDK ══ -->
+    <script src="https://js.stripe.com/v3/"></script>
+    <!-- ══ PAYPAL SDK ══
+         Reemplaza TU_PAYPAL_CLIENT_ID con tu Client ID (Sandbox para pruebas, Live para producción).
+         Lo encuentras en developer.paypal.com → My Apps & Credentials
+    ══ -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AcRsDfJPus_5Mur2K9O8DNC_yzH56wtqTyrRsWfVmK3JbWGbWKG0139Suix3Cv_jlRjen3LRgU14fL4UG&currency=USD&intent=capture&components=buttons&enable-funding=paypal" data-namespace="paypalSDK"></script>
 
     <style>
         /* ==========================================================================
@@ -75,11 +82,58 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
 
         html { scroll-behavior: smooth; }
+        input[type="date"] { text-align: left !important; }
+        input[type="date"]::-webkit-date-and-time-value { text-align: left !important; }
+
+        /* Custom PAX dropdown */
+        .pax-wrapper {
+            position: relative;
+            width: 100%;
+        }
+        .pax-display {
+            border: none; outline: none; background: transparent;
+            font-size: 15px; font-weight: 600; color: #333;
+            width: 100%; font-family: var(--font-body);
+            cursor: pointer; display: flex; align-items: center;
+            justify-content: space-between;
+            min-height: 25px;
+        }
+        .pax-display .pax-arrow {
+            color: #555; font-size: 12px; flex-shrink: 0;
+        }
+        .pax-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            z-index: 9999;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.10);
+            padding: 6px 0;
+            min-width: 120px;
+            max-height: 240px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            border: 1px solid #e8e8e8;
+        }
+        .pax-dropdown.open { display: block; }
+        .pax-option {
+            padding: 9px 18px; font-size: 15px; font-weight: 600;
+            color: #333; cursor: pointer; font-family: var(--font-body);
+            transition: background 0.12s;
+            white-space: nowrap;
+        }
+        .pax-option:hover { background: #f0f4ff; color: var(--navy-bg); }
+        .pax-option.selected { color: var(--navy-bg); font-weight: 800; background: #e8eef8; }
+        .pax-option.special { color: var(--gold); border-top: 1px solid #eee; font-weight: 700; }
+
+
 
         body {
             font-family: var(--font-body);
             margin: 0; padding: 0; color: var(--dark-gray); background-color: var(--white);
-            overflow-x: clip;
+            overflow-x: hidden;
         }
 
         img { max-width: 100%; height: auto; }
@@ -227,7 +281,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         /* CALCULADORA */
         #seccion-quote { 
-            position: relative; background-color: #f4f4f4; min-height: 100vh;
+            position: relative;
+            background-image: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.35)),
+                url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&auto=format&fit=crop&q=80');
+            background-size: cover; background-position: center center; background-attachment: fixed;
+            min-height: 100vh;
             display: flex; align-items: center; justify-content: center; flex-direction: column;
             padding: 30px 0 50px 0; z-index: 1;
         }
@@ -238,11 +296,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             color: var(--gold); text-align: center; font-size: 32px; margin-bottom: 25px;
             font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase;
             line-height: 1.2; font-family: var(--font-title);
+            text-shadow: 0 2px 12px rgba(0,0,0,0.6);
         }
 
         #calc-subtitle {
             font-size: 18px; font-weight: 400; text-transform: none; display: block;
-            margin-top: 5px; color: #555; font-family: var(--font-body);
+            margin-top: 5px; color: rgba(255,255,255,0.85); font-family: var(--font-body);
+            text-shadow: 0 1px 6px rgba(0,0,0,0.5);
         }
         
         .search-box-container { 
@@ -277,7 +337,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         
         .input-wrapper { 
             background: #fff; padding: 10px 15px; display: flex; flex-direction: column;
-            justify-content: center; position: relative; border-radius: 8px;
+            justify-content: center; position: relative; border-radius: 8px; overflow: visible;
             border: 1px solid #ccc; transition: 0.2s; 
         }
         .input-wrapper:focus-within { box-shadow: 0 0 0 2px rgba(0, 40, 85, 0.2); border-color: var(--navy-bg); }
@@ -543,11 +603,115 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             .tarjeta-info h3 { font-size: 18px; }
             .tarjeta-price { border-left: none; padding-left: 0; border-top: 1px solid #eee; padding-top: 15px; text-align: right; flex-direction: column; align-items: flex-end; justify-content: flex-start; flex: auto; width: 100%; gap: 10px; } 
             .btn-reservar { width: 100%; padding: 14px 20px; margin-top: 0; font-size: 14px; }
-            .extras-grid-4, div[style*="grid-template-columns:1fr 1fr 1fr 1fr"] { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
-            .extras-grid-2 { grid-template-columns: 1fr 1fr !important; }
-            .extras-grid-4 > div, div[style*="grid-template-columns:1fr 1fr 1fr 1fr"] > div { flex-direction: column !important; align-items: flex-start !important; gap: 6px !important; padding: 8px 10px !important; }
-            .extras-grid-4 > div > div, div[style*="grid-template-columns:1fr 1fr 1fr 1fr"] > div > div { width: 100% !important; justify-content: center !important; }
-            .extras-grid-4 > div > div > button, div[style*="grid-template-columns:1fr 1fr 1fr 1fr"] > div > div > button { width: 28px !important; height: 28px !important; font-size: 14px !important; flex-shrink: 0; }
+            /* RT carousel mobile: switch to horizontal scroll */
+            @media (max-width: 700px) {
+                /* RT arrows on mobile: styled like OW */
+                button[onclick*="rtSlide"] {
+                    width: 34px !important;
+                    height: 34px !important;
+                    background: #fff !important;
+                    color: #000 !important;
+                    border: 2px solid #ccc !important;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.12) !important;
+                    font-size: 20px !important;
+                    transition: all 0.2s !important;
+                }
+                button[onclick*="rtSlide"]:hover {
+                    background: #000 !important;
+                    color: #fff !important;
+                    border-color: #000 !important;
+                }
+                /* RT viewport scrollable on mobile */
+                div[style*="overflow:hidden; padding:2px"] {
+                    overflow-x: auto !important;
+                    -webkit-overflow-scrolling: touch !important;
+                    scrollbar-width: none !important;
+                }
+                div[style*="overflow:hidden; padding:2px"]::-webkit-scrollbar { display: none; }
+                div[id^="rt-track-"] {
+                    transform: none !important;
+                    transition: none !important;
+                    overflow-x: auto !important;
+                    -webkit-overflow-scrolling: touch !important;
+                    scroll-snap-type: x mandatory !important;
+                    scrollbar-width: none !important;
+                }
+                div[id^="rt-track-"]::-webkit-scrollbar { display: none; }
+                div[id^="rt-track-"] > div {
+                    flex: 0 0 100% !important;
+                    min-width: 0 !important;
+                    max-width: none !important;
+                    scroll-snap-align: start !important;
+                    text-align: center !important;
+                }
+                div[id^="rt-track-"] > div > div {
+                    text-align: center !important;
+                }
+                div[id^="rt-track-"] > div > div > div {
+                    justify-content: center !important;
+                }
+            }
+
+  /* EXTRAS: carrusel horizontal en mobile */
+            .extras-carousel-wrapper {
+                position: relative;
+            }
+            .extras-carousel-btn {
+                display: none; /* replaced by ow-flex-wrapper */
+                position: absolute;
+                top: 50%; transform: translateY(-50%);
+                z-index: 10;
+                width: 34px; height: 34px;
+                border-radius: 50%;
+                background: #fff;
+                color: #000;
+                border: 2px solid #ddd;
+                border: none;
+                cursor: pointer;
+                align-items: center;
+                justify-content: center;
+                font-size: 14px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            }
+            .extras-carousel-btn.prev { left: -14px; }
+            .extras-carousel-btn.next { right: -14px; }
+            .extras-grid-4, .extras-ow-grid,
+            div[style*="grid-template-columns:repeat(3,1fr)"] {
+                display: flex !important;
+                flex-direction: row !important;
+                overflow-x: auto !important;
+                gap: 0 !important;
+                scroll-snap-type: x mandatory !important;
+                -webkit-overflow-scrolling: touch !important;
+                padding-bottom: 0 !important;
+                scrollbar-width: none !important;
+                grid-template-columns: unset !important;
+                flex-wrap: nowrap !important;
+                scroll-behavior: smooth !important;
+            }
+            .extras-grid-4::-webkit-scrollbar,
+            .extras-ow-grid::-webkit-scrollbar { display: none !important; }
+
+            .extras-grid-4 > div, .extras-ow-grid > div,
+            div[style*="grid-template-columns:repeat(3,1fr)"] > div {
+                flex: 0 0 100% !important;
+                min-width: 0 !important;
+                max-width: none !important;
+                scroll-snap-align: start !important;
+                box-sizing: border-box !important;
+                align-items: center !important;
+            }
+            /* Center card content on mobile */
+            .extras-grid-4 > div > div,
+            .extras-ow-grid > div > div,
+            div[style*="grid-template-columns:repeat(3,1fr)"] > div > div {
+                text-align: center !important;
+            }
+            .extras-grid-4 > div > div > div,
+            .extras-ow-grid > div > div > div,
+            div[style*="grid-template-columns:repeat(3,1fr)"] > div > div > div {
+                justify-content: center !important;
+            }
             .extra-card-ow { flex-direction: column !important; align-items: flex-start !important; gap: 6px !important; padding: 8px 10px !important; }
             .extra-card-ow > div { width: 100% !important; justify-content: center !important; }
             .feature-grid { flex-wrap: wrap; gap: 6px; }
@@ -883,8 +1047,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         .tarjeta-booking-form.open { display: block; }
                         @keyframes slideDownBF { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
                         .tarjeta.expanded { border-color: var(--action-green) !important; box-shadow: 0 5px 25px rgba(0,166,81,0.15) !important; overflow: hidden; }
-                        .form-card-grid { display: grid; grid-template-columns: repeat(4,1fr); gap:12px; margin-bottom:14px; }
-                        .form-card-notes { display: grid; grid-template-columns: 3fr 1fr; gap:12px; margin-bottom:16px; }
+                        .form-card-grid { display: grid; grid-template-columns: 1fr 1fr 1.05fr 0.95fr; gap:12px; margin-bottom:14px; }
+                        .form-card-notes { display: grid; grid-template-columns: 1fr; gap:12px; margin-bottom:16px; }
                         .btn-enviar-reserva { background:var(--action-green); color:white; border:none; border-radius:8px; padding:15px 40px; font-size:16px; font-weight:800; cursor:pointer; font-family:var(--font-title); text-transform:uppercase; letter-spacing:1px; transition:all 0.2s; width:100%; box-shadow:0 5px 0 #007a3d; }
                         .btn-enviar-reserva:hover { background:var(--action-green-hover); transform:translateY(2px); box-shadow:0 3px 0 #007a3d; }
                         @media (max-width: 768px) { 
@@ -911,23 +1075,34 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     <div class="row-top-rt" id="rowTopRoundTrip" style="display:none;">
                         <div class="input-wrapper"><label id="labelOrigenRT">PICK-UP</label><input type="text" id="origenRT" placeholder="Ex: CUN/TQO Airport, Hotel, Airbnb, Resort..." oninput="document.getElementById('origen').value=this.value" onfocus="syncRT()"></div>
                         <div class="input-wrapper"><label id="labelDestinoRT">DESTINATION</label><input type="text" id="destinoRT" placeholder="Ex: CUN/TQO Airport, Hotel, Airbnb, Resort..." oninput="document.getElementById('destino').value=this.value" onfocus="syncRT()"></div>
-                        <div class="input-wrapper promo-rt-cell">
+                        <div class="input-wrapper promo-rt-cell" style="overflow:visible;">
                             <label id="label-pax-rt">PASSENGERS</label>
-                            <select id="pasajeros" onchange="if(this.value==='16+') {
-                                preCargarCustom({
-                                    origen: document.getElementById('origen').value,
-                                    destino: document.getElementById('destino').value,
-                                    fecha: document.getElementById('fechaIda').value,
-                                    hora: document.getElementById('horaIda').value,
-                                    tipoViaje: 'REDONDO',
-                                    fechaRegreso: document.getElementById('fechaVuelta').value,
-                                    horaRegreso: document.getElementById('horaVuelta').value,
-                                    autoLargeGroup: true
-                                });
-                                document.getElementById('servicio-personalizado').scrollIntoView({behavior:'smooth'});
-                            }" style="border:none; outline:none; background:transparent; font-size:15px; font-weight:600; color:#333; width:100%; font-family:var(--font-body);">
-                                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16+">16+ (Personalizado)</option>
-                            </select>
+                            <div class="pax-wrapper">
+                                <div class="pax-display" onclick="togglePaxDropdown('pax-drop-rt', event)">
+                                    <span id="pax-val-rt">1</span><span class="pax-arrow">&#8964;</span>
+                                </div>
+                                <select id="pasajeros" style="display:none;">
+                                    <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16+">16+</option>
+                                </select>
+                                <div id="pax-drop-rt" class="pax-dropdown">
+                                    <div class="pax-option selected" onclick="selectPax('pax-drop-rt','pasajeros','pax-val-rt',1)">1</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-rt','pasajeros','pax-val-rt',2)">2</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-rt','pasajeros','pax-val-rt',3)">3</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-rt','pasajeros','pax-val-rt',4)">4</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-rt','pasajeros','pax-val-rt',5)">5</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-rt','pasajeros','pax-val-rt',6)">6</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-rt','pasajeros','pax-val-rt',7)">7</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-rt','pasajeros','pax-val-rt',8)">8</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-rt','pasajeros','pax-val-rt',9)">9</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-rt','pasajeros','pax-val-rt',10)">10</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-rt','pasajeros','pax-val-rt',11)">11</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-rt','pasajeros','pax-val-rt',12)">12</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-rt','pasajeros','pax-val-rt',13)">13</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-rt','pasajeros','pax-val-rt',14)">14</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-rt','pasajeros','pax-val-rt',15)">15</div>
+                                    <div class="pax-option special" onclick="selectPax16('pax-drop-rt','pasajeros','pax-val-rt')">16+ →</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -943,30 +1118,40 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     <div class="row-bottom-ow" id="rowBottomOneWay">
                         <div class="input-wrapper">
                             <label id="label-fecha">SERVICE DATE</label>
-                            <input type="date" id="fechaIda" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%;">
+                            <input type="date" id="fechaIda" onclick="try{this.showPicker()}catch(e){}" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%; text-align:left;">
                         </div>
                         <div class="input-wrapper">
                             <label id="label-hora">SERVICE TIME</label>
-                            <input type="time" id="horaIda" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%; cursor:pointer;">
+                            <input type="time" id="horaIda" onclick="try{this.showPicker()}catch(e){}" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%; cursor:pointer;">
                         </div>
-                        <div class="input-wrapper">
+                        <div class="input-wrapper" style="overflow:visible;">
                             <label id="label-pax">PASSENGERS</label>
-                            <select id="pasajerosOneWay" onchange="if(this.value==='16+') { 
-                                const tipo = document.getElementById('tipoServicio').value;
-                                preCargarCustom({
-                                    origen: document.getElementById('origen').value,
-                                    destino: document.getElementById('destino').value,
-                                    fecha: document.getElementById('fechaIda').value,
-                                    hora: document.getElementById('horaIda').value,
-                                    tipoViaje: tipo,
-                                    fechaRegreso: document.getElementById('fechaVuelta').value,
-                                    horaRegreso: document.getElementById('horaVuelta').value,
-                                    autoLargeGroup: true
-                                });
-                                document.getElementById('servicio-personalizado').scrollIntoView({behavior:'smooth'});
-                            }" style="border:none; outline:none; background:transparent; font-size:15px; font-weight:600; color:#333; width:100%; font-family:var(--font-body);">
-                                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16+">16+ (Personalizado)</option>
+                            <select id="pasajerosOneWay" style="display:none;">
+                                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16+">16+</option>
                             </select>
+                            <div class="pax-wrapper">
+                                <div class="pax-display" onclick="togglePaxDropdown('pax-drop-ow', event)">
+                                    <span id="pax-val-ow">1</span><span class="pax-arrow">&#8964;</span>
+                                </div>
+                                <div id="pax-drop-ow" class="pax-dropdown">
+                                    <div class="pax-option selected" onclick="selectPax('pax-drop-ow','pasajerosOneWay','pax-val-ow',1)">1</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-ow','pasajerosOneWay','pax-val-ow',2)">2</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-ow','pasajerosOneWay','pax-val-ow',3)">3</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-ow','pasajerosOneWay','pax-val-ow',4)">4</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-ow','pasajerosOneWay','pax-val-ow',5)">5</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-ow','pasajerosOneWay','pax-val-ow',6)">6</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-ow','pasajerosOneWay','pax-val-ow',7)">7</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-ow','pasajerosOneWay','pax-val-ow',8)">8</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-ow','pasajerosOneWay','pax-val-ow',9)">9</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-ow','pasajerosOneWay','pax-val-ow',10)">10</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-ow','pasajerosOneWay','pax-val-ow',11)">11</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-ow','pasajerosOneWay','pax-val-ow',12)">12</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-ow','pasajerosOneWay','pax-val-ow',13)">13</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-ow','pasajerosOneWay','pax-val-ow',14)">14</div>
+                                    <div class="pax-option" onclick="selectPax('pax-drop-ow','pasajerosOneWay','pax-val-ow',15)">15</div>
+                                    <div class="pax-option special" onclick="selectPax16('pax-drop-ow','pasajerosOneWay','pax-val-ow')">16+ →</div>
+                                </div>
+                            </div>
                         </div>
                         <div class="input-wrapper">
                             <label id="label-promo" style="color:var(--gold);">PROMO CODE</label>
@@ -978,19 +1163,19 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     <div class="row-bottom-rt" id="rowBottomRoundTrip">
                         <div class="input-wrapper">
                             <label id="label-fecha-rt">SERVICE DATE</label>
-                            <input type="date" id="fechaIdaRT" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%;" oninput="document.getElementById('fechaIda').value=this.value">
+                            <input type="date" id="fechaIdaRT" onclick="try{this.showPicker()}catch(e){}" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%;" oninput="document.getElementById('fechaIda').value=this.value">
                         </div>
                         <div class="input-wrapper">
                             <label id="label-hora-rt">SERVICE TIME</label>
-                            <input type="time" id="horaIdaRT" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%; cursor:pointer;" oninput="document.getElementById('horaIda').value=this.value">
+                            <input type="time" id="horaIdaRT" onclick="try{this.showPicker()}catch(e){}" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%; cursor:pointer;" oninput="document.getElementById('horaIda').value=this.value">
                         </div>
                         <div class="input-wrapper" style="background:#f8fafc; border-color:#cbd5e1;">
                             <label id="label-fecha-vuelta" style="color:var(--action-green);">RETURN DATE</label>
-                            <input type="date" id="fechaVuelta" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%;">
+                            <input type="date" id="fechaVuelta" onclick="try{this.showPicker()}catch(e){}" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%;">
                         </div>
                         <div class="input-wrapper" style="background:#f8fafc; border-color:#cbd5e1;">
                             <label id="label-hora-vuelta" style="color:var(--action-green);">RETURN TIME</label>
-                            <input type="time" id="horaVuelta" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%; cursor:pointer;">
+                            <input type="time" id="horaVuelta" onclick="try{this.showPicker()}catch(e){}" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; font-family:var(--font-body); min-height:25px; width:100%; cursor:pointer;">
                         </div>
                         <div class="input-wrapper">
                             <label id="label-promo-rt" style="color:var(--gold);">PROMO CODE</label>
@@ -1176,19 +1361,19 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     </div>
                     <div class="input-wrapper">
                         <label id="custom-label-fecha" style="color:var(--navy-bg);">SERVICE DATE</label>
-                        <input type="date" id="custom-fecha" style="border:none;outline:none;background:transparent;font-size:14px;font-weight:600;color:#333;font-family:var(--font-body);min-height:25px;width:100%;">
+                        <input type="date" id="custom-fecha" onclick="try{this.showPicker()}catch(e){}" style="border:none;outline:none;background:transparent;font-size:14px;font-weight:600;color:#333;font-family:var(--font-body);min-height:25px;width:100%;">
                     </div>
                     <div class="input-wrapper">
                         <label id="custom-label-hora" style="color:var(--navy-bg);">SERVICE TIME</label>
-                        <input type="time" id="custom-hora" style="border:none;outline:none;background:transparent;font-size:14px;font-weight:600;color:#333;font-family:var(--font-body);min-height:25px;width:100%;cursor:pointer;">
+                        <input type="time" id="custom-hora" onclick="try{this.showPicker()}catch(e){}" style="border:none;outline:none;background:transparent;font-size:14px;font-weight:600;color:#333;font-family:var(--font-body);min-height:25px;width:100%;cursor:pointer;">
                     </div>
                     <div class="input-wrapper" id="custom-fecha-regreso-wrapper" style="display:none;">
                         <label id="custom-label-fecha-regreso" style="color:var(--action-green);">RETURN DATE</label>
-                        <input type="date" id="custom-fecha-regreso" style="border:none;outline:none;background:transparent;font-size:14px;font-weight:600;color:#333;font-family:var(--font-body);min-height:25px;width:100%;">
+                        <input type="date" id="custom-fecha-regreso" onclick="try{this.showPicker()}catch(e){}" style="border:none;outline:none;background:transparent;font-size:14px;font-weight:600;color:#333;font-family:var(--font-body);min-height:25px;width:100%;">
                     </div>
                     <div class="input-wrapper" id="custom-hora-regreso-wrapper" style="display:none;">
                         <label id="custom-label-hora-regreso" style="color:var(--action-green);">RETURN TIME</label>
-                        <input type="time" id="custom-hora-regreso" style="border:none;outline:none;background:transparent;font-size:14px;font-weight:600;color:#333;font-family:var(--font-body);min-height:25px;width:100%;cursor:pointer;">
+                        <input type="time" id="custom-hora-regreso" onclick="try{this.showPicker()}catch(e){}" style="border:none;outline:none;background:transparent;font-size:14px;font-weight:600;color:#333;font-family:var(--font-body);min-height:25px;width:100%;cursor:pointer;">
                     </div>
                     <div class="input-wrapper">
                         <label id="custom-label-tipo" style="color:var(--navy-bg);">SERVICE TYPE</label>
@@ -1206,7 +1391,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     <label id="custom-label-notas" style="color:var(--navy-bg);">DETAILS / NOTES</label>
                     <textarea id="custom-notas" rows="3" placeholder="Tell us more about your request — number of stops, special requirements, itinerary..." style="border:none;outline:none;background:transparent;font-size:14px;font-weight:600;color:#333;width:100%;font-family:var(--font-body);resize:vertical;"></textarea>
                 </div>
-                <button onclick="enviarSolicitudPersonalizada()" style="background:var(--navy-bg);color:#fff;border:none;border-radius:8px;padding:16px 40px;font-size:16px;font-weight:800;cursor:pointer;font-family:var(--font-title);text-transform:uppercase;letter-spacing:1px;width:100%;transition:all 0.2s;box-shadow:0 5px 0 #001a3a;" onmouseover="this.style.background='var(--gold)';this.style.color='#000'" onmouseout="this.style.background='var(--navy-bg)';this.style.color='#fff'">
+                <button onclick="enviarSolicitudPersonalizada()" style="background:var(--navy-bg);color:#fff;border:none;border-radius:8px;padding:16px 40px;font-size:16px;font-weight:800;cursor:pointer;font-family:var(--font-title);text-transform:uppercase;letter-spacing:1px;width:100%;transition:all 0.2s;box-shadow:0 5px 0 #001a3a;" >
                     <i class="fas fa-paper-plane"></i> <span id="custom-btn-txt">SEND REQUEST</span>
                 </button>
             </div>
@@ -1347,8 +1532,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     const imgUrlSuburban    = baseGH + "LUXURY%20VIP%20Desglose%20de%20Precios.webp";
     const imgUrlToyotaGL    = baseGH + "FAMILY%20VAN%20Desglose%20de%20Precios.webp";
 
-    // WHEEL PICKER ESTILO iOS — solo para Android
-    const isAndroid = /Android/i.test(navigator.userAgent);
+    // WHEEL PICKER ESTILO iOS — para todos los dispositivos móviles
+    const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
     const WHEEL_ITEM_H = 44;
     const WHEEL_PAD = 2;
 
@@ -1404,48 +1589,50 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
     function replaceTimeInput(inputId) {
         const input = document.getElementById(inputId);
-        if (!input || !isAndroid) return;
+        if (!input || !isMobile) return;
 
-        const uid = inputId;
-        const hours12 = Array.from({length:12},(_,i)=>String(i+1).padStart(2,'0'));
-        const mins5   = Array.from({length:12},(_,i)=>String(i*5).padStart(2,'0'));
+        const uid      = inputId;
+        const hours12  = Array.from({length:12}, (_,i) => String(i+1).padStart(2,'0'));
+        const mins5    = Array.from({length:12}, (_,i) => String(i*5).padStart(2,'0'));
         const ampmVals = ['AM','PM'];
+        const init     = input.value ? from24h(input.value) : null;
 
-        const init = input.value ? from24h(input.value) : {h:'06',m:'00',ap:'AM'};
-
+        // Display que reemplaza el input nativo
         const display = document.createElement('div');
         display.id = 'wd-display-'+uid;
-        display.style.cssText = 'font-size:14px;font-weight:600;color:#333;cursor:pointer;font-family:var(--font-body);padding:4px 0;display:flex;align-items:center;gap:6px;';
-        display.innerHTML = `<span id="wd-txt-${uid}">${init.h}:${init.m} ${init.ap}</span> <i class="fas fa-clock" style="color:#aaa;font-size:12px;"></i>`;
+        display.style.cssText = 'font-size:14px;font-weight:600;color:#333;cursor:pointer;font-family:var(--font-body);padding:4px 0;';
+        const placeholder = currentLang === 'en' ? '--:-- --' : '--:-- --';
+        display.innerHTML = '<span id="wd-txt-'+uid+'" style="color:'+(init?'#333':'#aaa')+'">'+(init ? init.h+':'+init.m+' '+init.ap : placeholder)+'</span>';
 
+        // Overlay fondo oscuro
         const overlay = document.createElement('div');
         overlay.id = 'wd-overlay-'+uid;
-        overlay.style.cssText = 'display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:99999;align-items:flex-end;justify-content:center;';
+        overlay.style.cssText = 'display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:99999;align-items:center;justify-content:center;';
 
-        const lblCancel = () => currentLang === 'en' ? 'Cancel' : 'Cancelar';
-        const lblTitle  = () => currentLang === 'en' ? 'Time'   : 'Hora';
-        const lblOk     = () => currentLang === 'en' ? 'Done'   : 'Listo';
+        const lblCancel = () => currentLang === 'en' ? 'Cancel'  : 'Cancelar';
+        const lblOk     = () => currentLang === 'en' ? 'Done'    : 'Listo';
 
-        overlay.innerHTML = `
-        <div style="background:#f9f9f9;width:100%;border-radius:16px 16px 0 0;padding-bottom:env(safe-area-inset-bottom);">
-            <div style="display:flex;justify-content:space-between;padding:14px 20px;border-bottom:0.5px solid #ddd;">
-                <button id="wd-cancel-${uid}" style="border:none;background:none;font-size:16px;color:#888;cursor:pointer;font-family:var(--font-body);"></button>
-                <span id="wd-title-${uid}" style="font-size:16px;font-weight:700;color:#333;font-family:var(--font-title);"></span>
-                <button id="wd-ok-${uid}" style="border:none;background:none;font-size:16px;font-weight:700;color:#007AFF;cursor:pointer;font-family:var(--font-body);"></button>
-            </div>
-            <div style="position:relative;height:180px;overflow:hidden;background:#f9f9f9;">
-                <div style="position:absolute;top:0;left:0;right:0;height:60px;background:linear-gradient(to bottom,#f9f9f9,transparent);z-index:2;pointer-events:none;"></div>
-                <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(to top,#f9f9f9,transparent);z-index:2;pointer-events:none;"></div>
-                <div style="position:absolute;top:50%;left:0;right:0;height:44px;transform:translateY(-50%);border-top:0.5px solid #ccc;border-bottom:0.5px solid #ccc;z-index:1;pointer-events:none;"></div>
-                <div style="display:flex;height:100%;padding:0 20px;gap:4px;">
-                    <div id="wd-h-${uid}"  style="flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none;"></div>
-                    <div style="display:flex;align-items:center;font-size:22px;font-weight:500;color:#333;z-index:3;">:</div>
-                    <div id="wd-m-${uid}"  style="flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none;"></div>
-                    <div style="width:8px;"></div>
-                    <div id="wd-ap-${uid}" style="flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none;"></div>
-                </div>
-            </div>
-        </div>`;
+        overlay.innerHTML =
+            '<div style="background:#fff;width:88%;max-width:340px;border-radius:16px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);">' +
+                // Wheel columns — sin header
+                '<div style="position:relative;height:216px;overflow:hidden;background:#fff;">' +
+                    '<div style="position:absolute;top:0;left:0;right:0;height:72px;background:linear-gradient(to bottom,rgba(255,255,255,1),rgba(255,255,255,0));z-index:2;pointer-events:none;"></div>' +
+                    '<div style="position:absolute;bottom:0;left:0;right:0;height:72px;background:linear-gradient(to top,rgba(255,255,255,1),rgba(255,255,255,0));z-index:2;pointer-events:none;"></div>' +
+                    '<div style="position:absolute;top:50%;left:0;right:0;height:44px;transform:translateY(-50%);background:rgba(0,0,0,0.06);border-radius:8px;margin:0 12px;z-index:1;pointer-events:none;"></div>' +
+                    '<div style="display:flex;height:100%;padding:0 12px;gap:0;align-items:stretch;">' +
+                        '<div id="wd-h-'+uid+'"  style="flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none;"></div>' +
+                        '<div style="display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:300;color:#333;z-index:3;width:18px;flex-shrink:0;">:</div>' +
+                        '<div id="wd-m-'+uid+'"  style="flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none;"></div>' +
+                        '<div style="flex:0 0 8px;"></div>' +
+                        '<div id="wd-ap-'+uid+'" style="flex:1;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;-ms-overflow-style:none;"></div>' +
+                    '</div>' +
+                '</div>' +
+                // Footer con botones
+                '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-top:1px solid #e5e5e5;">' +
+                    '<button id="wd-cancel-'+uid+'" style="border:none;background:none;font-size:16px;color:#888;cursor:pointer;font-family:var(--font-body);padding:6px 10px;border-radius:8px;"></button>' +
+                    '<button id="wd-ok-'+uid+'"     style="border:none;background:none;font-size:16px;font-weight:700;color:var(--navy-bg);cursor:pointer;font-family:var(--font-body);padding:6px 10px;border-radius:8px;"></button>' +
+                '</div>' +
+            '</div>';
 
         document.body.appendChild(overlay);
 
@@ -1457,44 +1644,50 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         wheelBuildCol(colM,  mins5);
         wheelBuildCol(colAP, ampmVals);
 
-        [colH,colM,colAP].forEach(c=>c.addEventListener('scroll',()=>wheelHighlight(c)));
+        [colH, colM, colAP].forEach(c => c.addEventListener('scroll', () => wheelHighlight(c)));
 
-        display.addEventListener('click', ()=>{
+        display.addEventListener('click', () => {
             overlay.style.display = 'flex';
-            // Actualizar labels según idioma actual
             overlay.querySelector('#wd-cancel-'+uid).textContent = lblCancel();
-            overlay.querySelector('#wd-title-'+uid).textContent  = lblTitle();
             overlay.querySelector('#wd-ok-'+uid).textContent     = lblOk();
-            // Bloquear scroll del fondo
             document.body.style.overflow = 'hidden';
-            const cur = from24h(input.value || '06:00');
+            const cur = from24h(input.value || '12:00');
             wheelScrollToIdx(colH,  hours12.indexOf(cur.h));
             wheelScrollToIdx(colM,  mins5.indexOf(cur.m) > -1 ? mins5.indexOf(cur.m) : 0);
             wheelScrollToIdx(colAP, ampmVals.indexOf(cur.ap));
-            setTimeout(()=>{[colH,colM,colAP].forEach(c=>wheelHighlight(c));},50);
+            setTimeout(() => { [colH, colM, colAP].forEach(c => wheelHighlight(c)); }, 50);
         });
 
-        overlay.querySelector('#wd-cancel-'+uid).addEventListener('click',()=>{
-            overlay.style.display='none';
-            document.body.style.overflow='';
+        overlay.querySelector('#wd-cancel-'+uid).addEventListener('click', () => {
+            overlay.style.display = 'none';
+            document.body.style.overflow = '';
         });
-        overlay.querySelector('#wd-ok-'+uid).addEventListener('click',()=>{
+
+        overlay.querySelector('#wd-ok-'+uid).addEventListener('click', () => {
             const h  = wheelGetSelected(colH);
             const m  = wheelGetSelected(colM);
             const ap = wheelGetSelected(colAP);
-            const h24 = to24h(h, ap);
-            input.value = h24+':'+m;
-            input.dispatchEvent(new Event('input',{bubbles:true}));
-            input.dispatchEvent(new Event('change',{bubbles:true}));
-            document.querySelector('#wd-txt-'+uid).textContent = h+':'+m+' '+ap;
-            overlay.style.display='none';
-            document.body.style.overflow='';
+            if (!h || !m || !ap) return;
+            let h24 = parseInt(h, 10);
+            if (ap === 'AM' && h24 === 12) h24 = 0;
+            if (ap === 'PM' && h24 !== 12) h24 += 12;
+            input.value = String(h24).padStart(2,'0') + ':' + m;
+            input.dispatchEvent(new Event('input'));
+            const txtEl = document.getElementById('wd-txt-'+uid); txtEl.textContent = h + ':' + m + ' ' + ap; txtEl.style.color = '#333';
+            overlay.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+
+        overlay.addEventListener('click', e => {
+            if (e.target === overlay) {
+                overlay.style.display = 'none';
+                document.body.style.overflow = '';
+            }
         });
 
         input.style.display = 'none';
         input.parentNode.insertBefore(display, input.nextSibling);
     }
-
     function adjustScrollMargin() {
         const header = document.querySelector('header');
         if(header) {
@@ -1511,10 +1704,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     // --- CORRECCION 1: TYC EN FORMATO HTML DE NUEVO ---
     const tycHtmlES = `
         <h4>1. PROCESO DE RESERVACIÓN Y PAGOS</h4>
-        <p><strong>Número de Reserva:</strong> Al completar su solicitud en nuestro sitio web, el sistema generará un número de reserva. Este número es únicamente para seguimiento y no garantiza la confirmación del servicio. La reserva se considera confirmada únicamente al recibir el anticipo del 30% en efectivo o el pago total con tarjeta de crédito/débito.</p>
-        <p><strong>Pago en Efectivo:</strong> Se requiere un anticipo del 30% con tarjeta de crédito/débito al momento de confirmar la reserva. Este anticipo no es reembolsable. El 70% restante se paga en efectivo al abordar la unidad.</p>
-        <p><strong>Pago con Tarjeta de Crédito/Débito:</strong> Se requiere el 100% del pago con tarjeta al momento de reservar.</p>
-        <p><strong>Confirmación Oficial:</strong> Una vez recibido el pago correspondiente, nuestro equipo enviará la confirmación oficial y la unidad quedará bloqueada en agenda.</p>
+        <p><strong>Número de Reserva:</strong> Al completar su solicitud en nuestro sitio web, el sistema generará un número de reserva único. La reserva se considera confirmada únicamente al completarse el pago en línea al 100% mediante Stripe (tarjeta de crédito/débito) o PayPal.</p>
+        <p><strong>Pago en Línea (100%):</strong> Se requiere el pago total al momento de reservar a través de nuestros procesadores seguros: Stripe (Visa, Mastercard, Amex) o PayPal. No se aceptan pagos en efectivo ni depósitos parciales para confirmar la reserva.</p>
+        <p><strong>Seguridad del Pago:</strong> Todos los pagos son procesados con encriptación SSL. Luxury Transfers Riviera no almacena datos de tarjetas — los datos se procesan directamente por Stripe y PayPal, certificados PCI-DSS.</p>
+        <p><strong>Confirmación Oficial:</strong> Una vez procesado el pago, recibirás confirmación automática y nuestro equipo bloqueará la unidad en agenda. Recibirás un mensaje de WhatsApp de confirmación en breve.</p>
 
         <h4>2. POLÍTICAS DE CANCELACIÓN Y REEMBOLSOS</h4>
         <p><strong>Cancelación con más de 48 horas de anticipación:</strong> Aplica reembolso del 70% del monto pagado con tarjeta de crédito/débito.</p>
@@ -1548,10 +1741,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
     const tycHtmlEN = `
         <h4>1. BOOKING PROCESS AND PAYMENTS</h4>
-        <p><strong>Booking Number:</strong> Upon completing your request on our website, the system will generate a booking number. This number is for tracking purposes only and does not guarantee service confirmation. The booking is considered confirmed only upon receipt of the 30% cash deposit or full payment by credit/debit card.</p>
-        <p><strong>Cash Payment:</strong> A 30% deposit by credit/debit card is required at the time of booking confirmation. This deposit is non-refundable. The remaining 70% is paid in cash upon boarding the vehicle.</p>
-        <p><strong>Full Card Payment:</strong> Full payment (100%) by credit/debit card is required at the time of booking.</p>
-        <p><strong>Official Confirmation:</strong> Once payment is received, our team will send an official confirmation and the vehicle will be blocked on our schedule.</p>
+        <p><strong>Booking Number:</strong> Upon completing your request on our website, the system will generate a unique booking number. The booking is considered confirmed only upon successful 100% online payment via Stripe (credit/debit card) or PayPal.</p>
+        <p><strong>Online Payment (100%):</strong> Full payment is required at the time of booking through our secure processors: Stripe (Visa, Mastercard, Amex) or PayPal. Cash payments and partial deposits are not accepted to confirm a reservation.</p>
+        <p><strong>Payment Security:</strong> All payments are processed with SSL encryption. Luxury Transfers Riviera does not store card data — all payment data is handled directly by Stripe and PayPal, both PCI-DSS certified.</p>
+        <p><strong>Official Confirmation:</strong> Once payment is processed, you will receive automatic confirmation and our team will block the vehicle on our schedule. You will receive a WhatsApp confirmation message shortly.</p>
 
         <h4>2. CANCELLATION AND REFUND POLICIES</h4>
         <p><strong>Cancellations more than 48 hours in advance:</strong> A 70% refund of the amount paid by credit/debit card will be issued.</p>
@@ -1678,9 +1871,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             modalTitleSent: "¡Reserva Confirmada!",
             modalTextReceived: "¡Gracias! Hemos recibido tu solicitud de reserva. Uno de nuestros asesores se pondrá en contacto contigo en breve para confirmar los detalles de tu traslado y coordinar tu método de pago.",
             modalTextSent: "¡Gracias! Hemos recibido tu solicitud. Uno de nuestros asesores se pondrá en contacto contigo en breve para darte un precio personalizado.",
-            modalPayCard: "💳 Procesaremos tu pago con Tarjeta de Crédito/Débito de forma segura.",
-            modalPayPaypal: "💳 Te enviaremos una solicitud de pago por PayPal.",
-            modalPayCash: "💳 Coordinaremos tu depósito del 30% y el 70% restante en efectivo.",
+            modalPayCard: "💳 Tu pago con tarjeta fue procesado de forma segura por Stripe.",
+            modalPayPaypal: "✅ Tu pago fue completado exitosamente a través de PayPal.",
+            modalPayCash: "✅ Reserva confirmada. Pago procesado en línea.",
             modalCodeLabel: "NÚMERO DE RESERVA",
             modalWarningTitle: "IMPORTANTE:",
             modalWarningText: "Guarda tu número de reserva. También recibirás un correo de confirmación — revisa tu carpeta de SPAM si no lo ves.",
@@ -2046,6 +2239,27 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
     }
 
+    // Ocultar loading overlay y resetear botones al cargar/regresar con botón Atrás
+    window.addEventListener('pageshow', function(e) {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) overlay.style.display = 'none';
+        // Resetear todos los botones de Stripe que quedaron en estado "Redirecting"
+        document.querySelectorAll('[id^="btn-stripe-"]').forEach(function(btn) {
+            const isEN = currentLang === 'en';
+            btn.disabled = false;
+            btn.innerHTML = '<span style="display:flex; align-items:center; gap:12px;">' +
+                '<span style="display:flex; gap:5px; align-items:center;">' +
+                '<svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;"><rect width="38" height="24" rx="4" fill="#fff"/><text x="5" y="17" font-family="Arial" font-size="11" font-weight="900" fill="#1a1f71">VISA</text></svg>' +
+                '<svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;"><rect width="38" height="24" rx="4" fill="#fff"/><circle cx="15" cy="12" r="7" fill="#eb001b"/><circle cx="23" cy="12" r="7" fill="#f79e1b"/><path d="M19 6.8a7 7 0 0 1 0 10.4A7 7 0 0 1 19 6.8z" fill="#ff5f00"/></svg>' +
+                '<svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;"><rect width="38" height="24" rx="4" fill="#007bc1"/><text x="4" y="17" font-family="Arial" font-size="9" font-weight="900" fill="#fff">AMEX</text></svg>' +
+                '<svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;"><rect width="38" height="24" rx="4" fill="#fff"/><circle cx="24" cy="12" r="7" fill="#f76f20"/><text x="3" y="16" font-family="Arial" font-size="7" font-weight="700" fill="#231f20">DISC</text></svg>' +
+                '</span>' +
+                '<span style="color:#fff; font-weight:700;">' + (isEN ? 'Pay with Card' : 'Pagar con Tarjeta') + '</span>' +
+                '</span>' +
+                '<i class="fas fa-chevron-right" style="font-size:11px; color:#fff; opacity:0.6;"></i>';
+        });
+    });
+
     window.onload = function() {
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('fechaIda').setAttribute('min', today);
@@ -2076,7 +2290,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         initSlider();
         adjustScrollMargin();
 
-        // Reemplazar todos los inputs de hora con selector personalizado
+        // Reemplazar todos los inputs de hora con selector personalizado (móvil)
         ['horaIda', 'horaIdaRT', 'horaVuelta', 'custom-hora', 'custom-hora-regreso'].forEach(replaceTimeInput);
     };
 
@@ -2688,7 +2902,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                                 ? "We couldn't find a price for this route automatically. Our team will quote you as soon as possible through our Custom Service."
                                 : "No pudimos encontrar un precio para esta ruta automáticamente. Nuestro equipo te cotizará lo antes posible a través de nuestro Servicio Personalizado."}
                         </p>
-                        <a href="#servicio-personalizado" onclick="preCargarCustom({origen:document.getElementById('origen').value,destino:document.getElementById('destino').value,fecha:document.getElementById('fechaIda').value,hora:document.getElementById('horaIda').value,pax:document.getElementById(document.getElementById('tipoServicio').value==='REDONDO'?'pasajeros':'pasajerosOneWay').value,tipoViaje:document.getElementById('tipoServicio').value,fechaRegreso:document.getElementById('fechaVuelta').value,horaRegreso:document.getElementById('horaVuelta').value});document.getElementById('servicio-personalizado').scrollIntoView({behavior:'smooth'});return false;" style="display:inline-block;background:var(--navy-bg);color:#fff;padding:14px 35px;border-radius:8px;font-family:var(--font-title);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:1px;text-decoration:none;transition:0.3s;" onmouseover="this.style.background='var(--gold)';this.style.color='#000'" onmouseout="this.style.background='var(--navy-bg)';this.style.color='#fff'">
+                        <a href="#servicio-personalizado" onclick="preCargarCustom({origen:document.getElementById('origen').value,destino:document.getElementById('destino').value,fecha:document.getElementById('fechaIda').value,hora:document.getElementById('horaIda').value,pax:document.getElementById(document.getElementById('tipoServicio').value==='REDONDO'?'pasajeros':'pasajerosOneWay').value,tipoViaje:document.getElementById('tipoServicio').value,fechaRegreso:document.getElementById('fechaVuelta').value,horaRegreso:document.getElementById('horaVuelta').value});document.getElementById('servicio-personalizado').scrollIntoView({behavior:'smooth'});return false;" style="display:inline-block;background:var(--navy-bg);color:#fff;padding:14px 35px;border-radius:8px;font-family:var(--font-title);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:1px;text-decoration:none;transition:0.3s;" >
                             <i class="fas fa-concierge-bell"></i> ${currentLang==='en' ? 'Request Custom Quote' : 'Solicitar Cotización Personalizada'}
                         </a>
                     </div>`;
@@ -2719,7 +2933,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                                 ? "We couldn't find a price for this route automatically. Our team will quote you as soon as possible through our Custom Service."
                                 : "No pudimos encontrar un precio para esta ruta automáticamente. Nuestro equipo te cotizará lo antes posible a través de nuestro Servicio Personalizado."}
                         </p>
-                        <a href="#servicio-personalizado" onclick="preCargarCustom({origen:document.getElementById('origen').value,destino:document.getElementById('destino').value,fecha:document.getElementById('fechaIda').value,hora:document.getElementById('horaIda').value,pax:document.getElementById(document.getElementById('tipoServicio').value==='REDONDO'?'pasajeros':'pasajerosOneWay').value,tipoViaje:document.getElementById('tipoServicio').value,fechaRegreso:document.getElementById('fechaVuelta').value,horaRegreso:document.getElementById('horaVuelta').value});document.getElementById('servicio-personalizado').scrollIntoView({behavior:'smooth'});return false;" style="display:inline-block;background:var(--navy-bg);color:#fff;padding:14px 35px;border-radius:8px;font-family:var(--font-title);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:1px;text-decoration:none;" onmouseover="this.style.background='var(--gold)';this.style.color='#000'" onmouseout="this.style.background='var(--navy-bg)';this.style.color='#fff'">
+                        <a href="#servicio-personalizado" onclick="preCargarCustom({origen:document.getElementById('origen').value,destino:document.getElementById('destino').value,fecha:document.getElementById('fechaIda').value,hora:document.getElementById('horaIda').value,pax:document.getElementById(document.getElementById('tipoServicio').value==='REDONDO'?'pasajeros':'pasajerosOneWay').value,tipoViaje:document.getElementById('tipoServicio').value,fechaRegreso:document.getElementById('fechaVuelta').value,horaRegreso:document.getElementById('horaVuelta').value});document.getElementById('servicio-personalizado').scrollIntoView({behavior:'smooth'});return false;" style="display:inline-block;background:var(--navy-bg);color:#fff;padding:14px 35px;border-radius:8px;font-family:var(--font-title);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:1px;text-decoration:none;" >
                             <i class="fas fa-concierge-bell"></i> ${currentLang==='en' ? 'Request Custom Quote' : 'Solicitar Cotización Personalizada'}
                         </a>
                     </div>`;
@@ -2773,7 +2987,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                                 ? 'For groups of 16 or more passengers, we offer a personalized service. Contact us and we\'ll quote you as soon as possible.'
                                 : 'Para grupos de 16 o más pasajeros ofrecemos un servicio personalizado. Contáctanos y te cotizamos lo antes posible.'}
                         </p>
-                        <a href="#servicio-personalizado" onclick="preCargarCustom({origen:document.getElementById('origen').value,destino:document.getElementById('destino').value,fecha:document.getElementById('fechaIda').value,hora:document.getElementById('horaIda').value,pax:document.getElementById(document.getElementById('tipoServicio').value==='REDONDO'?'pasajeros':'pasajerosOneWay').value,tipoViaje:document.getElementById('tipoServicio').value,fechaRegreso:document.getElementById('fechaVuelta').value,horaRegreso:document.getElementById('horaVuelta').value});document.getElementById('servicio-personalizado').scrollIntoView({behavior:'smooth'});return false;" style="display:inline-block;background:var(--navy-bg);color:#fff;padding:14px 35px;border-radius:8px;font-family:var(--font-title);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:1px;text-decoration:none;" onmouseover="this.style.background='var(--gold)';this.style.color='#000'" onmouseout="this.style.background='var(--navy-bg)';this.style.color='#fff'">
+                        <a href="#servicio-personalizado" onclick="preCargarCustom({origen:document.getElementById('origen').value,destino:document.getElementById('destino').value,fecha:document.getElementById('fechaIda').value,hora:document.getElementById('horaIda').value,pax:document.getElementById(document.getElementById('tipoServicio').value==='REDONDO'?'pasajeros':'pasajerosOneWay').value,tipoViaje:document.getElementById('tipoServicio').value,fechaRegreso:document.getElementById('fechaVuelta').value,horaRegreso:document.getElementById('horaVuelta').value});document.getElementById('servicio-personalizado').scrollIntoView({behavior:'smooth'});return false;" style="display:inline-block;background:var(--navy-bg);color:#fff;padding:14px 35px;border-radius:8px;font-family:var(--font-title);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:1px;text-decoration:none;" >
                             <i class="fas fa-concierge-bell"></i> ${currentLang==='en' ? 'Request Custom Quote' : 'Solicitar Cotización Personalizada'}
                         </a>
                     </div>`;
@@ -2830,6 +3044,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const precioOriginal = tieneDescuento ? Math.round(precio / descuentoPct) : precio;
 
         const dataStr = JSON.stringify({ esVenta: true, vehiculo: veh, precio: "$" + precio + " " + moneda, zona: zona, origen: document.getElementById('origen').value, destino: document.getElementById('destino').value }).replace(/"/g, "&quot;");
+        const precioDisplay = '<span style="font-size:26px;font-weight:900;color:var(--navy-bg);font-family:var(--font-title);">$' + precio + ' <small style="font-size:14px;font-weight:600;">' + moneda + '</small></span>';
         let tipoTexto = (tipo === 'SENCILLO') ? t.oneWay : t.roundTrip;
         let iconoTipo = (tipo === 'SENCILLO') ? "fa-arrow-right" : "fa-exchange-alt";
 
@@ -2868,11 +3083,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 <div class="price-container">
                     ${precioHTML}
                 </div>
-                <div id="total-con-extras-${id}" style="display:none; margin-top:6px; padding-top:6px; border-top:1px dashed #ddd; text-align:right; width:100%;">
-                    <div style="font-size:10px; color:#888; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">${isEN ? '+ Extras' : '+ Extras'}</div>
-                    <div style="font-size:11px; color:#555; font-weight:600;" id="extras-linea-${id}"></div>
-                    <div style="font-size:11px; color:#888; font-weight:600;">${isEN ? 'Total:' : 'Total:'} <span style="font-size:1.1rem; font-weight:900; color:var(--action-green);" id="grand-total-${id}"></span></div>
-                </div>
+                <div id="total-con-extras-${id}" style="display:none;"></div>
                 <button class="btn-reservar" style="width:100%;" onclick="abrirFormCard('${id}', ${dataStr})">${t.bookBtn} <i class="fas fa-chevron-down"></i></button>
             </div>
 
@@ -2890,44 +3101,59 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         <label>${isEN ? 'Email Address' : 'Correo Electrónico'}</label>
                         <input type="email" id="email-${id}" placeholder="${isEN ? 'email@example.com' : 'correo@ejemplo.com'}">
                     </div>
-                    <div class="input-wrapper" style="padding:8px 10px;">
+                    <div class="input-wrapper" style="padding:8px 10px; overflow:visible;">
                         <label style="font-weight:800; color:var(--navy-bg); margin-bottom:5px; display:block;">${isEN ? 'WHATSAPP *' : 'WHATSAPP *'}</label>
-                        <div style="display:flex; align-items:stretch; border:1px solid #ccc; border-radius:6px; overflow:hidden; background:#fff;">
-                            <div style="display:flex; align-items:center; background:#f8f9fa; border-right:1px solid #eee; flex-shrink:0;">
-                                <select id="bandera-${id}" onchange="cambiarPrefijoCard('${id}')" style="border:none; outline:none; background:transparent; cursor:pointer; font-size:13px; font-weight:700; color:var(--navy-bg); padding:8px 6px; appearance:none; -webkit-appearance:none; width:48px; text-align:center;">
-                                    <option value="+1"   selected>US</option>
-                                    <option value="+52"         >MX</option>
-                                    <option value="+1"          >CA</option>
-                                    <option value="+44"         >GB</option>
-                                    <option value="+49"         >DE</option>
-                                    <option value="+33"         >FR</option>
-                                    <option value="+34"         >ES</option>
-                                    <option value="+39"         >IT</option>
-                                    <option value="+31"         >NL</option>
-                                    <option value="+55"         >BR</option>
-                                    <option value="+54"         >AR</option>
-                                    <option value="+57"         >CO</option>
-                                    <option value="+56"         >CL</option>
-                                    <option value="+51"         >PE</option>
-                                    <option value="+58"         >VE</option>
-                                    <option value="+502"        >GT</option>
-                                    <option value="+507"        >PA</option>
-                                    <option value="+53"         >CU</option>
-                                    <option value="+61"         >AU</option>
-                                    <option value="+81"         >JP</option>
-                                    <option value="+86"         >CN</option>
-                                    <option value="+91"         >IN</option>
-                                    <option value="+7"          >RU</option>
-                                    <option value="+972"        >IL</option>
-                                    <option value="+971"        >AE</option>
-                                    <option disabled>──</option>
-                                    <option value="OTRO"        >${isEN ? 'Other' : 'Otro'}</option>
-                                </select>
-                                <div style="width:1px; height:100%; background:#eee;"></div>
-                                <input type="text" id="lada-${id}" value="+1" style="width:38px; border:none; outline:none; background:transparent; font-weight:800; color:var(--action-green); font-size:13px; text-align:center; padding:0;" readonly>
+                        <!-- Hidden native select (keeps cambiarPrefijoCard logic working) -->
+                        <select id="bandera-${id}" onchange="cambiarPrefijoCard('${id}')" style="display:none;">
+                            <option value="+1" selected>US</option>
+                            <option value="+52">MX</option><option value="+1">CA</option><option value="+44">GB</option>
+                            <option value="+49">DE</option><option value="+33">FR</option><option value="+34">ES</option>
+                            <option value="+39">IT</option><option value="+31">NL</option><option value="+55">BR</option>
+                            <option value="+54">AR</option><option value="+57">CO</option><option value="+56">CL</option>
+                            <option value="+51">PE</option><option value="+58">VE</option><option value="+502">GT</option>
+                            <option value="+507">PA</option><option value="+53">CU</option><option value="+61">AU</option>
+                            <option value="+81">JP</option><option value="+86">CN</option><option value="+91">IN</option>
+                            <option value="+7">RU</option><option value="+972">IL</option><option value="+971">AE</option>
+                            <option value="OTRO">${isEN?'Other':'Otro'}</option>
+                        </select>
+                        <div style="display:flex; align-items:stretch; border:1px solid #ccc; border-radius:6px; overflow:visible; background:#fff; position:relative;">
+                            <!-- Country trigger: only clicking country name opens dropdown -->
+                            <div id="country-trigger-${id}" style="display:flex;align-items:center;gap:0;background:#f8f9fa;border-right:1px solid #eee;flex-shrink:0;position:relative;">
+                                <span id="country-name-${id}" onclick="toggleCountryDrop('${id}')" style="font-size:13px;font-weight:700;color:var(--navy-bg);padding:10px 6px 10px 10px;cursor:pointer;user-select:none;">US</span>
+                                <div style="width:1px;height:100%;background:#eee;"></div>
+                                <span id="lada-${id}" style="font-size:13px;font-weight:800;color:var(--action-green);padding:10px 8px 10px 8px;">+1</span>
+                                <!-- Custom dropdown -->
+                                <div id="country-drop-${id}" style="display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:9999;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.18);border:1px solid #e8e8e8;min-width:160px;max-height:240px;overflow-y:auto;scrollbar-width:thin;">
+                                    <div class="country-option" data-code="+1" data-name="US" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">US</span><span style="color:var(--action-green);font-weight:700;">+1</span></div>
+<div class="country-option" data-code="+52" data-name="MX" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">MX</span><span style="color:var(--action-green);font-weight:700;">+52</span></div>
+<div class="country-option" data-code="+1" data-name="CA" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">CA</span><span style="color:var(--action-green);font-weight:700;">+1</span></div>
+<div class="country-option" data-code="+44" data-name="GB" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">GB</span><span style="color:var(--action-green);font-weight:700;">+44</span></div>
+<div class="country-option" data-code="+49" data-name="DE" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">DE</span><span style="color:var(--action-green);font-weight:700;">+49</span></div>
+<div class="country-option" data-code="+33" data-name="FR" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">FR</span><span style="color:var(--action-green);font-weight:700;">+33</span></div>
+<div class="country-option" data-code="+34" data-name="ES" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">ES</span><span style="color:var(--action-green);font-weight:700;">+34</span></div>
+<div class="country-option" data-code="+39" data-name="IT" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">IT</span><span style="color:var(--action-green);font-weight:700;">+39</span></div>
+<div class="country-option" data-code="+31" data-name="NL" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">NL</span><span style="color:var(--action-green);font-weight:700;">+31</span></div>
+<div class="country-option" data-code="+55" data-name="BR" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">BR</span><span style="color:var(--action-green);font-weight:700;">+55</span></div>
+<div class="country-option" data-code="+54" data-name="AR" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">AR</span><span style="color:var(--action-green);font-weight:700;">+54</span></div>
+<div class="country-option" data-code="+57" data-name="CO" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">CO</span><span style="color:var(--action-green);font-weight:700;">+57</span></div>
+<div class="country-option" data-code="+56" data-name="CL" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">CL</span><span style="color:var(--action-green);font-weight:700;">+56</span></div>
+<div class="country-option" data-code="+51" data-name="PE" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">PE</span><span style="color:var(--action-green);font-weight:700;">+51</span></div>
+<div class="country-option" data-code="+58" data-name="VE" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">VE</span><span style="color:var(--action-green);font-weight:700;">+58</span></div>
+<div class="country-option" data-code="+502" data-name="GT" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">GT</span><span style="color:var(--action-green);font-weight:700;">+502</span></div>
+<div class="country-option" data-code="+507" data-name="PA" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">PA</span><span style="color:var(--action-green);font-weight:700;">+507</span></div>
+<div class="country-option" data-code="+53" data-name="CU" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">CU</span><span style="color:var(--action-green);font-weight:700;">+53</span></div>
+<div class="country-option" data-code="+61" data-name="AU" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">AU</span><span style="color:var(--action-green);font-weight:700;">+61</span></div>
+<div class="country-option" data-code="+81" data-name="JP" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">JP</span><span style="color:var(--action-green);font-weight:700;">+81</span></div>
+<div class="country-option" data-code="+86" data-name="CN" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">CN</span><span style="color:var(--action-green);font-weight:700;">+86</span></div>
+<div class="country-option" data-code="+91" data-name="IN" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">IN</span><span style="color:var(--action-green);font-weight:700;">+91</span></div>
+<div class="country-option" data-code="+7" data-name="RU" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">RU</span><span style="color:var(--action-green);font-weight:700;">+7</span></div>
+<div class="country-option" data-code="+972" data-name="IL" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">IL</span><span style="color:var(--action-green);font-weight:700;">+972</span></div>
+<div class="country-option" data-code="+971" data-name="AE" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:#333;display:flex;gap:10px;align-items:center;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''"><span style="color:var(--navy-bg);font-weight:800;min-width:36px;">AE</span><span style="color:var(--action-green);font-weight:700;">+971</span></div>
+<div class="country-option" data-code="OTRO" data-name="Other" onclick="selectCountry(this,'${id}')" style="padding:9px 16px;cursor:pointer;font-size:14px;font-weight:600;color:var(--gold);border-top:1px solid #eee;transition:background 0.12s;" onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background=''">Other / Otro</div>
+                                </div>
                             </div>
-                            <div style="width:1px; background:#eee; flex-shrink:0;"></div>
-                            <input type="tel" id="tel-${id}" placeholder="987 654 3210" style="flex:1; border:none; outline:none; background:transparent; padding:10px; font-size:15px; width:100%; min-width:50px;">
+                            <div style="width:1px;background:#eee;flex-shrink:0;"></div>
+                            <input type="tel" id="tel-${id}" placeholder="987 654 3210" style="flex:1;border:none;outline:none;background:transparent;padding:10px;font-size:15px;width:100%;min-width:50px;">
                         </div>
                     </div>
                     <div class="input-wrapper">
@@ -2942,90 +3168,70 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 </div>
                 <!-- OPTIONAL EXTRAS -->
                 <div style="background:transparent; border-radius:10px; padding:15px; margin-bottom:16px; border:1px solid #ccc;">
-                    <div style="font-size:11px; font-weight:900; color:var(--navy-bg); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; font-family:var(--font-title);">
+                    <div style="font-size:11px; font-weight:900; color:var(--navy-bg); text-transform:uppercase; letter-spacing:1px; margin-bottom:14px; font-family:var(--font-title);">
                         <i class="fas fa-plus-circle" style="color:var(--gold);"></i> ${isEN ? 'Optional Extras' : 'Extras Opcionales'}
                     </div>
 
                     ${tipo === 'REDONDO' ? `
-                    <!-- ROUND TRIP: extras en 2 filas, 4 columnas -->
-                    <div class="extras-grid-4" style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px;">
-                        <div style="display:flex; align-items:center; justify-content:space-between; background:#fff; border-radius:8px; padding:10px 14px; border:1px solid #ccc;">
-                            <span style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body);">🥤 ${isEN ? 'Water' : 'Agua'} <span style="color:#aaa; font-size:11px;">${formatExtraPrice(2)}</span><br><span style="color:var(--navy-bg); font-size:10px; font-weight:700;">${isEN ? 'Trip' : 'Ida'}</span></span>
-                            <div style="display:flex; align-items:center; gap:6px;">
-                                <button type="button" onclick="cambiarExtra('${id}','water',-1)" style="width:26px;height:26px;border-radius:50%;border:1px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;">−</button>
-                                <span id="extra-water-${id}" style="font-weight:700;color:var(--navy-bg);min-width:18px;text-align:center;font-size:14px;">0</span>
-                                <button type="button" onclick="cambiarExtra('${id}','water',+1)" style="width:26px;height:26px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">+</button>
+                    <!-- ROUND TRIP: carrusel 3+3, flechas laterales -->
+                    <div style="position:relative; display:flex; align-items:center; gap:0;">
+
+                        <!-- Flecha izquierda -->
+                        <button type="button" onclick="rtSlide('rt-track-${id}',-1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:2px solid #ccc;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);z-index:2;margin-right:8px;transition:all 0.2s;" onmouseover="this.style.background='#000';this.style.color='#fff';this.style.borderColor='#000';" onmouseout="this.style.background='#fff';this.style.color='#000';this.style.borderColor='#ccc';">&#8249;</button>
+
+                        <!-- Viewport: overflow hidden -->
+                        <div style="flex:1; overflow:hidden;">
+                            <div id="rt-track-${id}" data-page="0" style="display:flex;gap:10px;transition:transform 0.35s ease;will-change:transform;">
+
+
+
+                                <!-- TRIP: Stop -->
+                                <div style="background:#fff; border-radius:12px; border:1.5px solid #D4AF37; overflow:hidden; box-shadow:0 2px 8px rgba(212,175,55,0.15); display:flex; flex-direction:column; flex:0 0 calc(33.333% - 7px); min-width:0;">
+                                    <div style="position:relative;background:#f8f4e8;height:90px;display:flex;align-items:center;justify-content:center;"><svg width="60" height="60" viewBox="0 0 80 80" fill="none"><circle cx="30" cy="28" r="16" stroke="#002855" stroke-width="3" fill="none"/><line x1="30" y1="28" x2="30" y2="20" stroke="#002855" stroke-width="2.5" stroke-linecap="round"/><line x1="30" y1="28" x2="36" y2="28" stroke="#D4AF37" stroke-width="2.5" stroke-linecap="round"/><path d="M22 44 C22 44 30 56 30 60" stroke="#002855" stroke-width="3" stroke-linecap="round"/><ellipse cx="55" cy="58" rx="14" ry="10" stroke="#002855" stroke-width="2.5" fill="none"/><path d="M48 58 L52 54 L55 58 L58 50" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="position:absolute;top:8px;left:8px;background:var(--navy-bg);color:#fff;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;padding:3px 7px;border-radius:20px;font-family:var(--font-title);">${isEN?'Trip':'Ida'}</span></div>
+                                    <div style="padding:10px 12px 12px; text-align:center;"><div style="font-size:13px;font-weight:600;color:#333;font-family:var(--font-body);margin-bottom:8px;">${isEN?'Quick 20-Minute Stop':'Parada Rápida 20 Min'}</div><div style="display:flex;align-items:center;justify-content:center;gap:6px;"><span style="font-size:15px;font-weight:800;color:var(--text-dark);font-family:var(--font-title);">${formatExtraPrice(25)}</span><button type="button" onclick="cambiarExtra('${id}','stop',-1)" style="width:28px;height:28px;border-radius:50%;border:1.5px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;">−</button><span id="extra-stop-${id}" style="font-weight:800;color:var(--navy-bg);min-width:20px;text-align:center;font-size:15px;">0</span><button type="button" onclick="cambiarExtra('${id}','stop',+1)" style="width:28px;height:28px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">+</button></div></div>
+                                </div>
+
+
+                                <!-- RETURN: Stop -->
+                                <div style="background:#fff; border-radius:12px; border:1.5px solid #D4AF37; overflow:hidden; box-shadow:0 2px 8px rgba(212,175,55,0.15); display:flex; flex-direction:column; flex:0 0 calc(33.333% - 7px); min-width:0;">
+                                    <div style="position:relative;background:#f8f4e8;height:90px;display:flex;align-items:center;justify-content:center;"><svg width="60" height="60" viewBox="0 0 80 80" fill="none"><circle cx="30" cy="28" r="16" stroke="#002855" stroke-width="3" fill="none"/><line x1="30" y1="28" x2="30" y2="20" stroke="#002855" stroke-width="2.5" stroke-linecap="round"/><line x1="30" y1="28" x2="36" y2="28" stroke="#D4AF37" stroke-width="2.5" stroke-linecap="round"/><path d="M22 44 C22 44 30 56 30 60" stroke="#002855" stroke-width="3" stroke-linecap="round"/><ellipse cx="55" cy="58" rx="14" ry="10" stroke="#002855" stroke-width="2.5" fill="none"/><path d="M48 58 L52 54 L55 58 L58 50" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="position:absolute;top:8px;left:8px;background:#555;color:#fff;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;padding:3px 7px;border-radius:20px;font-family:var(--font-title);">${isEN?'Return':'Regreso'}</span></div>
+                                    <div style="padding:10px 12px 12px; text-align:center;"><div style="font-size:13px;font-weight:600;color:#333;font-family:var(--font-body);margin-bottom:8px;">${isEN?'Quick 20-Minute Stop':'Parada Rápida 20 Min'}</div><div style="display:flex;align-items:center;justify-content:center;gap:6px;"><span style="font-size:15px;font-weight:800;color:var(--text-dark);font-family:var(--font-title);">${formatExtraPrice(25)}</span><button type="button" onclick="cambiarExtra('${id}','stopR',-1)" style="width:28px;height:28px;border-radius:50%;border:1.5px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;">−</button><span id="extra-stopR-${id}" style="font-weight:800;color:var(--navy-bg);min-width:20px;text-align:center;font-size:15px;">0</span><button type="button" onclick="cambiarExtra('${id}','stopR',+1)" style="width:28px;height:28px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">+</button></div></div>
+                                </div>
+
                             </div>
                         </div>
-                        <div style="display:flex; align-items:center; justify-content:space-between; background:#fff; border-radius:8px; padding:10px 14px; border:1px solid #ccc;">
-                            <span style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body);">🥤 ${isEN ? 'Water' : 'Agua'} <span style="color:#aaa; font-size:11px;">${formatExtraPrice(2)}</span><br><span style="color:var(--navy-bg); font-size:10px; font-weight:700;">${isEN ? 'Return' : 'Regreso'}</span></span>
-                            <div style="display:flex; align-items:center; gap:6px;">
-                                <button type="button" onclick="cambiarExtra('${id}','waterR',-1)" style="width:26px;height:26px;border-radius:50%;border:1px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;">−</button>
-                                <span id="extra-waterR-${id}" style="font-weight:700;color:var(--navy-bg);min-width:18px;text-align:center;font-size:14px;">0</span>
-                                <button type="button" onclick="cambiarExtra('${id}','waterR',+1)" style="width:26px;height:26px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">+</button>
+
+                        <!-- Flecha derecha -->
+                        <button type="button" onclick="rtSlide('rt-track-${id}',1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:2px solid #ccc;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);z-index:2;margin-left:8px;transition:all 0.2s;" onmouseover="this.style.background='#000';this.style.color='#fff';this.style.borderColor='#000';" onmouseout="this.style.background='#fff';this.style.color='#000';this.style.borderColor='#ccc';">&#8250;</button>
+
+                    </div>` : `
+                    <!-- ONE WAY: solo parada -->
+                    <div style="display:grid; grid-template-columns:1fr; gap:12px; max-width:340px; margin:0 auto;">
+
+                        <!-- Parada 20 min -->
+                        <div style="background:#fff; border-radius:12px; border:1.5px solid #D4AF37; overflow:hidden; box-shadow:0 2px 8px rgba(212,175,55,0.15); display:flex; flex-direction:column;">
+                            <div style="background:#f8f4e8; height:90px; display:flex; align-items:center; justify-content:center;">
+                                <svg width="72" height="72" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="30" cy="28" r="16" stroke="#002855" stroke-width="3" fill="none"/>
+                                    <line x1="30" y1="28" x2="30" y2="20" stroke="#002855" stroke-width="2.5" stroke-linecap="round"/>
+                                    <line x1="30" y1="28" x2="36" y2="28" stroke="#D4AF37" stroke-width="2.5" stroke-linecap="round"/>
+                                    <path d="M22 44 C22 44 30 56 30 60" stroke="#002855" stroke-width="3" stroke-linecap="round"/>
+                                    <ellipse cx="55" cy="58" rx="14" ry="10" stroke="#002855" stroke-width="2.5" fill="none"/>
+                                    <path d="M48 58 L52 54 L55 58 L58 50" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
                             </div>
-                        </div>
-                        <div style="display:flex; align-items:center; justify-content:space-between; background:#fff; border-radius:8px; padding:10px 14px; border:1px solid #ccc;">
-                            <span style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body);">🍺 ${isEN ? 'Beer' : 'Cerveza'} <span style="color:#aaa; font-size:11px;">${formatExtraPrice(4)}</span><br><span style="color:var(--navy-bg); font-size:10px; font-weight:700;">${isEN ? 'Trip' : 'Ida'}</span></span>
-                            <div style="display:flex; align-items:center; gap:6px;">
-                                <button type="button" onclick="cambiarExtra('${id}','beer',-1)" style="width:26px;height:26px;border-radius:50%;border:1px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;">−</button>
-                                <span id="extra-beer-${id}" style="font-weight:700;color:var(--navy-bg);min-width:18px;text-align:center;font-size:14px;">0</span>
-                                <button type="button" onclick="cambiarExtra('${id}','beer',+1)" style="width:26px;height:26px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">+</button>
+                            <div style="padding:12px 12px 14px; flex:1; display:flex; flex-direction:column; justify-content:space-between;">
+                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:10px;">${isEN ? 'Quick 20-Minute Stop' : 'Parada Rápida 20 Min'}</div>
+                                <div style="display:flex; align-items:center; justify-content:space-between;">
+                                    <span style="font-size:16px; font-weight:800; color:var(--text-dark); font-family:var(--font-title);">${formatExtraPrice(25)}</span>
+                                    <div style="display:flex; align-items:center; gap:7px;">
+                                        <button type="button" onclick="cambiarExtra('${id}','stop',-1)" style="width:28px;height:28px;border-radius:50%;border:1.5px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;line-height:1;">−</button>
+                                        <span id="extra-stop-${id}" style="font-weight:800;color:var(--navy-bg);min-width:20px;text-align:center;font-size:15px;">0</span>
+                                        <button type="button" onclick="cambiarExtra('${id}','stop',+1)" style="width:28px;height:28px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;line-height:1;">+</button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div style="display:flex; align-items:center; justify-content:space-between; background:#fff; border-radius:8px; padding:10px 14px; border:1px solid #ccc;">
-                            <span style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body);">🍺 ${isEN ? 'Beer' : 'Cerveza'} <span style="color:#aaa; font-size:11px;">${formatExtraPrice(4)}</span><br><span style="color:var(--navy-bg); font-size:10px; font-weight:700;">${isEN ? 'Return' : 'Regreso'}</span></span>
-                            <div style="display:flex; align-items:center; gap:6px;">
-                                <button type="button" onclick="cambiarExtra('${id}','beerR',-1)" style="width:26px;height:26px;border-radius:50%;border:1px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;">−</button>
-                                <span id="extra-beerR-${id}" style="font-weight:700;color:var(--navy-bg);min-width:18px;text-align:center;font-size:14px;">0</span>
-                                <button type="button" onclick="cambiarExtra('${id}','beerR',+1)" style="width:26px;height:26px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">+</button>
-                            </div>
-                        </div>
-                        <div style="display:flex; align-items:center; justify-content:space-between; background:#fff; border-radius:8px; padding:10px 14px; border:1px solid #ccc; border-color:#D4AF37;">
-                            <span style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body);">🛑 ${isEN ? 'Stop 20min' : 'Parada 20min'} <span style="color:#aaa; font-size:11px;">${formatExtraPrice(25)}</span><br><span style="color:var(--navy-bg); font-size:10px; font-weight:700;">${isEN ? 'Trip' : 'Ida'}</span></span>
-                            <div style="display:flex; align-items:center; gap:6px;">
-                                <button type="button" onclick="cambiarExtra('${id}','stop',-1)" style="width:26px;height:26px;border-radius:50%;border:1px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;">−</button>
-                                <span id="extra-stop-${id}" style="font-weight:700;color:var(--navy-bg);min-width:18px;text-align:center;font-size:14px;">0</span>
-                                <button type="button" onclick="cambiarExtra('${id}','stop',+1)" style="width:26px;height:26px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">+</button>
-                            </div>
-                        </div>
-                        <div style="display:flex; align-items:center; justify-content:space-between; background:#fff; border-radius:8px; padding:10px 14px; border:1px solid #ccc; border-color:#D4AF37;">
-                            <span style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body);">🛑 ${isEN ? 'Stop 20min' : 'Parada 20min'} <span style="color:#aaa; font-size:11px;">${formatExtraPrice(25)}</span><br><span style="color:var(--navy-bg); font-size:10px; font-weight:700;">${isEN ? 'Return' : 'Regreso'}</span></span>
-                            <div style="display:flex; align-items:center; gap:6px;">
-                                <button type="button" onclick="cambiarExtra('${id}','stopR',-1)" style="width:26px;height:26px;border-radius:50%;border:1px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;">−</button>
-                                <span id="extra-stopR-${id}" style="font-weight:700;color:var(--navy-bg);min-width:18px;text-align:center;font-size:14px;">0</span>
-                                <button type="button" onclick="cambiarExtra('${id}','stopR',+1)" style="width:26px;height:26px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">+</button>
-                            </div>
-                        </div>
-                    </div>
-                    ` : `
-                    <!-- ONE WAY: extras en grid 2 columnas -->
-                    <div class="extras-ow-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; min-width:0;">
-                        <div class="extra-card-ow" style="display:flex; align-items:center; justify-content:space-between; background:#fff; border-radius:8px; padding:10px 14px; border:1px solid #ccc;">
-                            <span style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body);">🥤 ${isEN ? 'Water Bottle' : 'Agua'} <span style="color:#aaa; font-size:11px;">${formatExtraPrice(2)}</span></span>
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <button type="button" onclick="cambiarExtra('${id}','water',-1)" style="width:26px;height:26px;border-radius:50%;border:1px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;">−</button>
-                                <span id="extra-water-${id}" style="font-weight:700;color:var(--navy-bg);min-width:18px;text-align:center;font-size:14px;">0</span>
-                                <button type="button" onclick="cambiarExtra('${id}','water',+1)" style="width:26px;height:26px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">+</button>
-                            </div>
-                        </div>
-                        <div class="extra-card-ow" style="display:flex; align-items:center; justify-content:space-between; background:#fff; border-radius:8px; padding:10px 14px; border:1px solid #ccc;">
-                            <span style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body);">🍺 ${isEN ? 'Beer' : 'Cerveza'} <span style="color:#aaa; font-size:11px;">${formatExtraPrice(4)}</span></span>
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <button type="button" onclick="cambiarExtra('${id}','beer',-1)" style="width:26px;height:26px;border-radius:50%;border:1px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;">−</button>
-                                <span id="extra-beer-${id}" style="font-weight:700;color:var(--navy-bg);min-width:18px;text-align:center;font-size:14px;">0</span>
-                                <button type="button" onclick="cambiarExtra('${id}','beer',+1)" style="width:26px;height:26px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">+</button>
-                            </div>
-                        </div>
-                        <div class="extra-card-ow" style="display:flex; align-items:center; justify-content:space-between; background:#fff; border-radius:8px; padding:10px 14px; border:1px solid #ccc; border-color:#D4AF37;">
-                            <span style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body);">🛑 ${isEN ? 'Stop 20min' : 'Parada 20min'} <span style="color:#aaa; font-size:11px;">${formatExtraPrice(25)}</span></span>
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <button type="button" onclick="cambiarExtra('${id}','stop',-1)" style="width:26px;height:26px;border-radius:50%;border:1px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;">−</button>
-                                <span id="extra-stop-${id}" style="font-weight:700;color:var(--navy-bg);min-width:18px;text-align:center;font-size:14px;">0</span>
-                                <button type="button" onclick="cambiarExtra('${id}','stop',+1)" style="width:26px;height:26px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">+</button>
-                            </div>
-                        </div>
-                    </div>
+                        </div></div>
                     `}
 
                     <div id="extras-total-${id}" style="margin-top:10px; text-align:right; font-size:13px; font-weight:700; color:var(--navy-bg); display:none;">
@@ -3036,23 +3242,110 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 <div class="form-card-notes">
                     <div class="input-wrapper">
                         <label>${isEN ? 'Notes / Luggage / Baby Seats' : 'Notas / Equipaje / Sillas de Bebé'}</label>
-                        <textarea id="notas-${id}" rows="2" placeholder="${isEN ? 'Ex: 4 large suitcases...' : 'Ej: 4 maletas grandes, silla de bebé...'}"></textarea>
-                    </div>
-                    <div class="input-wrapper">
-                        <label style="color:var(--gold);">${isEN ? 'Preferred Payment' : 'MÉTODO DE PAGO'}</label>
-                        <select id="pago-${id}" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; width:100%; font-family:var(--font-body);">
-                            <option value="Credit/Debit Card">${isEN ? 'Credit/Debit Card' : 'Tarjeta de Crédito/Débito'}</option>
-                            <option value="30% Credit/Debit + 70% Cash">${isEN ? '30% Credit/Debit + 70% Cash' : '30% Tarjeta + 70% Efectivo'}</option>
-                        </select>
+                        <textarea id="notas-${id}" rows="3" placeholder="${isEN ? 'Ex: 4 large suitcases...' : 'Ej: 4 maletas grandes, silla de bebé...'}" style="resize:none; height:80px;"></textarea>
                     </div>
                 </div>
+
                 <div class="terms-container" style="margin-bottom:16px;">
                     <input type="checkbox" id="terms-${id}">
-                    <span>${isEN ? 'I have read and agree to the' : 'He leído y acepto los'} <span class="terms-link" onclick="abrirTyC()">${isEN ? 'Terms & Conditions' : 'Términos y Condiciones'}</span></span>
+                    <span>${isEN ? 'I have read and agree to the' : 'He leído y acepto los'}
+                        <span class="terms-link" onclick="abrirTyC()">
+                            ${isEN ? 'Terms & Conditions' : 'Términos y Condiciones'}
+                        </span>
+                    </span>
                 </div>
-                <button class="btn-enviar-reserva" onclick="enviarDesdeCard('${id}', ${dataStr})">
-                    <i class="fas fa-paper-plane"></i> ${isEN ? 'SEND BOOKING REQUEST' : 'ENVIAR SOLICITUD DE RESERVA'}
+
+                <!-- ══ BOTÓN CONTINUAR — valida el form ══ -->
+                <button id="btn-continuar-${id}" class="btn-enviar-reserva"
+                    onclick="validarYMostrarPago('${id}', ${dataStr})">
+                    <i class="fas fa-lock"></i>
+                    ${isEN ? 'CONTINUE TO PAYMENT' : 'CONTINUAR AL PAGO'}
                 </button>
+
+                <!-- BLOQUE DE PAGO -->
+                <div id="payment-block-${id}" style="display:none; margin-top:20px;">
+
+                    <!-- Solo el monto — sin repetir vehículo ni ruta -->
+                    <div style="background:#f0f4ff; border:2.5px solid var(--navy-bg); border-radius:10px; padding:14px 20px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 10px rgba(0,40,85,0.10);">
+                        <span style="font-size:11px; color:var(--navy-bg); text-transform:uppercase; letter-spacing:1.5px; font-family:var(--font-title); font-weight:800;">
+                            ${isEN ? 'Total to pay' : 'Total a pagar'}
+                        </span>
+                        <span id="total-to-pay-display-${id}" style="font-size:24px; font-weight:900; color:var(--navy-bg); font-family:var(--font-title); letter-spacing:-0.5px;">
+                            $${precio} <small style="font-size:13px; font-weight:600;">${moneda}</small>
+                        </span>
+                    </div>
+
+                    <p style="font-size:11px; font-weight:800; color:#999; text-transform:uppercase; letter-spacing:1px; margin:0 0 12px; font-family:var(--font-title);">
+                        ${isEN ? 'Choose how to pay' : 'Elige c&oacute;mo pagar'}
+                    </p>
+
+                    <!-- BOTON TARJETA: fondo BLANCO, borde sutil, logos reales -->
+                    <button id="btn-stripe-${id}" onclick="pagarConStripe('${id}', ${dataStr})"
+                        style="width:100%; background:#0a0a0a; color:#fff; border:none; border-radius:10px; padding:14px 18px; font-size:14px; font-weight:700; cursor:pointer; font-family:var(--font-body); display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;"
+                        >
+                        <span style="display:flex; align-items:center; gap:12px;">
+                            <!-- Logos reales de tarjetas -->
+                            <span style="display:flex; gap:5px; align-items:center;">
+                                <svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;">
+                                    <rect width="38" height="24" rx="4" fill="#fff"/>
+                                    <text x="5" y="17" font-family="Arial" font-size="11" font-weight="900" fill="#1a1f71">VISA</text>
+                                </svg>
+                                <svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;">
+                                    <rect width="38" height="24" rx="4" fill="#fff"/>
+                                    <circle cx="15" cy="12" r="7" fill="#eb001b"/>
+                                    <circle cx="23" cy="12" r="7" fill="#f79e1b"/>
+                                    <path d="M19 6.8a7 7 0 0 1 0 10.4A7 7 0 0 1 19 6.8z" fill="#ff5f00"/>
+                                </svg>
+                                <svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;">
+                                    <rect width="38" height="24" rx="4" fill="#007bc1"/>
+                                    <text x="4" y="17" font-family="Arial" font-size="9" font-weight="900" fill="#fff">AMEX</text>
+                                </svg>
+                                <svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;">
+                                    <rect width="38" height="24" rx="4" fill="#fff"/>
+                                    <circle cx="24" cy="12" r="7" fill="#f76f20"/>
+                                    <text x="3" y="16" font-family="Arial" font-size="7" font-weight="700" fill="#231f20">DISC</text>
+                                </svg>
+                            </span>
+                            <span style="color:#fff; font-weight:700;">${isEN ? 'Pay with Card' : 'Pagar con Tarjeta'}</span>
+                        </span>
+                        <i class="fas fa-chevron-right" style="font-size:11px; color:#fff; opacity:0.6;"></i>
+                    </button>
+
+                    <!-- SEPARADOR -->
+                    <div style="display:flex; align-items:center; gap:10px; margin:12px 0;">
+                        <div style="flex:1; height:0.5px; background:#e2e8f0;"></div>
+                        <span style="color:#bbb; font-size:11px; font-weight:600;">${isEN ? 'or' : 'o'}</span>
+                        <div style="flex:1; height:0.5px; background:#e2e8f0;"></div>
+                    </div>
+
+                    <!-- PAYPAL SDK (cuando el dominio este registrado carga aqui) -->
+                    <div id="paypal-button-container-${id}" style="min-height:55px; border-radius:8px; overflow:hidden;"></div>
+
+                    <!-- PAYPAL FALLBACK con logo SVG oficial -->
+                    <div id="paypal-fallback-${id}" style="display:none;">
+                        <button onclick="pagarConPayPal('${id}', ${dataStr})"
+                            style="width:100%; background:#FFC439; border:none; border-radius:8px; padding:14px 20px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;"
+                            >
+                            <!-- Logo PayPal SVG oficial (azul oscuro + azul claro) -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 101 32" width="90" height="28">
+                                <path fill="#003087" d="M12.237 2.8L4.437 2.8C3.937 2.8 3.437 3.2 3.337 3.7L0.237 23.7C0.137 24.1 0.437 24.4 0.837 24.4L4.537 24.4C5.037 24.4 5.537 24 5.637 23.5L6.437 18.1C6.537 17.6 6.937 17.2 7.537 17.2L10.037 17.2C15.137 17.2 18.137 14.7 18.937 9.8C19.237 7.7 18.937 6 17.937 4.8C16.837 3.5 14.837 2.8 12.237 2.8ZM13.137 10.1C12.737 12.9 10.537 12.9 8.537 12.9L7.337 12.9L8.137 7.7C8.137 7.4 8.437 7.2 8.737 7.2L9.237 7.2C10.637 7.2 11.937 7.2 12.637 8C13.137 8.4 13.237 9.1 13.137 10.1Z"/>
+                                <path fill="#003087" d="M35.437 10L31.737 10C31.437 10 31.137 10.2 31.137 10.5L30.937 11.5L30.637 11.1C29.737 9.8 27.837 9.4 25.937 9.4C21.637 9.4 17.937 12.7 17.237 17.3C16.837 19.6 17.337 21.8 18.637 23.3C19.837 24.7 21.537 25.3 23.537 25.3C27.037 25.3 28.937 23.1 28.937 23.1L28.737 24.1C28.637 24.5 28.937 24.8 29.337 24.8L32.737 24.8C33.237 24.8 33.737 24.4 33.837 23.9L35.937 10.7C36.037 10.4 35.737 10 35.437 10ZM29.937 17.5C29.537 19.7 27.737 21.2 25.537 21.2C24.437 21.2 23.537 20.8 22.937 20.1C22.337 19.4 22.137 18.4 22.337 17.3C22.637 15.1 24.537 13.6 26.637 13.6C27.737 13.6 28.637 14 29.237 14.7C29.837 15.5 30.037 16.4 29.937 17.5Z"/>
+                                <path fill="#009cde" d="M55.337 10L51.637 10C51.237 10 50.937 10.2 50.737 10.5L45.537 18.1L43.337 10.8C43.137 10.3 42.737 10 42.237 10L38.637 10C38.237 10 37.837 10.4 38.037 10.9L42.137 23.2L38.237 28.6C37.937 29 38.237 29.6 38.737 29.6L42.437 29.6C42.837 29.6 43.137 29.4 43.337 29.1L55.837 10.9C56.137 10.5 55.837 10 55.337 10Z"/>
+                                <path fill="#003087" d="M67.737 2.8L59.937 2.8C59.437 2.8 58.937 3.2 58.837 3.7L55.737 23.6C55.637 24 55.937 24.3 56.337 24.3L60.337 24.3C60.737 24.3 61.037 24 61.037 23.7L61.937 18C62.037 17.5 62.437 17.1 63.037 17.1L65.537 17.1C70.637 17.1 73.637 14.6 74.437 9.7C74.737 7.6 74.437 5.9 73.437 4.7C72.237 3.5 70.337 2.8 67.737 2.8ZM68.637 10.1C68.237 12.9 66.037 12.9 64.037 12.9L62.837 12.9L63.637 7.7C63.637 7.4 63.937 7.2 64.237 7.2L64.737 7.2C66.137 7.2 67.437 7.2 68.137 8C68.637 8.4 68.737 9.1 68.637 10.1Z"/>
+                                <path fill="#009cde" d="M90.937 10L87.237 10C86.937 10 86.637 10.2 86.637 10.5L86.437 11.5L86.137 11.1C85.237 9.8 83.337 9.4 81.437 9.4C77.137 9.4 73.437 12.7 72.737 17.3C72.337 19.6 72.837 21.8 74.137 23.3C75.337 24.7 77.037 25.3 79.037 25.3C82.537 25.3 84.437 23.1 84.437 23.1L84.237 24.1C84.137 24.5 84.437 24.8 84.837 24.8L88.237 24.8C88.737 24.8 89.237 24.4 89.337 23.9L91.437 10.7C91.537 10.4 91.237 10 90.937 10ZM85.337 17.5C84.937 19.7 83.137 21.2 80.937 21.2C79.837 21.2 78.937 20.8 78.337 20.1C77.737 19.4 77.537 18.4 77.737 17.3C78.037 15.1 79.937 13.6 82.037 13.6C83.137 13.6 84.037 14 84.637 14.7C85.337 15.5 85.437 16.4 85.337 17.5Z"/>
+                                <path fill="#009cde" d="M95.337 3.3L92.137 23.6C92.037 24 92.337 24.3 92.737 24.3L95.937 24.3C96.437 24.3 96.937 23.9 97.037 23.4L100.237 3.5C100.337 3.1 100.037 2.8 99.637 2.8L96.037 2.8C95.637 2.8 95.437 3 95.337 3.3Z"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div id="paypal-error-${id}" style="color:#e74c3c; font-size:12px; margin-top:8px; font-weight:600; display:none; text-align:center;"></div>
+
+                    <p style="text-align:center; font-size:10px; color:#bbb; margin-top:14px; font-family:var(--font-body); line-height:1.5;">
+                        <i class="fas fa-shield-alt" style="color:#00a651; margin-right:4px;"></i>
+                        ${isEN ? "Your payment is processed on Stripe or PayPal's secure servers. We never store your card data." : 'Tu pago se procesa en los servidores de Stripe o PayPal. Nunca almacenamos tus datos de tarjeta.'}
+                    </p>
+
+                </div><!-- /payment-block -->
             </div>
         </div>`;
     }
@@ -3064,23 +3357,22 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const nombre = document.getElementById('nombre-' + id);
         const email  = document.getElementById('email-' + id);
         const lada   = document.getElementById('lada-' + id);
+        const ladaVal = lada ? (lada.value !== undefined ? lada.value : lada.textContent) : '';
         const tel    = document.getElementById('tel-' + id);
         const bandera= document.getElementById('bandera-' + id);
         const notas  = document.getElementById('notas-' + id);
-        const pago   = document.getElementById('pago-' + id);
         const vuelo  = document.getElementById('vuelo-' + id);
         const vueloR = document.getElementById('vuelo-regreso-' + id);
         if (nombre && nombre.value) _savedFormData.nombre  = nombre.value;
         if (email  && email.value)  _savedFormData.email   = email.value;
-        if (lada   && lada.value)   _savedFormData.lada    = lada.value;
+        if (lada)   _savedFormData.lada = ladaVal.trim();
         if (tel    && tel.value)    _savedFormData.tel     = tel.value;
         if (bandera&& bandera.value)_savedFormData.bandera = bandera.value;
         if (notas  && notas.value)  _savedFormData.notas   = notas.value;
-        if (pago   && pago.value)   _savedFormData.pago    = pago.value;
         if (vuelo  && vuelo.value)  _savedFormData.vuelo   = vuelo.value;
         if (vueloR && vueloR.value) _savedFormData.vueloR  = vueloR.value;
         // Guardar extras
-        const tipos = ['water','beer','waterR','beerR','stop','stopR'];
+        const tipos = ['stop','stopR'];
         _savedFormData.extras = {};
         tipos.forEach(t => {
             const el = document.getElementById(`extra-${t}-${id}`);
@@ -3098,21 +3390,19 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const tel    = document.getElementById('tel-' + id);
         const bandera= document.getElementById('bandera-' + id);
         const notas  = document.getElementById('notas-' + id);
-        const pago   = document.getElementById('pago-' + id);
         const vuelo  = document.getElementById('vuelo-' + id);
         const vueloR = document.getElementById('vuelo-regreso-' + id);
         if (nombre && _savedFormData.nombre)  nombre.value  = _savedFormData.nombre;
         if (email  && _savedFormData.email)   email.value   = _savedFormData.email;
-        if (lada   && _savedFormData.lada)    lada.value    = _savedFormData.lada;
+        if (lada && _savedFormData.lada) { if (lada.value !== undefined) lada.value = _savedFormData.lada; else lada.textContent = _savedFormData.lada; }
         if (tel    && _savedFormData.tel)     tel.value     = _savedFormData.tel;
         if (bandera&& _savedFormData.bandera) { bandera.value = _savedFormData.bandera; cambiarPrefijoCard(id); }
         if (notas  && _savedFormData.notas)   notas.value   = _savedFormData.notas;
-        if (pago   && _savedFormData.pago)    pago.value    = _savedFormData.pago;
         if (vuelo  && _savedFormData.vuelo)   vuelo.value   = _savedFormData.vuelo;
         if (vueloR && _savedFormData.vueloR)  vueloR.value  = _savedFormData.vueloR;
         // Restaurar extras
         if (_savedFormData.extras) {
-            const tipos = ['water','beer','waterR','beerR','stop','stopR'];
+            const tipos = ['stop','stopR'];
             tipos.forEach(t => {
                 const el = document.getElementById(`extra-${t}-${id}`);
                 if (el && _savedFormData.extras[t]) el.innerText = _savedFormData.extras[t];
@@ -3127,12 +3417,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     }
 
     // Extras opcionales
-    const _extrasPrecios = { water: 2, beer: 4, waterR: 2, beerR: 4, stop: 25, stopR: 25 };
+    const _extrasPrecios = { stop: 25, stopR: 25 };
     const _extrasNombres = {
-        water:  { en: 'Water Bottle (Trip)',  es: 'Agua (Ida)' },
-        beer:   { en: 'Beer (Trip)',          es: 'Cerveza (Ida)' },
-        waterR: { en: 'Water Bottle (Return)',es: 'Agua (Regreso)' },
-        beerR:  { en: 'Beer (Return)',        es: 'Cerveza (Regreso)' },
         stop:   { en: '20-Min Stop (Trip)',   es: 'Parada 20 Min (Ida)' },
         stopR:  { en: '20-Min Stop (Return)', es: 'Parada 20 Min (Regreso)' }
     };
@@ -3168,7 +3454,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             if (val > 100) val = 100;
             el.innerText = val;
         }
-        const tipos = ['water','beer','waterR','beerR','stop','stopR'];
+        const tipos = ['stop','stopR'];
         const monedaActual = getExtrasMoneda();
         let extrasTotalUSD   = 0;
         let extrasTotalLocal = 0;
@@ -3198,31 +3484,24 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             amountEl.innerText = `${symbol}${extrasTotalLocal} ${monedaActual}`;
         }
 
-        // Actualizar grand total en la tarjeta de precio
-        const grandTotalEl = document.getElementById(`grand-total-${id}`);
-        const extrasLineaEl = document.getElementById(`extras-linea-${id}`);
-        const totalConExtrasEl = document.getElementById(`total-con-extras-${id}`);
-        if (grandTotalEl && totalConExtrasEl) {
-            if (extrasTotalLocal > 0) {
-                const priceEl = document.querySelector(`#${id} .price-current`);
-                const precioBase = priceEl ? priceEl.innerText.replace(/[^0-9.]/g,'') : '0';
-                const moneda = getExtrasMoneda();
-                const precioBaseNum = parseFloat(precioBase) || 0;
-                // Usar total local directamente (ya calculado correctamente en la moneda del cliente)
-                const extraParaTotal = extrasTotalLocal;
-                const grandTotal = Math.round(precioBaseNum + extraParaTotal);
-                const symbol = moneda === 'MXN' ? '$' : moneda === 'CAD' ? 'C$' : '$';
-                if (extrasLineaEl) extrasLineaEl.innerText = `+${symbol}${extrasTotalLocal} ${moneda}`;
-                grandTotalEl.innerText = `${symbol}${grandTotal} ${moneda}`;
-                totalConExtrasEl.style.display = 'block';
-            } else {
-                totalConExtrasEl.style.display = 'none';
-            }
+        // Actualizar el display "TOTAL TO PAY" en el bloque de pago
+        const totalToPayEl = document.getElementById(`total-to-pay-display-${id}`);
+        if (totalToPayEl) {
+            const priceEl = document.querySelector(`#${id} .price-current`);
+            const precioBase = priceEl ? parseFloat(priceEl.innerText.replace(/[^0-9.]/g,'')) || 0 : 0;
+            const moneda = getExtrasMoneda();
+            const symbol = moneda === 'MXN' ? '$' : moneda === 'CAD' ? 'C$' : '$';
+            const grandTotal = Math.round(precioBase + extrasTotalLocal);
+            totalToPayEl.innerHTML = `${symbol}${grandTotal} <small style="font-size:13px; font-weight:600;">${moneda}</small>`;
         }
+
+        // Ocultar el bloque lateral de extras (ya no se usa)
+        const totalConExtrasEl = document.getElementById(`total-con-extras-${id}`);
+        if (totalConExtrasEl) totalConExtrasEl.style.display = 'none';
     }
 
     function getExtrasText(id) {
-        const tipos = ['water','beer','waterR','beerR','stop','stopR'];
+        const tipos = ['stop','stopR'];
         const lang = currentLang;
         const monedaActual = getExtrasMoneda();
         const symbol = monedaActual === 'CAD' ? 'C$' : '$';
@@ -3247,7 +3526,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     }
 
     function getExtrasTotal(id) {
-        const tipos = ['water','beer','waterR','beerR','stop','stopR'];
+        const tipos = ['stop','stopR'];
         const monedaActual = getExtrasMoneda();
         let total = 0;
         tipos.forEach(t => {
@@ -3303,22 +3582,75 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             // Restaurar totales de extras si los había
             cambiarExtra(id, '_rt', 0);
             // Auto-guardar cuando el cliente escribe, sin esperar a cerrar
-            const camposAutoguardar = ['nombre','email','tel','notas','pago','vuelo','vuelo-regreso'];
+            const camposAutoguardar = ['nombre','email','tel','notas','vuelo','vuelo-regreso'];
             camposAutoguardar.forEach(campo => {
                 const el = document.getElementById(campo + '-' + id);
                 if (el) el.addEventListener('input', () => guardarDatosForm(id));
             });
             const bandera = document.getElementById('bandera-' + id);
             if (bandera) bandera.addEventListener('change', () => guardarDatosForm(id));
-            const pago = document.getElementById('pago-' + id);
-            if (pago) pago.addEventListener('change', () => guardarDatosForm(id));
             setTimeout(() => tarjeta.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
         }
     }
 
+    function toggleCountryDrop(id) {
+        const drop = document.getElementById('country-drop-' + id);
+        if (!drop) return;
+        const isOpen = drop.style.display !== 'none';
+        // Close all open country drops first
+        document.querySelectorAll('[id^="country-drop-"]').forEach(d => d.style.display = 'none');
+        if (!isOpen) drop.style.display = 'block';
+    }
+    function selectCountry(el, id) {
+        const code = el.dataset.code;
+        const name = el.dataset.name;
+        document.getElementById('country-drop-' + id).style.display = 'none';
+        document.getElementById('country-name-' + id).textContent = name;
+        const ladaEl = document.getElementById('lada-' + id);
+        // Sync hidden select
+        const sel = document.getElementById('bandera-' + id);
+        if (sel) { sel.value = code; }
+        if (code === 'OTRO') {
+            // Build: fixed "+" label + numbers-only input
+            const wrapper = document.createElement('span');
+            wrapper.style.cssText = 'display:flex;align-items:center;';
+
+            const plus = document.createElement('span');
+            plus.textContent = '+';
+            plus.style.cssText = 'font-weight:800;color:var(--action-green);font-size:13px;padding-left:2px;user-select:none;';
+
+            const input = document.createElement('input');
+            input.type = 'tel';
+            input.inputMode = 'numeric';
+            input.pattern = '[0-9]*';
+            input.placeholder = '00';
+            input.id = 'lada-' + id;
+            input.maxLength = 4;
+            input.style.cssText = 'width:36px;border:none;outline:none;background:transparent;font-weight:800;color:var(--action-green);font-size:13px;text-align:left;padding:0 6px 0 2px;';
+            input.oninput = function() { this.value = this.value.replace(/[^0-9]/g, ''); };
+
+            wrapper.appendChild(plus);
+            wrapper.appendChild(input);
+            ladaEl.parentNode.replaceChild(wrapper, ladaEl);
+            input.focus();
+        } else {
+            ladaEl.textContent = code;
+            // Focus phone input
+            const tel = document.getElementById('tel-' + id);
+            if (tel) tel.focus();
+        }
+    }
+    // Close country drop on outside click
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('[id^="country-trigger-"]')) {
+            document.querySelectorAll('[id^="country-drop-"]').forEach(d => d.style.display = 'none');
+        }
+    });
+
     function cambiarPrefijoCard(id) {
         const sel = document.getElementById('bandera-' + id);
         const cod = document.getElementById('lada-' + id);
+        const codVal = cod ? (cod.value !== undefined ? cod.value : cod.textContent).trim() : '';
         const tel = document.getElementById('tel-' + id);
         if (!sel || !cod) return;
         if (sel.value === 'OTRO') {
@@ -3329,18 +3661,18 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     }
 
     function enviarDesdeCard(id, datosCard) {
+        // Esta función ya no se llama directamente — el pago se inicia desde validarYMostrarPago()
+        // Se mantiene por compatibilidad interna
+    }
+
+    function _construirDatosVenta(id, datosCard, metodoPago) {
         const t = translations[currentLang];
-        if (!document.getElementById('terms-' + id).checked) { alert(t.alertTerms); return; }
         const nombre = document.getElementById('nombre-' + id).value.trim();
         const email  = document.getElementById('email-' + id).value.trim();
-        const lada   = document.getElementById('lada-' + id).value.trim();
+        const ladaEl2 = document.getElementById('lada-' + id); const lada = ladaEl2 ? (ladaEl2.value !== undefined ? ladaEl2.value : ladaEl2.textContent).trim() : '';
         const tel    = document.getElementById('tel-' + id).value.trim();
         const vuelo  = document.getElementById('vuelo-' + id).value.trim();
         const notas  = document.getElementById('notas-' + id).value.trim();
-        const pago   = document.getElementById('pago-' + id).value;
-        if (nombre.length < 2) { alert(t.alertName); return; }
-        if (email.length < 5)  { alert(t.alertEmail); return; }
-        if (!tel)               { alert(t.alertPhone); return; }
         guardarDatosForm(id);
         const codigoUnico = generarCodigo();
         const horaIda = convertirHora12h(document.getElementById('horaIda').value);
@@ -3353,21 +3685,17 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
         const extrasTexto = getExtrasText(id);
         const extrasTotal = getExtrasTotal(id);
-
-        // Capturar cantidades individuales de extras
-        const extraAgua     = parseInt(document.getElementById('extra-water-' + id)  ? document.getElementById('extra-water-' + id).innerText  : 0) || 0;
-        const extraCerveza  = parseInt(document.getElementById('extra-beer-' + id)   ? document.getElementById('extra-beer-' + id).innerText   : 0) || 0;
-        const extraAguaR    = parseInt(document.getElementById('extra-waterR-' + id) ? document.getElementById('extra-waterR-' + id).innerText : 0) || 0;
-        const extraCervezaR = parseInt(document.getElementById('extra-beerR-' + id)  ? document.getElementById('extra-beerR-' + id).innerText  : 0) || 0;
+        const extraAgua = 0, extraCerveza = 0, extraAguaR = 0, extraCervezaR = 0;
         const extraStop     = parseInt(document.getElementById('extra-stop-' + id)   ? document.getElementById('extra-stop-' + id).innerText   : 0) || 0;
         const extraStopR    = parseInt(document.getElementById('extra-stopR-' + id)  ? document.getElementById('extra-stopR-' + id).innerText  : 0) || 0;
         const moneda = document.getElementById('moneda') ? document.getElementById('moneda').value : 'USD';
         const totalExtrasStr = extrasTotal > 0 ? ('$' + extrasTotal + ' ' + moneda) : '$0';
-
-        // Notas limpias — solo lo que el cliente escribió
-        const notasFinales = notas;
-
-        const datosVenta = {
+        const tipoActivo = document.getElementById('tipoServicio') ? document.getElementById('tipoServicio').value : 'SENCILLO';
+        const el = tipoActivo === 'REDONDO'
+            ? document.getElementById('codigoPromo')
+            : document.getElementById('codigoPromoOneWay');
+        const cupon = el ? el.value.trim().toUpperCase() : '';
+        return {
             esVenta: true, codigo: codigoUnico,
             nombre, telefono: lada + " " + tel, email,
             pasajeros: document.getElementById('pasajeros').value,
@@ -3376,7 +3704,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             destino: datosCard.destino || document.getElementById('destino').value,
             fecha: document.getElementById('fechaIda').value, hora: horaIda,
             fechaRegreso: fechaVueltaVal, horaRegreso: horaVueltaVal,
-            notas: notasFinales, vuelo,
+            notas, vuelo,
             vueloRegreso: document.getElementById('vuelo-regreso-' + id) ? document.getElementById('vuelo-regreso-' + id).value : "",
             vehiculo: datosCard.vehiculo, precio: datosCard.precio,
             precioTotal: (() => {
@@ -3384,22 +3712,410 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 const tot  = base + extrasTotal;
                 return "$" + tot + " " + moneda;
             })(),
-            zona: datosCard.zona, idioma: currentLang, pago,
+            zona: datosCard.zona, idioma: currentLang,
+            pago: metodoPago + ' ✅ Pagado en Línea',
             extraAgua, extraCerveza, extraAguaR, extraCervezaR, extraStop, extraStopR,
             totalExtras: totalExtrasStr,
-            cupon: (() => {
-                const tipoActivo = document.getElementById('tipoServicio') ? document.getElementById('tipoServicio').value : 'SENCILLO';
-                const el = tipoActivo === 'REDONDO'
-                    ? document.getElementById('codigoPromo')
-                    : document.getElementById('codigoPromoOneWay');
-                return el ? el.value.trim().toUpperCase() : '';
-            })()
+            cupon
         };
-        document.getElementById('codigoDisplay').innerText = codigoUnico;
+    }
+
+    // ════════════════════════════════════════════════════════════
+    //  CONFIGURACIÓN DE PAGOS
+    // ════════════════════════════════════════════════════════════
+    // Tu Cloudflare Worker de pagos
+    const WORKER_PAGOS_URL = 'https://checkout.luxurytransfersriviera.com.mx';
+
+    // Clave pública de Stripe (pk_test_... para pruebas, pk_live_... para producción)
+    const STRIPE_PUBLISHABLE_KEY = 'pk_test_51TN67lJjHdBIePeJ48T49veLxD0HxlXh9kJmTELedVm0I0GwQVsVsfyJS0VGXg4amdh2RLXlozKX2UzDsVRnsnjx00EIThWaVt';
+
+    // Instancia global de Stripe — se inicializa solo cuando el cliente paga (lazy)
+    let _stripe = null;
+    function getStripe() {
+        if (!_stripe) _stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+        return _stripe;
+    }
+    // Almacén de elementos Stripe montados por card id
+    const _stripeElements = {};
+    // Almacén de datos de venta pendientes de pago
+    const _datosPendientes = {};
+
+    // ─── PASO 1: Validar formulario y mostrar botones de pago ────────
+    function validarYMostrarPago(id, datosCard) {
+        const t    = translations[currentLang];
+        const isEN = currentLang === 'en';
+
+        if (!document.getElementById('terms-' + id).checked) { alert(t.alertTerms); return; }
+        const nombre = document.getElementById('nombre-' + id).value.trim();
+        const email  = document.getElementById('email-' + id).value.trim();
+        const tel    = document.getElementById('tel-' + id).value.trim();
+        if (nombre.length < 2) { alert(t.alertName);  return; }
+        if (email.length < 5)  { alert(t.alertEmail); return; }
+        if (!tel)               { alert(t.alertPhone); return; }
+
+        const btnContinuar = document.getElementById('btn-continuar-' + id);
+        if (btnContinuar) btnContinuar.style.display = 'none';
+
+        const payBlock = document.getElementById('payment-block-' + id);
+        payBlock.style.display = 'block';
+        setTimeout(() => payBlock.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+
+        const moneda       = document.getElementById('moneda') ? document.getElementById('moneda').value : 'USD';
+        const basePrice    = parseFloat((datosCard.precio || '0').replace(/[^0-9.]/g, '')) || 0;
+        const extras       = getExtrasTotal(id);
+        const totalFinal   = Math.round((basePrice + extras) * 100) / 100;
+        const currencyCode = moneda === 'MXN' ? 'MXN' : moneda === 'CAD' ? 'CAD' : 'USD';
+
+        // Montar botones PayPal (lazy)
+        const container = document.getElementById('paypal-button-container-' + id);
+        if (container && !container.hasChildNodes()) {
+            const sdkRef = typeof paypalSDK !== 'undefined' ? paypalSDK
+                         : typeof paypal    !== 'undefined' ? paypal : null;
+
+            if (sdkRef) {
+                sdkRef.Buttons({
+                    style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 50 },
+
+                    createOrder: async () => {
+                        _setPayPalError(id, '');
+                        try {
+                            const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
+                                method:  'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    method:      'paypal',
+                                    action:      'create-order',
+                                    amount:      totalFinal.toFixed(2),
+                                    currency:    currencyCode,
+                                    bookingCode: id,
+                                    vehicle:     datosCard.vehiculo || ''
+                                })
+                            });
+                            if (!res.ok) throw new Error('Worker HTTP ' + res.status);
+                            const json    = await res.json();
+                            const orderID = json.orderID || json.id;
+                            if (!orderID) throw new Error('No orderID from Worker');
+                            _datosPendientes[id] = { datosCard, moneda, totalFinal };
+                            return orderID;
+                        } catch (e) {
+                            _setPayPalError(id, isEN
+                                ? '\u26a0\ufe0f Server error. Please try card payment.'
+                                : '\u26a0\ufe0f Error del servidor. Intenta pagar con tarjeta.');
+                            throw e;
+                        }
+                    },
+
+                    onApprove: async (data) => {
+                        document.getElementById('loadingOverlay').style.display = 'flex';
+                        _setPayPalError(id, '');
+                        try {
+                            const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
+                                method:  'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    method:      'paypal',
+                                    action:      'capture-order',
+                                    orderID:     data.orderID,
+                                    bookingCode: id
+                                })
+                            });
+                            if (!res.ok) throw new Error('Capture HTTP ' + res.status);
+                            const capture       = await res.json();
+                            const captureStatus = capture.status ||
+                                capture.purchase_units?.[0]?.payments?.captures?.[0]?.status;
+                            if (captureStatus !== 'COMPLETED') throw new Error('Status: ' + captureStatus);
+                            _finalizarReserva(id, datosCard, 'PayPal');
+                        } catch (e) {
+                            document.getElementById('loadingOverlay').style.display = 'none';
+                            console.error('PayPal capture error:', e);
+                            _setPayPalError(id, isEN
+                                ? '\u26a0\ufe0f Payment not confirmed. Contact us via WhatsApp.'
+                                : '\u26a0\ufe0f Pago no confirmado. Cont\u00e1ctanos por WhatsApp.');
+                        }
+                    },
+
+                    onCancel: () => _setPayPalError(id, isEN
+                        ? 'Payment cancelled. You can try again.'
+                        : 'Pago cancelado. Puedes intentarlo de nuevo.'),
+
+                    onError: (err) => {
+                        console.error('PayPal SDK error:', err);
+                        // SDK falló → mostrar botón estático de fallback
+                        container.style.display = 'none';
+                        const fb = document.getElementById('paypal-fallback-' + id);
+                        if (fb) fb.style.display = 'block';
+                    }
+                }).render('#paypal-button-container-' + id).catch(() => {
+                    // render() falló → botón estático
+                    container.style.display = 'none';
+                    const fb = document.getElementById('paypal-fallback-' + id);
+                    if (fb) fb.style.display = 'block';
+                });
+            } else {
+                // SDK no cargó → mostrar botón estático directamente
+                container.style.display = 'none';
+                const fb = document.getElementById('paypal-fallback-' + id);
+                if (fb) fb.style.display = 'block';
+            }
+        }
+    }
+
+    // ─── PayPal estático: crea orden y redirige a PayPal ───────────────
+    async function pagarConPayPal(id, datosCard) {
+        const isEN = currentLang === 'en';
+
+        const moneda       = document.getElementById('moneda') ? document.getElementById('moneda').value : 'USD';
+        const basePrice    = parseFloat((datosCard.precio || '0').replace(/[^0-9.]/g, '')) || 0;
+        const extras       = getExtrasTotal(id);
+        const totalFinal   = Math.round((basePrice + extras) * 100) / 100;
+        const currencyCode = moneda === 'MXN' ? 'MXN' : moneda === 'CAD' ? 'CAD' : 'USD';
+
+        // Construir datos completos ANTES de salir de la página
+        const datosVenta = _construirDatosVenta(id, datosCard, 'PayPal Checkout');
+        datosVenta.precioTotal = '$' + totalFinal + ' ' + moneda.toUpperCase();
+        sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datosVenta));
+
+        document.getElementById('loadingOverlay').style.display = 'flex';
+
+        const siteUrl = window.location.origin + window.location.pathname;
+
+        try {
+            const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    method:           'paypal',
+                    action:           'create-order',
+                    amount:           totalFinal.toFixed(2),
+                    currency:         currencyCode,
+                    bookingCode:      datosVenta.codigo,
+                    vehicle:          datosCard.vehiculo || '',
+                    // URLs de retorno — PayPal regresará aquí tras el pago
+                    returnUrl:        siteUrl + '?payment=paypal-success',
+                    cancelPayPalUrl:  siteUrl + '?payment=cancelled'
+                })
+            });
+            if (!res.ok) throw new Error('Worker HTTP ' + res.status);
+            const json    = await res.json();
+            const orderID = json.orderID || json.id;
+            if (!orderID) throw new Error('No orderID from Worker');
+
+            // Redirigir al checkout oficial de PayPal (sandbox o producción)
+            const isSandbox = WORKER_PAGOS_URL.includes('sandbox') ||
+                              window.location.hostname.includes('localhost') ||
+                              document.querySelector('script[src*="sandbox.paypal"]') !== null;
+            // Detectar sandbox por el Client ID en el SDK
+            const sdkScript = document.querySelector('script[src*="paypal.com/sdk"]');
+            const clientId  = sdkScript ? new URL(sdkScript.src).searchParams.get('client-id') : '';
+            // Client IDs de sandbox empiezan con 'A' y son más largos; usamos la URL base del worker
+            const useSandbox = WORKER_PAGOS_URL.includes('sandbox') ||
+                               (typeof AcRsDfJPus !== 'undefined') ||
+                               clientId.startsWith('A'); // sandbox client IDs
+            const paypalBase = useSandbox
+                ? 'https://www.sandbox.paypal.com'
+                : 'https://www.paypal.com';
+
+            window.location.href = paypalBase + '/checkoutnow?token=' + orderID;
+
+        } catch (e) {
+            document.getElementById('loadingOverlay').style.display = 'none';
+            console.error('PayPal static error:', e);
+            sessionStorage.removeItem('ltr_pendingBooking');
+            alert(isEN
+                ? '⚠️ Connection error. Please try card payment or contact us.'
+                : '⚠️ Error de conexión. Intenta pagar con tarjeta o contáctanos.');
+        }
+    }
+
+    function _setPayPalError(id, msg) {
+        const el = document.getElementById('paypal-error-' + id);
+        if (!el) return;
+        el.innerText = msg;
+        el.style.display = msg ? 'block' : 'none';
+    }
+
+    // ─── PASO 2: Stripe Checkout — redirige a stripe.com ─────────────
+    async function pagarConStripe(id, datosCard) {
+        const btn  = document.getElementById('btn-stripe-' + id);
+        const isEN = currentLang === 'en';
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (isEN ? 'Redirecting to Stripe...' : 'Redirigiendo a Stripe...');
+
+        const moneda       = document.getElementById('moneda') ? document.getElementById('moneda').value : 'USD';
+        const basePrice    = parseFloat((datosCard.precio || '0').replace(/[^0-9.]/g, '')) || 0;
+        const extras       = getExtrasTotal(id);
+        const totalFinal   = Math.round((basePrice + extras) * 100) / 100;
+        const currencyCode = moneda === 'MXN' ? 'mxn' : moneda === 'CAD' ? 'cad' : 'usd';
+
+        // Construir datos completos ANTES de salir de la página
+        const datosVenta = _construirDatosVenta(id, datosCard, 'Stripe Checkout');
+        datosVenta.precioTotal = '$' + totalFinal + ' ' + moneda.toUpperCase();
+
+        // Guardar en sessionStorage — se recuperan al volver de Stripe
+        sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datosVenta));
+
+        try {
+            const siteUrl = window.location.origin + window.location.pathname;
+            const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    method:      'stripe',
+                    action:      'create-checkout-session',
+                    amount:      totalFinal,
+                    currency:    currencyCode,
+                    bookingCode: datosVenta.codigo,
+                    vehicle:     datosCard.vehiculo || 'Transfer Privado',
+                    successUrl:  siteUrl + '?payment=success&code=' + datosVenta.codigo,
+                    cancelUrl:   siteUrl + '?payment=cancelled'
+                })
+            });
+            if (!res.ok) throw new Error('Worker HTTP ' + res.status);
+            const json = await res.json();
+            if (!json.url) throw new Error('No redirect URL from Worker');
+
+            // Redirigir a la p\u00e1gina oficial de Stripe
+            window.location.href = json.url;
+
+        } catch (e) {
+            console.error('Stripe Checkout error:', e);
+            btn.disabled = false;
+            btn.innerHTML = '<span style="display:flex;gap:5px;align-items:center;">' +
+                '<span style="background:#1a1f71;color:#fff;font-size:10px;font-weight:900;padding:3px 7px;border-radius:3px;">VISA</span>' +
+                '<span style="background:#eb001b;color:#fff;font-size:10px;font-weight:900;padding:3px 7px;border-radius:3px;">MC</span>' +
+                '<span style="background:#007bc1;color:#fff;font-size:10px;font-weight:900;padding:3px 7px;border-radius:3px;">AMEX</span>' +
+                '</span>' + (isEN ? 'Pay with Credit / Debit Card' : 'Pagar con Tarjeta de Cr\u00e9dito / D\u00e9bito') +
+                ' <i class="fas fa-arrow-right" style="font-size:13px;opacity:0.8;"></i>';
+            alert(isEN
+                ? '\u26a0\ufe0f Could not connect to payment server. Please try again.'
+                : '\u26a0\ufe0f No se pudo conectar al servidor de pagos. Intenta de nuevo.');
+        }
+    }
+
+    // ─── PASO 3: Finalizar reserva — tras pago verificado ────────────
+    function _finalizarReserva(id, datosCard, metodoPago) {
+        const datosVenta = _construirDatosVenta(id, datosCard, metodoPago);
+        document.getElementById('codigoDisplay').innerText = datosVenta.codigo;
+        _dispararPurchaseYEnviar(datosVenta);
+    }
+
+    function _finalizarDesdeStripe(datosVenta) {
+        document.getElementById('codigoDisplay').innerText = datosVenta.codigo;
+        _dispararPurchaseYEnviar(datosVenta);
+    }
+
+    function _dispararPurchaseYEnviar(datosVenta) {
+        if (typeof fbq !== 'undefined' && datosVenta.precioTotal) {
+            const priceNum   = parseFloat(datosVenta.precioTotal.replace(/[^0-9.]/g, '')) || 0;
+            const currencyFb = datosVenta.precioTotal.includes('MXN') ? 'MXN'
+                             : datosVenta.precioTotal.includes('CAD') ? 'CAD' : 'USD';
+            fbq('track', 'Purchase',
+                { value: priceNum, currency: currencyFb, content_name: datosVenta.vehiculo },
+                { eventID: datosVenta.codigo }
+            );
+        }
+        enviarConversionsAPI(datosVenta, 'Purchase');
         iniciarEnvio(datosVenta);
     }
 
-    async function enviarConversionsAPI(data, eventName) {
+    // ─── Al cargar la p\u00e1gina: detectar regreso desde Stripe o PayPal ──
+    (function detectarRetornoPago() {
+        const params  = new URLSearchParams(window.location.search);
+        const payment = params.get('payment');
+        if (!payment) return;
+
+        // Limpiar URL inmediatamente
+        window.history.replaceState({}, '', window.location.pathname);
+
+        // ── Stripe regresó exitosamente ──────────────────────────────
+        if (payment === 'success') {
+            const raw = sessionStorage.getItem('ltr_pendingBooking');
+            if (raw) {
+                try {
+                    const datosVenta = JSON.parse(raw);
+                    sessionStorage.removeItem('ltr_pendingBooking');
+                    setTimeout(() => _finalizarDesdeStripe(datosVenta), 600);
+                } catch (e) {
+                    console.error('Error procesando regreso de Stripe:', e);
+                }
+            }
+            return;
+        }
+
+        // ── PayPal regresó exitosamente ──────────────────────────────
+        if (payment === 'paypal-success') {
+            const token   = params.get('token');    // orderID de PayPal
+            const payerID = params.get('PayerID');  // ID del comprador
+
+            if (!token) {
+                console.error('PayPal return sin token');
+                return;
+            }
+
+            const raw = sessionStorage.getItem('ltr_pendingBooking');
+            if (!raw) {
+                console.error('No hay datos de reserva en sessionStorage');
+                return;
+            }
+
+            let datosVenta;
+            try {
+                datosVenta = JSON.parse(raw);
+                sessionStorage.removeItem('ltr_pendingBooking');
+            } catch (e) {
+                console.error('Error parseando datos de reserva:', e);
+                return;
+            }
+
+            // Capturar el pago en el Worker
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            setTimeout(async () => {
+                try {
+                    const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
+                        method:  'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            method:      'paypal',
+                            action:      'capture-order',
+                            orderID:     token,
+                            bookingCode: datosVenta.codigo
+                        })
+                    });
+                    if (!res.ok) throw new Error('Capture HTTP ' + res.status);
+                    const capture       = await res.json();
+                    const captureStatus = capture.status ||
+                        capture.purchase_units?.[0]?.payments?.captures?.[0]?.status;
+
+                    if (captureStatus === 'COMPLETED') {
+                        // ✅ Pago capturado — finalizar reserva
+                        _finalizarDesdeStripe(datosVenta); // misma función, reutilizamos
+                    } else {
+                        throw new Error('Capture status: ' + captureStatus);
+                    }
+                } catch (e) {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    console.error('PayPal capture al regresar:', e);
+                    alert(currentLang === 'en'
+                        ? '⚠️ Payment could not be confirmed. Please contact us via WhatsApp with your booking code: ' + datosVenta.codigo
+                        : '⚠️ El pago no pudo confirmarse. Contáctanos por WhatsApp con tu código: ' + datosVenta.codigo);
+                }
+            }, 500);
+            return;
+        }
+
+        // ── Pago cancelado ───────────────────────────────────────────
+        if (payment === 'cancelled') {
+            sessionStorage.removeItem('ltr_pendingBooking');
+            setTimeout(() => {
+                alert(currentLang === 'en'
+                    ? "Payment cancelled. You can try again whenever you're ready."
+                    : 'Pago cancelado. Puedes intentarlo de nuevo cuando quieras.');
+            }, 400);
+        }
+    })();
+
+        async function enviarConversionsAPI(data, eventName) {
         try {
             async function hashSHA256(str) {
                 const msgBuffer = new TextEncoder().encode(str.toLowerCase().trim());
@@ -3458,19 +4174,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         if(SCRIPT_URL.includes("PEGAR")) { alert("Falta configurar la URL del Script."); return; }
         document.getElementById('loadingOverlay').style.display = 'flex';
 
-        // META PIXEL + CAPI — mismo evento y mismo eventID (paso 4: Send Booking Request)
-        // Purchase = reserva con precio confirmado | Lead = cotización personalizada
-        const metaEventName = data.esVenta ? 'Purchase' : 'Lead';
-        if(typeof fbq !== 'undefined') {
-            if (data.esVenta && data.precio) {
-                const priceNum = parseFloat(data.precioTotal || data.precio.replace(/[^0-9.]/g,'')) || 0;
-                const currency = data.precioTotal || data.precio.includes('MXN') ? 'MXN' : data.precioTotal || data.precio.includes('CAD') ? 'CAD' : 'USD';
-                fbq('track', 'Purchase', { value: priceNum, currency: currency }, { eventID: data.codigo });
-            } else {
-                fbq('track', 'Lead', {}, { eventID: data.codigo });
-            }
+        // META PIXEL + CAPI
+        // ⚠️  Purchase se dispara ÚNICAMENTE desde _finalizarReserva() — después de que
+        //     el servidor confirma el cobro. Aquí solo disparamos Lead para cotizaciones.
+        if (!data.esVenta) {
+            if (typeof fbq !== 'undefined') fbq('track', 'Lead', {}, { eventID: data.codigo });
+            enviarConversionsAPI(data, 'Lead');
         }
-        enviarConversionsAPI(data, metaEventName);
         
         const t = translations[currentLang]; 
         const l = t.waLabels; 
@@ -3516,12 +4226,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
 
         // Agregar Extras si hay
-        if(data.extraAgua > 0 || data.extraCerveza > 0 || data.extraAguaR > 0 || data.extraCervezaR > 0) {
+        if(false) {
             msg += `\n*${currentLang === 'en' ? 'Extras' : 'Extras'}:*\n`;
-            if(data.extraAgua > 0)     msg += `  🥤 ${currentLang === 'en' ? 'Water (Trip)' : 'Agua (Ida)'}: ${data.extraAgua}\n`;
-            if(data.extraCerveza > 0)  msg += `  🍺 ${currentLang === 'en' ? 'Beer (Trip)' : 'Cerveza (Ida)'}: ${data.extraCerveza}\n`;
-            if(data.extraAguaR > 0)    msg += `  🥤 ${currentLang === 'en' ? 'Water (Return)' : 'Agua (Regreso)'}: ${data.extraAguaR}\n`;
-            if(data.extraCervezaR > 0) msg += `  🍺 ${currentLang === 'en' ? 'Beer (Return)' : 'Cerveza (Regreso)'}: ${data.extraCervezaR}\n`;
             msg += `  💰 Total Extras: ${data.totalExtras}\n`;
         }
 
@@ -3647,6 +4353,47 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         iniciarEnvio(datos);
     }
 
+    // ─── CUSTOM PAX DROPDOWN ─────────────────────────────────────────────────
+    function togglePaxDropdown(dropId, e) {
+        e.stopPropagation();
+        const drop = document.getElementById(dropId);
+        const isOpen = drop.classList.contains('open');
+        document.querySelectorAll('.pax-dropdown.open').forEach(d => d.classList.remove('open'));
+        if (!isOpen) drop.classList.add('open');
+    }
+    function selectPax(dropId, selectId, displayId, val) {
+        document.getElementById(selectId).value = val;
+        document.getElementById(displayId).textContent = val;
+        const drop = document.getElementById(dropId);
+        drop.querySelectorAll('.pax-option').forEach(o => o.classList.remove('selected'));
+        event.target.classList.add('selected');
+        drop.classList.remove('open');
+        // Sync the two selects
+        if (selectId === 'pasajeros') document.getElementById('pasajerosOneWay').value = val;
+        if (selectId === 'pasajerosOneWay') document.getElementById('pasajeros').value = val;
+    }
+    function selectPax16(dropId, selectId, displayId) {
+        document.getElementById(dropId).classList.remove('open');
+        const tipo = document.getElementById('tipoServicio') ? document.getElementById('tipoServicio').value : 'SENCILLO';
+        preCargarCustom({
+            origen: document.getElementById('origen').value,
+            destino: document.getElementById('destino').value,
+            fecha: document.getElementById('fechaIda') ? document.getElementById('fechaIda').value : '',
+            hora: document.getElementById('horaIda') ? document.getElementById('horaIda').value : '',
+            tipoViaje: tipo,
+            fechaRegreso: document.getElementById('fechaVuelta') ? document.getElementById('fechaVuelta').value : '',
+            horaRegreso: document.getElementById('horaVuelta') ? document.getElementById('horaVuelta').value : '',
+            autoLargeGroup: true
+        });
+        document.getElementById('servicio-personalizado').scrollIntoView({behavior:'smooth'});
+    }
+    // Close pax dropdown on outside click
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.pax-wrapper')) {
+            document.querySelectorAll('.pax-dropdown.open').forEach(d => d.classList.remove('open'));
+        }
+    });
+
     function cerrarModal() { document.getElementById('modalConfirmacion').style.display = 'none'; document.body.style.overflow = ''; }
 
     // CUPÓN EMERGENTE
@@ -3657,6 +4404,107 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             document.body.style.overflow = 'hidden';
         }
     }
+    // ── EXTRAS CAROUSEL ARROWS (mobile only) ─────────────────────────────────
+    function slideRTCarousel(trackId, direction) {
+        const track = document.getElementById(trackId);
+        if (!track) return;
+        const cardWidth = track.querySelector('.extras-rt-card') ? track.querySelector('.extras-rt-card').offsetWidth + 10 : 180;
+        const totalWidth = cardWidth * 3;
+        // Get current scroll-like offset via transform or data attribute
+        let current = parseInt(track.dataset.offset || '0');
+        const maxOffset = 0; // can't go beyond 0 (start)
+        const minOffset = 0; // only 3 cards total, nothing to scroll in RT
+        // Since we only have 3 cards per group, arrows do nothing extra
+        // But this is ready if more cards are added
+        current = 0;
+        track.dataset.offset = current;
+    }
+
+    function rtSlide(trackId, direction) {
+        const track = document.getElementById(trackId);
+        if (!track) return;
+        const cards = track.children;
+        if (!cards.length) return;
+        const isMobile = window.innerWidth <= 700;
+        if (isMobile) {
+            // On mobile: clamp page between 0 and total cards - 1
+            const total = cards.length;
+            let page = parseInt(track.dataset.mobilePage || '0');
+            page = Math.max(0, Math.min(total - 1, page + direction));
+            track.dataset.mobilePage = page;
+            const cardW = cards[0].offsetWidth;
+            track.scrollTo({ left: page * cardW, behavior: 'smooth' });
+            // Dim arrows at boundaries
+            const wrapper = track.closest('[style*="position:relative"]');
+            if (wrapper) {
+                wrapper.querySelectorAll('button[onclick*="rtSlide"]').forEach(function(btn) {
+                    const isNext = btn.getAttribute('onclick').includes(',1)');
+                    btn.style.opacity = (isNext && page === total-1) || (!isNext && page === 0) ? '0.3' : '1';
+                });
+            }
+        } else {
+            // Desktop: translateX toggle between page 0 (Trip) and page 1 (Return)
+            const cardW = cards[0].offsetWidth + 12;
+            const pageW = cardW * 3;
+            let page = parseInt(track.dataset.page || '0');
+            page = page === 0 ? 1 : 0;
+            track.dataset.page = page;
+            track.style.transform = "translateX(-" + (page * pageW) + "px)";
+        }
+    }
+
+    function initExtrasCarousels() {
+        if (window.innerWidth > 700) return; // Only on mobile
+        document.querySelectorAll('.extras-grid-4, .extras-ow-grid, [style*="grid-template-columns:repeat(3,1fr)"]').forEach(function(grid) {
+            if (grid.closest('.extras-ow-flex-wrapper')) return; // Already wrapped
+            // Build flanking flex layout: [← btn] [scrollable grid] [→ btn]
+            const wrapper = document.createElement('div');
+            wrapper.className = 'extras-ow-flex-wrapper';
+            wrapper.style.cssText = 'display:flex;align-items:center;gap:6px;width:100%;';
+            grid.parentNode.insertBefore(wrapper, grid);
+
+            const btnPrev = document.createElement('button');
+            btnPrev.setAttribute('type', 'button');
+            btnPrev.innerHTML = '&#8249;';
+            btnPrev.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fff;color:#000;border:2px solid #ccc;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);transition:all 0.2s;';
+            btnPrev.onmouseover = function(){ this.style.background='#000'; this.style.color='#fff'; this.style.borderColor='#000'; };
+            btnPrev.onmouseout  = function(){ this.style.background='#fff'; this.style.color='#000'; this.style.borderColor='#ccc'; };
+            let owPage = 0;
+            const owTotal = grid.children.length;
+            function owScroll(dir) {
+                owPage = Math.max(0, Math.min(owTotal - 1, owPage + dir));
+                const cardW = grid.children[0] ? grid.children[0].offsetWidth : scrollWrap.offsetWidth;
+                grid.scrollTo({ left: owPage * cardW, behavior: 'smooth' });
+                btnPrev.style.opacity = owPage === 0 ? '0.3' : '1';
+                btnNext.style.opacity = owPage === owTotal - 1 ? '0.3' : '1';
+            }
+            btnPrev.onclick = function() { owScroll(-1); };
+
+            const scrollWrap = document.createElement('div');
+            scrollWrap.style.cssText = 'flex:1;overflow:hidden;';
+            grid.parentNode.insertBefore(scrollWrap, grid);
+            scrollWrap.appendChild(grid);
+
+            const btnNext = document.createElement('button');
+            btnNext.setAttribute('type', 'button');
+            btnNext.innerHTML = '&#8250;';
+            btnNext.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fff;color:#000;border:2px solid #ccc;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);transition:all 0.2s;';
+            btnNext.onmouseover = function(){ this.style.background='#000'; this.style.color='#fff'; this.style.borderColor='#000'; };
+            btnNext.onmouseout  = function(){ this.style.background='#fff'; this.style.color='#000'; this.style.borderColor='#ccc'; };
+            btnNext.onclick = function() { owScroll(1); };
+
+            wrapper.appendChild(btnPrev);
+            wrapper.appendChild(scrollWrap);
+            wrapper.appendChild(btnNext);
+        });
+    }
+    // Re-init carousels whenever results render (MutationObserver on results container)
+    (function() {
+        const target = document.getElementById('resultados') || document.body;
+        const obs = new MutationObserver(function() { setTimeout(initExtrasCarousels, 100); });
+        obs.observe(target, { childList: true, subtree: true });
+    })();
+
     function cerrarCupon() {
         document.getElementById('cupon-overlay').style.display = 'none';
         document.body.style.overflow = '';
@@ -3670,6 +4518,16 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         });
     }
     function irACotizar() {
+        // Auto-apply coupon code to all promo fields
+        const code = 'LTR-10';
+        ['codigoPromoOneWay', 'codigoPromoRT'].forEach(function(id) {
+            const el = document.getElementById(id);
+            if (el) el.value = code;
+        });
+        // Also fill any dynamic promo inputs in booking cards
+        document.querySelectorAll('[id^="promo-"]').forEach(function(el) {
+            el.value = code;
+        });
         cerrarCupon();
         document.getElementById('seccion-quote').scrollIntoView({ behavior: 'smooth' });
     }
@@ -3681,7 +4539,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             ? 'Use this coupon when quoting your transfer and get a <strong style="color:var(--gold);">10% discount</strong> on your booking.'
             : 'Usa este cupón al cotizar tu transfer y obtén un <strong style="color:var(--gold);">10% de descuento</strong> en tu reserva.';
         document.getElementById('cupon-hint').textContent   = isEN ? '🖱️ Click the code to copy it' : '🖱️ Haz clic en el código para copiarlo';
-        document.getElementById('cupon-btn').textContent    = isEN ? 'Quote Now' : 'Cotizar Ahora';
+        document.getElementById('cupon-btn').textContent    = isEN ? 'Apply Coupon' : 'Aplicar Cupón';
     }
     // Mostrar cupón a los 4 segundos
     setTimeout(mostrarCupon, 4000);
