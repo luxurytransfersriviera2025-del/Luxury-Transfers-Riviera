@@ -1382,6 +1382,25 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7Fc9DMmnbwoc2Xt8xoRdem8jOoRNlnrofAx0JjFUNzlBLvVzpX5zi8Hj5OaojlGw/exec"; 
     const CAPI_WORKER_URL = "https://meta-conversiones-api.luxurytransfersriviera2025.workers.dev";
 
+    // ── PRICING WORKER ─────────────────────────────────────────────────────
+    const PRECIOS_WORKER_URL = 'https://luxuryprecios.luxurytransferiviera2025.workers.dev/precios';
+
+    // In-memory cache — loaded once per session on first cotizar() call
+    let _precios = null;
+
+    async function cargarPrecios() {
+        if (_precios) return _precios;
+        try {
+            const res = await fetch(PRECIOS_WORKER_URL);
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            _precios = await res.json();
+            return _precios;
+        } catch (e) {
+            console.error('Error loading pricing data:', e);
+            throw new Error('Could not load pricing data. Please check your connection and try again.');
+        }
+    }
+
     let direccionMode = 'desdeAero'; 
     const baseGH = "https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/";
     const imgUrlsErtiga = [
@@ -1657,275 +1676,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         return hh + ':' + m + ' ' + ampm;
     }
 
-    // --- TARIFAS ---
-    // MATRIZ COMPLETA ZONA A ZONA — precios sencillo en USD (redondo = x2)
-    const z = (s,v,sm,sp,l) => ({sedan:s,van:v,small:sm,sprinter:sp,luxury:l});
-    const tarifasMatrizUSD = {
-        "AEROPUERTO CANCUN": {
-            "ZONA HOTELERA DE CANCUN":z(58,72,102,141,154),"CENTRO DE CANCUN":z(58,72,102,141,154),
-            "COSTA MUJERES":z(102,116,154,193,206),"PLAYA MUJERES":z(90,102,141,179,193),"PUERTO JUAREZ":z(72,84,116,154,167),
-            "PLAYA PARAISO":z(96,110,148,187,198),"PUERTO MORELOS":z(77,90,122,154,167),"PLAYA DEL CARMEN":z(110,122,167,218,231),
-            "PUERTO AVENTURAS":z(129,141,193,244,256),"AKUMAL":z(148,167,226,289,301),
-            "CENTRO DE TULUM":z(179,198,264,333,352),"ZONA HOTELERA DE TULUM":z(198,218,289,372,392),
-            "FELIPE CARRILLO PUERTO":z(468,478,515,1116,1258),"MAHAHUAL":z(571,581,618,1116,1200),
-            "BACALAR":z(571,581,618,1116,1200),"CHETUMAL":z(577,587,624,1116,1250),
-            "HOLBOX":z(391,402,441,970,886),"VALLADOLID":z(366,376,416,750,1056),"MERIDA":z(571,581,618,1027,1150),
-            "AEROPUERTO CANCUN":z(58,72,102,141,154),"AEROPUERTO TULUM":z(243,253,285,410,370)
-        },
-        "AEROPUERTO TULUM": {
-            "ZONA HOTELERA DE CANCUN":z(231,251,333,424,449),"CENTRO DE CANCUN":z(238,256,341,430,457),
-            "COSTA MUJERES":z(226,238,321,418,430),"PLAYA MUJERES":z(212,226,301,392,404),"PUERTO JUAREZ":z(198,212,283,366,378),
-            "PLAYA PARAISO":z(161,173,231,301,315),"PUERTO MORELOS":z(179,193,256,333,346),"PLAYA DEL CARMEN":z(141,154,206,270,283),
-            "PUERTO AVENTURAS":z(122,135,179,238,251),"AKUMAL":z(110,122,167,218,231),
-            "CENTRO DE TULUM":z(77,90,122,161,173),"ZONA HOTELERA DE TULUM":z(90,102,141,179,193),
-            "FELIPE CARRILLO PUERTO":z(110,175,205,218,203),"MAHAHUAL":z(350,415,445,618,650),
-            "BACALAR":z(350,415,445,618,650),"CHETUMAL":z(450,515,545,918,950),
-            "HOLBOX":z(519,584,614,950,1050),"VALLADOLID":z(366,376,416,750,1056),"MERIDA":z(638,645,675,1025,1100),
-            "AEROPUERTO CANCUN":z(243,253,285,410,370),"AEROPUERTO TULUM":z(58,72,102,141,154)
-        },
-        "CENTRO DE CANCUN": {
-            "ZONA HOTELERA DE CANCUN":z(58,72,102,141,154),"CENTRO DE CANCUN":z(45,58,90,116,129),
-            "COSTA MUJERES":z(84,97,129,167,179),"PLAYA MUJERES":z(72,84,116,154,167),"PUERTO JUAREZ":z(52,64,96,129,141),
-            "PLAYA PARAISO":z(116,129,167,218,231),"PUERTO MORELOS":z(96,110,149,187,199),"PLAYA DEL CARMEN":z(129,141,193,244,256),
-            "PUERTO AVENTURAS":z(149,167,226,289,303),"AKUMAL":z(167,187,244,308,321),
-            "CENTRO DE TULUM":z(199,218,289,372,392),"ZONA HOTELERA DE TULUM":z(218,238,308,410,430),
-            "FELIPE CARRILLO PUERTO":z(535,540,572,1116,1258),"MAHAHUAL":z(638,643,675,1116,1150),
-            "BACALAR":z(638,643,675,1116,1150),"CHETUMAL":z(644,649,681,1116,1150),
-            "HOLBOX":z(399,402,441,970,886),"VALLADOLID":z(381,386,418,750,1056),"MERIDA":z(638,645,675,1025,1100),
-            "AEROPUERTO CANCUN":z(58,72,102,141,154),"AEROPUERTO TULUM":z(238,256,341,430,457)
-        },
-        "ZONA HOTELERA DE CANCUN": {
-            "ZONA HOTELERA DE CANCUN":z(58,72,102,141,154),"CENTRO DE CANCUN":z(58,72,102,141,154),
-            "COSTA MUJERES":z(116,129,167,206,218),"PLAYA MUJERES":z(102,116,154,193,206),"PUERTO JUAREZ":z(84,96,129,167,179),
-            "PLAYA PARAISO":z(102,116,154,193,206),"PUERTO MORELOS":z(84,96,129,167,179),"PLAYA DEL CARMEN":z(122,135,179,231,244),
-            "PUERTO AVENTURAS":z(141,154,206,256,270),"AKUMAL":z(161,179,238,301,315),
-            "CENTRO DE TULUM":z(193,212,276,346,366),"ZONA HOTELERA DE TULUM":z(212,231,301,385,404),
-            "FELIPE CARRILLO PUERTO":z(535,540,572,1116,1258),"MAHAHUAL":z(638,643,675,1116,1150),
-            "BACALAR":z(638,643,675,1116,1150),"CHETUMAL":z(644,649,681,1116,1150),
-            "HOLBOX":z(391,402,441,970,886),"VALLADOLID":z(381,386,418,750,1056),"MERIDA":z(638,645,675,1025,1100),
-            "AEROPUERTO CANCUN":z(58,72,102,141,154),"AEROPUERTO TULUM":z(231,251,333,424,449)
-        },
-        "PLAYA MUJERES": {
-            "ZONA HOTELERA DE CANCUN":z(102,116,154,193,206),"CENTRO DE CANCUN":z(72,84,116,154,167),
-            "COSTA MUJERES":z(58,72,102,141,154),"PLAYA MUJERES":z(58,72,102,141,154),"PUERTO JUAREZ":z(70,84,111,141,154),
-            "PLAYA PARAISO":z(161,179,238,308,321),"PUERTO MORELOS":z(141,161,212,270,283),"PLAYA DEL CARMEN":z(187,198,264,341,352),
-            "PUERTO AVENTURAS":z(212,226,295,378,392),"AKUMAL":z(231,244,327,424,437),
-            "CENTRO DE TULUM":z(226,244,321,410,424),"ZONA HOTELERA DE TULUM":z(231,244,321,410,424),
-            "FELIPE CARRILLO PUERTO":z(520,545,560,1160,1280),"MAHAHUAL":z(620,645,675,1190,1240),
-            "BACALAR":z(620,645,675,1190,1240),"CHETUMAL":z(644,660,690,1220,1270),
-            "HOLBOX":z(410,440,460,1000,1056),"VALLADOLID":z(395,410,440,1020,1090),"MERIDA":z(600,645,675,1060,1180),
-            "AEROPUERTO CANCUN":z(90,102,141,179,193),"AEROPUERTO TULUM":z(212,226,301,392,404)
-        },
-        "COSTA MUJERES": {
-            "ZONA HOTELERA DE CANCUN":z(116,129,167,206,218),"CENTRO DE CANCUN":z(84,97,129,167,179),
-            "COSTA MUJERES":z(58,72,102,141,154),"PLAYA MUJERES":z(58,72,102,141,154),"PUERTO JUAREZ":z(84,96,129,161,173),
-            "PLAYA PARAISO":z(173,193,256,333,346),"PUERTO MORELOS":z(154,173,231,295,308),"PLAYA DEL CARMEN":z(198,212,283,366,378),
-            "PUERTO AVENTURAS":z(226,238,315,404,418),"AKUMAL":z(244,256,346,449,462),
-            "CENTRO DE TULUM":z(238,256,341,437,449),"ZONA HOTELERA DE TULUM":z(244,256,341,437,449),
-            "FELIPE CARRILLO PUERTO":z(550,570,592,1200,1290),"MAHAHUAL":z(638,670,690,1250,1280),
-            "BACALAR":z(638,670,690,1250,1280),"CHETUMAL":z(660,690,720,1280,1300),
-            "HOLBOX":z(420,460,480,1050,1100),"VALLADOLID":z(410,440,465,1100,1200),"MERIDA":z(638,645,675,1150,1250),
-            "AEROPUERTO CANCUN":z(102,116,154,193,206),"AEROPUERTO TULUM":z(226,238,321,418,430)
-        },
-        "PUERTO JUAREZ": {
-            "ZONA HOTELERA DE CANCUN":z(84,96,129,167,179),"CENTRO DE CANCUN":z(52,64,96,129,141),
-            "COSTA MUJERES":z(84,96,129,161,173),"PLAYA MUJERES":z(70,84,111,141,154),"PUERTO JUAREZ":z(58,72,102,129,141),
-            "PLAYA PARAISO":z(141,154,206,270,283),"PUERTO MORELOS":z(122,135,179,231,244),"PLAYA DEL CARMEN":z(173,187,244,315,327),
-            "PUERTO AVENTURAS":z(198,212,276,352,366),"AKUMAL":z(218,231,308,398,410),
-            "CENTRO DE TULUM":z(206,226,295,380,392),"ZONA HOTELERA DE TULUM":z(218,231,301,385,398),
-            "FELIPE CARRILLO PUERTO":z(500,520,540,1150,1270),"MAHAHUAL":z(600,610,630,1170,1220),
-            "BACALAR":z(600,610,630,1170,1220),"CHETUMAL":z(620,630,650,1190,1250),
-            "HOLBOX":z(400,420,450,980,920),"VALLADOLID":z(381,386,420,950,1080),"MERIDA":z(585,600,620,1050,1170),
-            "AEROPUERTO CANCUN":z(72,84,116,154,167),"AEROPUERTO TULUM":z(198,212,283,366,378)
-        },
-        "PUERTO MORELOS": {
-            "ZONA HOTELERA DE CANCUN":z(84,96,129,167,179),"CENTRO DE CANCUN":z(96,110,149,187,199),
-            "COSTA MUJERES":z(154,173,231,295,308),"PLAYA MUJERES":z(141,161,212,270,283),"PUERTO JUAREZ":z(122,135,179,231,244),
-            "PLAYA PARAISO":z(77,90,122,154,167),"PUERTO MORELOS":z(58,72,102,129,141),"PLAYA DEL CARMEN":z(96,110,148,193,206),
-            "PUERTO AVENTURAS":z(129,141,193,244,256),"AKUMAL":z(154,173,231,295,308),
-            "CENTRO DE TULUM":z(167,187,251,321,333),"ZONA HOTELERA DE TULUM":z(198,212,276,352,366),
-            "FELIPE CARRILLO PUERTO":z(420,450,470,1000,1050),"MAHAHUAL":z(525,530,580,1050,1150),
-            "BACALAR":z(525,530,580,1050,1150),"CHETUMAL":z(565,580,600,1100,1200),
-            "HOLBOX":z(420,440,450,900,830),"VALLADOLID":z(420,430,480,990,1130),"MERIDA":z(740,790,800,1200,1250),
-            "AEROPUERTO CANCUN":z(77,90,122,154,167),"AEROPUERTO TULUM":z(179,193,256,333,346)
-        },
-        "PLAYA PARAISO": {
-            "ZONA HOTELERA DE CANCUN":z(102,116,154,193,206),"CENTRO DE CANCUN":z(116,129,167,218,231),
-            "COSTA MUJERES":z(173,193,256,333,346),"PLAYA MUJERES":z(161,179,238,308,321),"PUERTO JUAREZ":z(141,154,206,270,283),
-            "PLAYA PARAISO":z(75,92,131,166,180),"PUERTO MORELOS":z(77,90,122,154,167),"PLAYA DEL CARMEN":z(96,110,148,193,206),
-            "PUERTO AVENTURAS":z(116,129,173,226,238),"AKUMAL":z(135,154,206,270,283),
-            "CENTRO DE TULUM":z(141,161,218,283,295),"ZONA HOTELERA DE TULUM":z(179,193,251,321,333),
-            "FELIPE CARRILLO PUERTO":z(360,370,420,680,720),"MAHAHUAL":z(500,510,560,750,800),
-            "BACALAR":z(500,510,560,750,800),"CHETUMAL":z(525,575,595,990,1025),
-            "HOLBOX":z(430,450,470,820,850),"VALLADOLID":z(400,420,470,980,1120),"MERIDA":z(735,780,790,1190,1230),
-            "AEROPUERTO CANCUN":z(96,110,148,187,198),"AEROPUERTO TULUM":z(161,173,231,301,315)
-        },
-        "PLAYA DEL CARMEN": {
-            "ZONA HOTELERA DE CANCUN":z(122,135,179,231,244),"CENTRO DE CANCUN":z(129,141,193,244,256),
-            "COSTA MUJERES":z(198,212,283,366,378),"PLAYA MUJERES":z(187,198,264,341,352),"PUERTO JUAREZ":z(173,187,244,315,327),
-            "PLAYA PARAISO":z(96,110,148,193,206),"PUERTO MORELOS":z(96,110,148,193,206),"PLAYA DEL CARMEN":z(58,72,102,141,154),
-            "PUERTO AVENTURAS":z(77,90,122,161,173),"AKUMAL":z(96,110,148,193,206),
-            "CENTRO DE TULUM":z(116,135,187,244,256),"ZONA HOTELERA DE TULUM":z(161,173,226,289,301),
-            "FELIPE CARRILLO PUERTO":z(340,350,410,670,710),"MAHAHUAL":z(470,495,525,710,760),
-            "BACALAR":z(470,495,525,710,760),"CHETUMAL":z(510,570,590,970,1000),
-            "HOLBOX":z(450,470,490,850,900),"VALLADOLID":z(395,410,460,960,1100),"MERIDA":z(730,770,785,1180,1220),
-            "AEROPUERTO CANCUN":z(110,122,167,218,231),"AEROPUERTO TULUM":z(141,154,206,270,283)
-        },
-        "PUERTO AVENTURAS": {
-            "ZONA HOTELERA DE CANCUN":z(141,154,206,256,270),"CENTRO DE CANCUN":z(149,167,226,289,303),
-            "COSTA MUJERES":z(226,238,315,404,418),"PLAYA MUJERES":z(212,226,295,378,392),"PUERTO JUAREZ":z(198,212,276,352,366),
-            "PLAYA PARAISO":z(116,129,173,226,238),"PUERTO MORELOS":z(129,141,193,244,256),"PLAYA DEL CARMEN":z(77,90,122,161,173),
-            "PUERTO AVENTURAS":z(58,72,102,141,154),"AKUMAL":z(84,96,129,173,187),
-            "CENTRO DE TULUM":z(90,110,154,206,218),"ZONA HOTELERA DE TULUM":z(141,154,198,256,270),
-            "FELIPE CARRILLO PUERTO":z(290,330,400,650,700),"MAHAHUAL":z(450,490,520,700,750),
-            "BACALAR":z(450,490,520,700,750),"CHETUMAL":z(495,560,570,950,980),
-            "HOLBOX":z(470,500,510,890,950),"VALLADOLID":z(390,400,450,950,1080),"MERIDA":z(720,760,780,1150,1200),
-            "AEROPUERTO CANCUN":z(129,141,193,244,256),"AEROPUERTO TULUM":z(122,135,179,238,251)
-        },
-        "AKUMAL": {
-            "ZONA HOTELERA DE CANCUN":z(161,179,238,301,315),"CENTRO DE CANCUN":z(167,187,244,308,321),
-            "COSTA MUJERES":z(244,256,346,449,462),"PLAYA MUJERES":z(231,244,327,424,437),"PUERTO JUAREZ":z(218,231,308,398,410),
-            "PLAYA PARAISO":z(135,154,206,270,283),"PUERTO MORELOS":z(154,173,231,295,308),"PLAYA DEL CARMEN":z(96,110,148,193,206),
-            "PUERTO AVENTURAS":z(84,96,129,173,187),"AKUMAL":z(58,72,102,141,154),
-            "CENTRO DE TULUM":z(64,77,116,154,167),"ZONA HOTELERA DE TULUM":z(122,135,179,238,251),
-            "FELIPE CARRILLO PUERTO":z(258,278,310,650,700),"MAHAHUAL":z(420,485,515,659,700),
-            "BACALAR":z(420,485,515,659,700),"CHETUMAL":z(485,555,585,975,1000),
-            "HOLBOX":z(480,518,548,908,1000),"VALLADOLID":z(375,385,440,940,1070),"MERIDA":z(650,655,685,1100,1150),
-            "AEROPUERTO CANCUN":z(148,167,226,289,301),"AEROPUERTO TULUM":z(110,122,167,218,231)
-        },
-        "CENTRO DE TULUM": {
-            "ZONA HOTELERA DE CANCUN":z(193,212,276,346,366),"CENTRO DE CANCUN":z(199,218,289,372,392),
-            "COSTA MUJERES":z(238,256,341,437,449),"PLAYA MUJERES":z(226,244,321,410,424),"PUERTO JUAREZ":z(206,226,295,380,392),
-            "PLAYA PARAISO":z(141,161,218,283,295),"PUERTO MORELOS":z(167,187,251,321,333),"PLAYA DEL CARMEN":z(116,135,187,244,256),
-            "PUERTO AVENTURAS":z(90,110,154,206,218),"AKUMAL":z(64,77,116,154,167),
-            "CENTRO DE TULUM":z(45,58,90,129,141),"ZONA HOTELERA DE TULUM":z(58,70,102,141,154),
-            "FELIPE CARRILLO PUERTO":z(100,165,195,218,203),"MAHAHUAL":z(400,465,495,618,650),
-            "BACALAR":z(400,465,495,618,650),"CHETUMAL":z(450,515,545,918,950),
-            "HOLBOX":z(490,555,585,950,1050),"VALLADOLID":z(345,355,405,940,1045),"MERIDA":z(638,645,675,1025,1100),
-            "AEROPUERTO CANCUN":z(179,198,264,333,352),"AEROPUERTO TULUM":z(77,90,122,161,173)
-        },
-        "ZONA HOTELERA DE TULUM": {
-            "ZONA HOTELERA DE CANCUN":z(212,231,301,385,404),"CENTRO DE CANCUN":z(218,238,308,410,430),
-            "COSTA MUJERES":z(244,256,341,437,449),"PLAYA MUJERES":z(231,244,321,410,424),"PUERTO JUAREZ":z(218,231,301,385,398),
-            "PLAYA PARAISO":z(179,193,251,321,333),"PUERTO MORELOS":z(198,212,276,352,366),"PLAYA DEL CARMEN":z(161,173,226,289,301),
-            "PUERTO AVENTURAS":z(141,154,198,256,270),"AKUMAL":z(122,135,179,238,251),
-            "CENTRO DE TULUM":z(58,70,102,141,154),"ZONA HOTELERA DE TULUM":z(58,72,102,141,154),
-            "FELIPE CARRILLO PUERTO":z(126,191,221,269,245),"MAHAHUAL":z(410,475,505,618,650),
-            "BACALAR":z(410,475,505,618,650),"CHETUMAL":z(476,541,571,969,992),
-            "HOLBOX":z(516,581,611,1000,1092),"VALLADOLID":z(355,366,416,940,1045),"MERIDA":z(640,645,675,1025,1100),
-            "AEROPUERTO CANCUN":z(198,218,289,372,392),"AEROPUERTO TULUM":z(90,102,141,179,193)
-        },
-        "FELIPE CARRILLO PUERTO": {
-            "ZONA HOTELERA DE CANCUN":z(535,540,572,1116,1258),"CENTRO DE CANCUN":z(535,540,572,1116,1258),
-            "COSTA MUJERES":z(550,570,592,1200,1290),"PLAYA MUJERES":z(520,545,560,1160,1280),"PUERTO JUAREZ":z(500,520,540,1150,1270),
-            "PLAYA PARAISO":z(360,370,420,680,720),"PUERTO MORELOS":z(420,450,470,1000,1050),"PLAYA DEL CARMEN":z(340,350,410,670,710),
-            "PUERTO AVENTURAS":z(290,330,400,650,700),"AKUMAL":z(258,278,310,650,700),
-            "CENTRO DE TULUM":z(100,165,195,218,203),"ZONA HOTELERA DE TULUM":z(126,191,221,269,245),
-            "AEROPUERTO CANCUN":z(468,478,515,1116,1258),"AEROPUERTO TULUM":z(110,175,205,218,203)
-        },
-        "HOLBOX": {
-            "ZONA HOTELERA DE CANCUN":z(391,402,441,970,886),"CENTRO DE CANCUN":z(399,402,441,970,886),
-            "COSTA MUJERES":z(420,460,480,1050,1100),"PLAYA MUJERES":z(410,440,460,1000,1056),"PUERTO JUAREZ":z(400,420,450,980,920),
-            "PLAYA PARAISO":z(430,450,470,820,850),"PUERTO MORELOS":z(420,440,450,900,830),"PLAYA DEL CARMEN":z(450,470,490,850,900),
-            "PUERTO AVENTURAS":z(470,500,510,890,950),"AKUMAL":z(480,518,548,908,1000),
-            "CENTRO DE TULUM":z(490,555,585,950,1050),"ZONA HOTELERA DE TULUM":z(516,581,611,1000,1092),
-            "AEROPUERTO CANCUN":z(391,402,441,970,886),"AEROPUERTO TULUM":z(519,584,614,950,1050)
-        },
-        "MAHAHUAL": {
-            "ZONA HOTELERA DE CANCUN":z(638,643,675,1116,1150),"CENTRO DE CANCUN":z(638,643,675,1116,1150),
-            "COSTA MUJERES":z(638,670,690,1250,1280),"PLAYA MUJERES":z(620,645,675,1190,1240),"PUERTO JUAREZ":z(600,610,630,1170,1220),
-            "PLAYA PARAISO":z(500,510,560,750,800),"PUERTO MORELOS":z(525,530,580,1050,1150),"PLAYA DEL CARMEN":z(470,495,525,710,760),
-            "PUERTO AVENTURAS":z(450,490,520,700,750),"AKUMAL":z(420,485,515,659,700),
-            "CENTRO DE TULUM":z(400,465,495,618,650),"ZONA HOTELERA DE TULUM":z(410,475,505,618,650),
-            "AEROPUERTO CANCUN":z(571,581,618,1116,1200),"AEROPUERTO TULUM":z(350,415,445,618,650)
-        },
-        "BACALAR": {
-            "ZONA HOTELERA DE CANCUN":z(638,643,675,1116,1150),"CENTRO DE CANCUN":z(638,643,675,1116,1150),
-            "COSTA MUJERES":z(638,670,690,1250,1280),"PLAYA MUJERES":z(620,645,675,1190,1240),"PUERTO JUAREZ":z(600,610,630,1170,1220),
-            "PLAYA PARAISO":z(500,510,560,750,800),"PUERTO MORELOS":z(525,530,580,1050,1150),"PLAYA DEL CARMEN":z(470,495,525,710,760),
-            "PUERTO AVENTURAS":z(450,490,520,700,750),"AKUMAL":z(420,485,515,659,700),
-            "CENTRO DE TULUM":z(400,465,495,618,650),"ZONA HOTELERA DE TULUM":z(410,475,505,618,650),
-            "AEROPUERTO CANCUN":z(571,581,618,1116,1200),"AEROPUERTO TULUM":z(350,415,445,618,650)
-        },
-        "CHETUMAL": {
-            "ZONA HOTELERA DE CANCUN":z(644,649,681,1116,1150),"CENTRO DE CANCUN":z(644,649,681,1116,1150),
-            "COSTA MUJERES":z(660,690,720,1280,1300),"PLAYA MUJERES":z(644,660,690,1220,1270),"PUERTO JUAREZ":z(620,630,650,1190,1250),
-            "PLAYA PARAISO":z(525,575,595,990,1025),"PUERTO MORELOS":z(565,580,600,1100,1200),"PLAYA DEL CARMEN":z(510,570,590,970,1000),
-            "PUERTO AVENTURAS":z(495,560,570,950,980),"AKUMAL":z(485,555,585,975,1000),
-            "CENTRO DE TULUM":z(450,515,545,918,950),"ZONA HOTELERA DE TULUM":z(476,541,571,969,992),
-            "AEROPUERTO CANCUN":z(577,587,624,1116,1250),"AEROPUERTO TULUM":z(450,515,545,918,950)
-        },
-        "VALLADOLID": {
-            "ZONA HOTELERA DE CANCUN":z(381,386,418,750,1056),"CENTRO DE CANCUN":z(381,386,418,750,1056),
-            "COSTA MUJERES":z(410,440,465,1100,1200),"PLAYA MUJERES":z(395,410,440,1020,1090),"PUERTO JUAREZ":z(381,386,420,950,1080),
-            "PLAYA PARAISO":z(400,420,470,980,1120),"PUERTO MORELOS":z(420,430,480,990,1130),"PLAYA DEL CARMEN":z(395,410,460,960,1100),
-            "PUERTO AVENTURAS":z(390,400,450,950,1080),"AKUMAL":z(375,385,440,940,1070),
-            "CENTRO DE TULUM":z(345,355,405,940,1045),"ZONA HOTELERA DE TULUM":z(355,366,416,940,1045),
-            "AEROPUERTO CANCUN":z(366,376,416,750,1056),"AEROPUERTO TULUM":z(366,376,416,750,1056)
-        },
-        "MERIDA": {
-            "ZONA HOTELERA DE CANCUN":z(638,645,675,1025,1100),"CENTRO DE CANCUN":z(638,645,675,1025,1100),
-            "COSTA MUJERES":z(638,645,675,1150,1250),"PLAYA MUJERES":z(600,645,675,1060,1180),"PUERTO JUAREZ":z(585,600,620,1050,1170),
-            "PLAYA PARAISO":z(735,780,790,1190,1230),"PUERTO MORELOS":z(740,790,800,1200,1250),"PLAYA DEL CARMEN":z(730,770,785,1180,1220),
-            "PUERTO AVENTURAS":z(720,760,780,1150,1200),"AKUMAL":z(650,655,685,1100,1150),
-            "CENTRO DE TULUM":z(638,645,675,1025,1100),"ZONA HOTELERA DE TULUM":z(640,645,675,1025,1100),
-            "AEROPUERTO CANCUN":z(571,581,618,1027,1150),"AEROPUERTO TULUM":z(638,645,675,1025,1100)
-        }
-    };
-    function convertirPrecio(usd, moneda) {
-        if (moneda === 'MXN') return usd === 2 ? 35 : usd === 4 ? 70 : Math.round(usd * 18.5);
-        if (moneda === 'CAD') return Math.round(usd * 18.5 / 11.5);
-        return usd;
-    }
 
-    const diccionarioZonas = {
-        "AEROPUERTO CANCUN":       ["AEROPUERTO INTERNACIONAL DE CANCUN","CANCUN INTERNATIONAL AIRPORT","AEROPUERTO CANCUN","AEROPUERTO DE CANCUN","CUN AIRPORT","TERMINAL 2","TERMINAL 3","TERMINAL 4","TERMINAL CANCUN"],
-        "AEROPUERTO TULUM":        ["AEROPUERTO TULUM","TQO","AEROPUERTO INTERNACIONAL DE TULUM","AEROPUERTO FELIPE CARRILLO PUERTO","TULUM AIRPORT"],
-        "PUERTO JUAREZ":           ["PUERTO JUAREZ", "PUERTO JUÁREZ", "PUNTA SAM", "ISLA MUJERES FERRY", "FERRY TERMINAL", "EMBARCADERO JUAREZ", "EL EMBARCADERO"],
-        "ZONA HOTELERA DE TULUM":  ["TULUM HOTEL ZONE","ZONA HOTELERA TULUM","PAPAYA PLAYA","NOMADE","AZULIK","ESTRELLITA","LIBELULA","CASA PHOENIX"],
-        "CENTRO DE TULUM":         ["TULUM DOWNTOWN","CENTRO DE TULUM","TULUM PUEBLO","TULUM, Q.R.","ZAMA","VELETA"],
-        "ZONA HOTELERA DE CANCUN": ["CANCUN HOTEL ZONE","ZONA HOTELERA","KUKULCAN","HOTEL ZONE","BOULEVARD KUKULCAN"],
-        "CENTRO DE CANCUN":        ["CANCUN DOWNTOWN","CENTRO DE CANCUN","CANCUN CENTRO","SUPERMANZANA","CANCUN, Q.R.","ALAMOS","HUAYACAN"],
-        "COSTA MUJERES":           ["COSTA MUJERES","RIU DUNAMAR","RIU PALACE COSTA","PLANET HOLLYWOOD","CATALONIA COSTA"],
-        "PLAYA MUJERES":           ["PLAYA MUJERES","ATELIER","FINEST","BELOVED","EXCELLENCE PLAYA"],
-        "PUERTO MORELOS":          ["PUERTO MORELOS","DREAMS JADE","NOW SAPPHIRE","OCEAN CORAL","MOON PALACE","ROYALTON"],
-        "PLAYA PARAISO":           ["PLAYA PARAISO","IBEROSTAR","VIDANTA","MAROMA"],
-        "PLAYA DEL CARMEN":        ["PLAYA DEL CARMEN","XCARET","FIFTH AVENUE","QUINTA AVENIDA","PLAYACAR"],
-        "PUERTO AVENTURAS":        ["PUERTO AVENTURAS","DREAMS AVENTURAS","DREAMS PUERTO","HARD ROCK RIVIERA","BARCELO","UNICO","CATALONIA ROYAL"],
-        "AKUMAL":                  ["AKUMAL","AKUMAL BAY","BAHIA PRINCIPE","SIRENIS","PALLADIUM"],
-        "MAHAHUAL":                ["MAHAHUAL"],
-        "BACALAR":                 ["BACALAR"],
-        "CHETUMAL":                ["CHETUMAL"],
-        "HOLBOX":                  ["HOLBOX","CHIQUILA"],
-        "VALLADOLID":              ["VALLADOLID"],
-        "CHICHEN ITZA":            ["CHICHEN ITZA","CHICHÉN ITZÁ","CHICHEN","ZONA ARQUEOLOGICA CHICHEN","ARCHAEOLOGICAL ZONE CHICHEN","CHICHEN ITZA YUC","PISTE","PISTÉ"],
-        "MERIDA":                  ["MERIDA"],
-        "FELIPE CARRILLO PUERTO":  ["CARRILLO PUERTO CENTRO","PUEBLO CARRILLO PUERTO"]
-    };
-    const zonasGPS = [
-        { nombre: "AEROPUERTO CANCUN",       latMin: 21.025, latMax: 21.045, lonMin: -86.895, lonMax: -86.855 },
-        { nombre: "AEROPUERTO TULUM",        latMin: 20.215, latMax: 20.245, lonMin: -87.640, lonMax: -87.580 },
-        { nombre: "COSTA MUJERES",           latMin: 21.2300, latMax: 21.3500, lonMin: -86.8500, lonMax: -86.7800 },
-        { nombre: "PLAYA MUJERES",           latMin: 21.2000, latMax: 21.2290, lonMin: -86.8200, lonMax: -86.7800 },
-        { nombre: "PUERTO JUAREZ",           latMin: 21.1650, latMax: 21.1990, lonMin: -86.8250, lonMax: -86.7900 },
-        { nombre: "ZONA HOTELERA DE CANCUN", latMin: 21.0000, latMax: 21.1200, lonMin: -86.8100, lonMax: -86.7500 },
-        { nombre: "ZONA HOTELERA DE CANCUN", latMin: 21.1200, latMax: 21.1500, lonMin: -86.8100, lonMax: -86.7200 },
-        { nombre: "CENTRO DE CANCUN",        latMin: 21.1200, latMax: 21.1700, lonMin: -86.9500, lonMax: -86.8250 },
-        { nombre: "PUERTO MORELOS",          latMin: 20.8200, latMax: 20.9800, lonMin: -87.0000, lonMax: -86.8000 },
-        { nombre: "PLAYA PARAISO",           latMin: 20.7000, latMax: 20.8200, lonMin: -86.9900, lonMax: -86.9200 },
-        { nombre: "PLAYA DEL CARMEN",        latMin: 20.5500, latMax: 20.7000, lonMin: -87.1500, lonMax: -87.0000 },
-        { nombre: "PUERTO AVENTURAS",        latMin: 20.4500, latMax: 20.5500, lonMin: -87.3000, lonMax: -87.1500 },
-        { nombre: "AKUMAL",                  latMin: 20.3000, latMax: 20.4500, lonMin: -87.3500, lonMax: -87.2500 },
-        { nombre: "CENTRO DE TULUM",         latMin: 20.1800, latMax: 20.2400, lonMin: -87.5500, lonMax: -87.4600 },
-        { nombre: "ZONA HOTELERA DE TULUM",  latMin: 20.0900, latMax: 20.1799, lonMin: -87.4700, lonMax: -87.3900 },
-        { nombre: "CHICHEN ITZA",            latMin: 20.6500, latMax: 20.7100, lonMin: -88.6500, lonMax: -88.4500 }
-    ];
-    const zonasCP = { "7750": "CENTRO DE CANCUN", "7751": "CENTRO DE CANCUN", "77520": "PUERTO JUAREZ", "77580": "PUERTO MORELOS", "77710": "PLAYA DEL CARMEN", "77712": "PLAYA DEL CARMEN", "77714": "PLAYA DEL CARMEN", "77733": "PUERTO AVENTURAS", "77776": "AKUMAL", "77760": "CENTRO DE TULUM", "77780": "CENTRO DE TULUM", "77310": "HOLBOX", "77930": "BACALAR", "770": "CHETUMAL", "970": "MERIDA", "971": "MERIDA", "972": "MERIDA", "973": "MERIDA", "9778": "VALLADOLID" };
-
-    // Zonas de larga distancia — requieren coincidencia estricta de palabra completa
-    const zonasLargaDistancia = ['VALLADOLID', 'MERIDA', 'BACALAR', 'MAHAHUAL', 'CHETUMAL', 'HOLBOX', 'FELIPE CARRILLO PUERTO'];
-
-    function detectarZonaPorGPS(lat, lng) {
+    function detectarZonaPorGPS(lat, lng, zonasGPS) {
         if (!lat || !lng) return null;
         for (let i = 0; i < zonasGPS.length; i++) {
             if (lat >= zonasGPS[i].latMin && lat <= zonasGPS[i].latMax && lng >= zonasGPS[i].lonMin && lng <= zonasGPS[i].lonMax) {
@@ -1935,7 +1687,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         return null;
     }
 
-    function detectarZonaPorCP(cp) {
+    function detectarZonaPorCP(cp, zonasCP) {
         if (!cp) return null;
         for (let codigo in zonasCP) {
             if (cp === codigo || cp.startsWith(codigo)) return zonasCP[codigo];
@@ -1943,12 +1695,17 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         return null;
     }
 
-    function detectarZonaCompleta(lugar, lat, lng, cp) {
+    function detectarZonaCompleta(lugar, lat, lng, cp, p) {
         let zona = null;
+        const diccionarioZonas    = p.diccionarioZonas;
+        const zonasGPS             = p.zonasGPS;
+        const zonasCP              = p.zonasCP;
+        const zonasLargaDistancia  = p.zonasLargaDistancia;
+        const zonasBlockeadas      = p.zonasBlockeadas;
         if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
-            zona = detectarZonaPorGPS(lat, lng);
+            zona = detectarZonaPorGPS(lat, lng, zonasGPS);
         }
-        if (!zona && cp) zona = detectarZonaPorCP(cp);
+        if (!zona && cp) zona = detectarZonaPorCP(cp, zonasCP);
         if (!zona && lugar) {
             const up = lugar.toUpperCase();
             for (let key in diccionarioZonas) {
@@ -1966,8 +1723,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 if (zona) break;
             }
         }
-        // Zonas bloqueadas — sin precio, van a Servicio Personalizado
-        const zonasBlockeadas = ['CHICHEN ITZA'];
         if (zona && zonasBlockeadas.includes(zona)) return null;
         return zona;
     }
@@ -2087,9 +1842,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
     function limpiarResultados() { document.getElementById('resultados').style.display = 'none'; }
 
-    function cotizar(dispararMeta = true) {
+    async function cotizar(dispararMeta = true) {
         try {
-    
+            const p = await cargarPrecios();
+
             const rawHora = document.getElementById('horaIda').value;
             const fecha = document.getElementById('fechaIda').value;
 
@@ -2187,14 +1943,14 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 origenVal,
                 parseFloat(document.getElementById('latitudOrigen').value),
                 parseFloat(document.getElementById('longitudOrigen').value),
-                document.getElementById('cpOrigen').value
+                document.getElementById('cpOrigen').value, p
             );
-            // Detectar zona destino
+            // Detect destination zone
             const zonaDestino = detectarZonaCompleta(
                 destinoVal,
                 parseFloat(document.getElementById('latitudDestino').value),
                 parseFloat(document.getElementById('longitudDestino').value),
-                document.getElementById('cpDestino').value
+                document.getElementById('cpDestino').value, p
             );
 
             if (!zonaOrigen || !zonaDestino) {
@@ -2218,7 +1974,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             }
 
             // Buscar precio en la matriz
-            const preciosSencillo = tarifasMatrizUSD[zonaOrigen] && tarifasMatrizUSD[zonaOrigen][zonaDestino];
+            const preciosSencillo = p.tarifasMatrizUSD[zonaOrigen] && p.tarifasMatrizUSD[zonaOrigen][zonaDestino];
 
             const divRes = document.getElementById('resultados');
             divRes.innerHTML = "";
@@ -2686,30 +2442,18 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         document.activeElement.blur();
     }
 
-    // Extras opcionales
-    const _extrasPrecios = { stop: 25, stopR: 25 };
-    const _extrasNombres = {
-        stop:  '20-Min Stop (Trip)',
-        stopR: '20-Min Stop (Return)'
-    };
-
-    function getExtrasMoneda() {
-        return document.getElementById('moneda') ? document.getElementById('moneda').value : 'USD';
-    }
-
-    // Precios fijos por moneda para evitar decimales
-    const _extrasPreciosCAD = { 2: 3, 4: 6, 25: 40 };
-    const _extrasPreciosMXN = { 2: 35, 4: 70, 25: 500 };
 
     function formatExtraPrice(usdPrice) {
         const moneda = getExtrasMoneda();
         const symbol = moneda === 'MXN' ? '$' : moneda === 'CAD' ? 'C$' : '$';
+        const pCAD = (_precios && _precios.extrasPreciosCAD) || { 25: 40 };
+        const pMXN = (_precios && _precios.extrasPreciosMXN) || { 25: 500 };
         if (moneda === 'CAD') {
-            const fixedCAD = _extrasPreciosCAD[usdPrice] || Math.round(usdPrice * 18.5 / 11.5);
+            const fixedCAD = pCAD[usdPrice] || Math.round(usdPrice * 18.5 / 11.5);
             return `${symbol}${fixedCAD} ${moneda}`;
         }
         if (moneda === 'MXN') {
-            const fixedMXN = _extrasPreciosMXN[usdPrice] || Math.round(usdPrice * 18.5);
+            const fixedMXN = pMXN[usdPrice] || Math.round(usdPrice * 18.5);
             return `${symbol}${fixedMXN} ${moneda}`;
         }
         return `${symbol}${usdPrice} ${moneda}`;
@@ -2731,12 +2475,12 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         tipos.forEach(t => {
             const e = document.getElementById(`extra-${t}-${id}`);
             if (e) {
-                const usdUnit = _extrasPrecios[t] || 0;
+                const usdUnit = ((_precios&&_precios.extras&&_precios.extras[t]&&_precios.extras[t].usd)) || 25;
                 var localUnit;
                 if (monedaActual === 'CAD') {
-                    localUnit = _extrasPreciosCAD[usdUnit] || Math.round(usdUnit * 18.5 / 11.5);
+                    localUnit = ((_precios&&_precios.extrasPreciosCAD)||{})[usdUnit] || Math.round(usdUnit * 18.5 / 11.5);
                 } else if (monedaActual === 'MXN') {
-                    localUnit = _extrasPreciosMXN[usdUnit] || Math.round(usdUnit * 18.5);
+                    localUnit = ((_precios&&_precios.extrasPreciosMXN)||{})[usdUnit] || Math.round(usdUnit * 18.5);
                 } else {
                     localUnit = usdUnit;
                 }
@@ -2778,12 +2522,12 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         tipos.forEach(t => {
             const el = document.getElementById(`extra-${t}-${id}`);
             if (el && parseInt(el.innerText) > 0) {
-                const usdUnit = _extrasPrecios[t] || 0;
+                const usdUnit = ((_precios&&_precios.extras&&_precios.extras[t]&&_precios.extras[t].usd)) || 25;
                 var localUnit;
                 if (monedaActual === 'CAD') {
-                    localUnit = _extrasPreciosCAD[usdUnit] || Math.round(usdUnit * 18.5 / 11.5);
+                    localUnit = ((_precios&&_precios.extrasPreciosCAD)||{})[usdUnit] || Math.round(usdUnit * 18.5 / 11.5);
                 } else if (monedaActual === 'MXN') {
-                    localUnit = _extrasPreciosMXN[usdUnit] || Math.round(usdUnit * 18.5);
+                    localUnit = ((_precios&&_precios.extrasPreciosMXN)||{})[usdUnit] || Math.round(usdUnit * 18.5);
                 } else {
                     localUnit = usdUnit;
                 }
@@ -2801,12 +2545,12 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         tipos.forEach(t => {
             const el = document.getElementById(`extra-${t}-${id}`);
             if (el) {
-                const usdUnit = _extrasPrecios[t] || 0;
+                const usdUnit = ((_precios&&_precios.extras&&_precios.extras[t]&&_precios.extras[t].usd)) || 25;
                 var unit;
                 if (monedaActual === 'CAD') {
-                    unit = _extrasPreciosCAD[usdUnit] || Math.round(usdUnit * 18.5 / 11.5);
+                    unit = ((_precios&&_precios.extrasPreciosCAD)||{})[usdUnit] || Math.round(usdUnit * 18.5 / 11.5);
                 } else if (monedaActual === 'MXN') {
-                    unit = _extrasPreciosMXN[usdUnit] || Math.round(usdUnit * 18.5);
+                    unit = ((_precios&&_precios.extrasPreciosMXN)||{})[usdUnit] || Math.round(usdUnit * 18.5);
                 } else {
                     unit = usdUnit;
                 }
