@@ -1630,6 +1630,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         document.body.style.opacity = '1';
 
+        // Preload pricing data in background so cotizar() is instant
+        cargarPrecios().catch(function(e) { console.warn('Precios preload failed:', e); });
+
         // Restaurar modo correcto sin re-llenar el campo
         direccionMode = 'desdeAero';
 
@@ -2449,6 +2452,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         document.activeElement.blur();
     }
 
+
+    function getExtrasMoneda() {
+        return document.getElementById('moneda') ? document.getElementById('moneda').value : 'USD';
+    }
 
     function formatExtraPrice(usdPrice) {
         const moneda = getExtrasMoneda();
