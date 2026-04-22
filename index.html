@@ -1976,7 +1976,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     nombre: '', 
                     telefono: '', 
                     email: '', 
-                    pasajeros: document.getElementById('pasajeros').value,
+                    pasajeros: (document.getElementById('pasajeros') || {value:''}).value,
                     tipoViaje: tipoViajeTxt,
                     origen: document.getElementById('origen').value, 
                     destino: destinoFinal, 
@@ -2755,12 +2755,17 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
 
     function _construirDatosVenta(id, datosCard, metodoPago) {
-        const nombre = document.getElementById('nombre-' + id).value.trim();
-        const email  = document.getElementById('email-' + id).value.trim();
+        const nombreEl = document.getElementById('nombre-' + id);
+        const emailEl  = document.getElementById('email-' + id);
+        const telEl    = document.getElementById('tel-' + id);
+        const vueloEl  = document.getElementById('vuelo-' + id);
+        const notasEl  = document.getElementById('notas-' + id);
+        const nombre = nombreEl ? nombreEl.value.trim() : '';
+        const email  = emailEl  ? emailEl.value.trim()  : '';
         const ladaEl2 = document.getElementById('lada-' + id); const lada = ladaEl2 ? (ladaEl2.value !== undefined ? ladaEl2.value : ladaEl2.textContent).trim() : '';
-        const tel    = document.getElementById('tel-' + id).value.trim();
-        const vuelo  = document.getElementById('vuelo-' + id).value.trim();
-        const notas  = document.getElementById('notas-' + id).value.trim();
+        const tel    = telEl    ? telEl.value.trim()    : '';
+        const vuelo  = vueloEl  ? vueloEl.value.trim()  : '';
+        const notas  = notasEl  ? notasEl.value.trim()  : '';
         guardarDatosForm(id);
         const codigoUnico = generarCodigo();
         const horaIda = convertirHora12h(document.getElementById('horaIda').value);
@@ -2786,7 +2791,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         return {
             esVenta: true, codigo: codigoUnico,
             nombre, telefono: lada + " " + tel, email,
-            pasajeros: document.getElementById('pasajeros').value,
+            pasajeros: (document.getElementById('pasajeros') || {value:''}).value,
             tipoViaje: tipoViajeFinal,
             origen: datosCard.origen || document.getElementById('origen').value,
             destino: datosCard.destino || document.getElementById('destino').value,
