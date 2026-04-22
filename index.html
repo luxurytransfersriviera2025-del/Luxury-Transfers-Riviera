@@ -1389,22 +1389,18 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                             <div style="font-size:10px; color:#888; text-transform:uppercase; font-weight:700; letter-spacing:1px;">Name</div>
                             <div id="recovery-nombre" style="font-size:13px; font-weight:600; color:#222; margin-top:2px;"></div>
                         </div>
-                        <!-- Email — conditional -->
                         <div id="recovery-row-email" style="display:none;">
                             <div style="font-size:10px; color:#888; text-transform:uppercase; font-weight:700; letter-spacing:1px;">Email</div>
                             <div id="recovery-email" style="font-size:13px; font-weight:600; color:#222; margin-top:2px; word-break:break-all;"></div>
                         </div>
-                        <!-- Phone — conditional -->
                         <div id="recovery-row-tel" style="display:none;">
                             <div style="font-size:10px; color:#888; text-transform:uppercase; font-weight:700; letter-spacing:1px;">Phone</div>
                             <div id="recovery-tel" style="font-size:13px; font-weight:600; color:#222; margin-top:2px;"></div>
                         </div>
-                        <!-- Flight number — conditional, full width -->
                         <div id="recovery-row-vuelo" style="display:none; grid-column:span 2;">
                             <div style="font-size:10px; color:#888; text-transform:uppercase; font-weight:700; letter-spacing:1px;">✈️ Flight Number</div>
                             <div id="recovery-vuelo" style="font-size:13px; font-weight:600; color:#222; margin-top:2px;"></div>
                         </div>
-                        <!-- Extras — conditional, full width -->
                         <div id="recovery-row-extras" style="display:none; grid-column:span 2;">
                             <div style="font-size:10px; color:#888; text-transform:uppercase; font-weight:700; letter-spacing:1px;">🛑 Extras</div>
                             <div id="recovery-extras" style="font-size:13px; font-weight:600; color:#D4AF37; margin-top:2px;"></div>
@@ -2987,12 +2983,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         } catch (e) {
             document.getElementById('loadingOverlay').style.display = 'none';
             console.error('PayPal static error:', e);
-            const savedRawPP = sessionStorage.getItem('ltr_pendingBooking');
-            if (savedRawPP) {
-                try { mostrarRecuperacion(JSON.parse(savedRawPP)); } catch(_) {}
-            } else {
-                alert('⚠️ Connection error. Please try card payment or contact us.');
-            }
+            sessionStorage.removeItem('ltr_pendingBooking');
+            alert('⚠️ Connection error. Please try card payment or contact us.');
         }
     }
 
@@ -3115,31 +3107,17 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         document.getElementById('recovery-nombre').textContent  = datos.nombre   || '';
         document.getElementById('recovery-pax').textContent     = datos.pasajeros ? datos.pasajeros + ' Passenger' + (parseInt(datos.pasajeros) > 1 ? 's' : '') : '';
 
-        // Email — conditional
-        const emailEl  = document.getElementById('recovery-email');
-        const emailRow = document.getElementById('recovery-row-email');
-        if (datos.email) { emailEl.textContent = datos.email; emailRow.style.display = ''; }
-        else { emailRow.style.display = 'none'; }
-
-        // Phone — conditional
-        const telEl    = document.getElementById('recovery-tel');
-        const telRow   = document.getElementById('recovery-row-tel');
-        const telVal   = (datos.telefono || '').trim().replace(/^\+?\s*$/, '');
-        if (telVal) { telEl.textContent = datos.telefono; telRow.style.display = ''; }
-        else { telRow.style.display = 'none'; }
-
-        // Flight number — conditional
-        const vueloEl  = document.getElementById('recovery-vuelo');
-        const vueloRow = document.getElementById('recovery-row-vuelo');
-        if (datos.vuelo) { vueloEl.textContent = datos.vuelo; vueloRow.style.display = ''; }
-        else { vueloRow.style.display = 'none'; }
-
-        // Extras — conditional (only if amount > $0)
-        const extrasEl  = document.getElementById('recovery-extras');
-        const extrasRow = document.getElementById('recovery-row-extras');
+        const showField = (rowId, elId, val) => {
+            const row = document.getElementById(rowId);
+            const el  = document.getElementById(elId);
+            if (val) { el.textContent = val; row.style.display = ''; }
+            else { row.style.display = 'none'; }
+        };
+        showField('recovery-row-email',  'recovery-email',  datos.email || '');
+        showField('recovery-row-tel',    'recovery-tel',    (datos.telefono || '').trim().replace(/^\+?\s*$/, '') ? datos.telefono : '');
+        showField('recovery-row-vuelo',  'recovery-vuelo',  datos.vuelo || '');
         const extrasAmt = parseFloat((datos.totalExtras || '').replace(/[^0-9.]/g, '')) || 0;
-        if (extrasAmt > 0) { extrasEl.textContent = datos.totalExtras; extrasRow.style.display = ''; }
-        else { extrasRow.style.display = 'none'; }
+        showField('recovery-row-extras', 'recovery-extras', extrasAmt > 0 ? datos.totalExtras : '');
 
         // Set vehicle image
         const vehKey = Object.keys(_vehicleImages).find(k => (datos.vehiculo || '').toUpperCase().includes(k));
@@ -3198,7 +3176,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             console.error('Recovery Stripe error:', e);
             btn.disabled = false;
             btn.innerHTML = '<span style="display:flex;align-items:center;gap:10px;"><span style="display:flex;gap:5px;"><svg width="36" height="22" viewBox="0 0 38 24" style="border-radius:3px;overflow:hidden;"><rect width="38" height="24" rx="4" fill="#fff"/><text x="5" y="17" font-family="Arial" font-size="11" font-weight="900" fill="#1a1f71">VISA</text></svg></span><span>Pay with Card</span></span><i class="fas fa-chevron-right" style="opacity:0.5;"></i>';
-            if (_recoveryDatos) mostrarRecuperacion(_recoveryDatos);
+            alert('⚠️ Connection error. Please try PayPal or contact us via WhatsApp.');
         }
     }
 
@@ -3245,6 +3223,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             document.getElementById('loadingOverlay').style.display = 'none';
             console.error('Recovery PayPal error:', e);
             mostrarRecuperacion(datos); // re-show modal
+            alert('⚠️ Connection error. Please try card payment or contact us via WhatsApp.');
         }
     }
 
