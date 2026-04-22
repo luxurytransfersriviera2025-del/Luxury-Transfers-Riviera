@@ -826,7 +826,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 <a href="#seccion-quote" class="nav-link">Quote</a>
                 <a href="#servicios" class="nav-link">Services</a>
                 <a href="#flota" class="nav-link">Fleet</a>
-                <a href="#servicio-personalizado" class="nav-link">Custom</a>
+                <a href="#servicio-personalizado" class="nav-link" id="nav-custom">Custom</a>
                 <a href="/es/" class="nav-link"><i class="fas fa-globe"></i> Español</a>
             </nav>
         </div>
@@ -2802,16 +2802,16 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const totalFinal   = Math.round((basePrice + extras) * 100) / 100;
         const currencyCode = moneda === 'MXN' ? 'MXN' : moneda === 'CAD' ? 'CAD' : 'USD';
 
-        // Build complete data BEFORE leaving the page
-        const datosVenta = _construirDatosVenta(id, datosCard, 'PayPal Checkout');
-        datosVenta.precioTotal = '$' + totalFinal + ' ' + moneda.toUpperCase();
-        sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datosVenta));
-
         document.getElementById('loadingOverlay').style.display = 'flex';
 
         const siteUrl = window.location.origin + window.location.pathname;
 
         try {
+            // Build complete data BEFORE leaving the page
+            const datosVenta = _construirDatosVenta(id, datosCard, 'PayPal Checkout');
+            datosVenta.precioTotal = '$' + totalFinal + ' ' + moneda.toUpperCase();
+            sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datosVenta));
+
             const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -2877,14 +2877,14 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const totalFinal   = Math.round((basePrice + extras) * 100) / 100;
         const currencyCode = moneda === 'MXN' ? 'mxn' : moneda === 'CAD' ? 'cad' : 'usd';
 
-        // Build complete data BEFORE leaving the page
-        const datosVenta = _construirDatosVenta(id, datosCard, 'Stripe Checkout');
-        datosVenta.precioTotal = '$' + totalFinal + ' ' + moneda.toUpperCase();
-
-        // Guardar en sessionStorage — se recuperan al volver de Stripe
-        sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datosVenta));
-
         try {
+            // Build complete data BEFORE leaving the page
+            const datosVenta = _construirDatosVenta(id, datosCard, 'Stripe Checkout');
+            datosVenta.precioTotal = '$' + totalFinal + ' ' + moneda.toUpperCase();
+
+            // Save in sessionStorage — recovered when returning from Stripe
+            sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datosVenta));
+
             const siteUrl = window.location.origin + window.location.pathname;
             const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
                 method:  'POST',
