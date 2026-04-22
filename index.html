@@ -2987,8 +2987,36 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         } catch (e) {
             document.getElementById('loadingOverlay').style.display = 'none';
             console.error('PayPal static error:', e);
-            sessionStorage.removeItem('ltr_pendingBooking');
-            alert('⚠️ Connection error. Please try card payment or contact us.');
+            // Show recovery modal — always, never alert()
+            const savedRawPP = sessionStorage.getItem('ltr_pendingBooking');
+            if (savedRawPP) {
+                try { mostrarRecuperacion(JSON.parse(savedRawPP)); } catch(_) {}
+            } else {
+                // Fallback: build recovery data from datosCard + visible form fields
+                const monedaFbPP = document.getElementById('moneda') ? document.getElementById('moneda').value : 'USD';
+                const nombreFbPP = document.getElementById('nombre-' + id) ? document.getElementById('nombre-' + id).value.trim() : '';
+                const emailFbPP  = document.getElementById('email-' + id)  ? document.getElementById('email-' + id).value.trim()  : '';
+                const ladaFbPPEl = document.getElementById('lada-' + id);
+                const telFbPPEl  = document.getElementById('tel-' + id);
+                const telefonoPP = ladaFbPPEl && telFbPPEl ? ((ladaFbPPEl.value || ladaFbPPEl.textContent || '').trim() + ' ' + telFbPPEl.value.trim()).trim() : '';
+                const vueloPP    = document.getElementById('vuelo-' + id) ? document.getElementById('vuelo-' + id).value.trim() : '';
+                const extrasPP   = getExtrasTotal(id);
+                const extrasTxtPP = extrasPP > 0 ? ('$' + extrasPP + ' ' + monedaFbPP) : '';
+                const fallbackPP = {
+                    codigo:      'LTR-????',
+                    vehiculo:    datosCard.vehiculo || '',
+                    precio:      datosCard.precio   || '',
+                    precioTotal: '$' + totalFinal + ' ' + monedaFbPP,
+                    origen:      datosCard.origen   || (document.getElementById('origen')   ? document.getElementById('origen').value   : ''),
+                    destino:     datosCard.destino  || (document.getElementById('destino')  ? document.getElementById('destino').value  : ''),
+                    fecha:       document.getElementById('fechaIda') ? document.getElementById('fechaIda').value : '',
+                    hora:        document.getElementById('horaIda')  ? document.getElementById('horaIda').value  : '',
+                    pasajeros:   document.getElementById('pasajeros') ? document.getElementById('pasajeros').value : '',
+                    nombre:  nombreFbPP, email: emailFbPP, telefono: telefonoPP,
+                    vuelo:   vueloPP,   totalExtras: extrasTxtPP
+                };
+                mostrarRecuperacion(fallbackPP);
+            }
         }
     }
 
@@ -3046,12 +3074,35 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             console.error('Stripe Checkout error:', e);
             btn.disabled = false;
             btn.innerHTML = '<span style="display:flex; align-items:center; gap:12px;">' + '<span style="display:flex; gap:5px; align-items:center;">' + '<svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;"><rect width="38" height="24" rx="4" fill="#fff"/><text x="5" y="17" font-family="Arial" font-size="11" font-weight="900" fill="#1a1f71">VISA</text></svg>' + '<svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;"><rect width="38" height="24" rx="4" fill="#fff"/><circle cx="15" cy="12" r="7" fill="#eb001b"/><circle cx="23" cy="12" r="7" fill="#f79e1b"/><path d="M19 6.8a7 7 0 0 1 0 10.4A7 7 0 0 1 19 6.8z" fill="#ff5f00"/></svg>' + '<svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;"><rect width="38" height="24" rx="4" fill="#007bc1"/><text x="4" y="17" font-family="Arial" font-size="9" font-weight="900" fill="#fff">AMEX</text></svg>' + '<svg width="38" height="24" viewBox="0 0 38 24" style="flex-shrink:0; border-radius:4px; overflow:hidden;"><rect width="38" height="24" rx="4" fill="#fff"/><circle cx="24" cy="12" r="7" fill="#f76f20"/><text x="3" y="16" font-family="Arial" font-size="7" font-weight="700" fill="#231f20">DISC</text></svg>' + '</span>' + '<span style="color:#fff; font-weight:700;">Pay with Card</span>' + '</span>' + '<i class="fas fa-chevron-right" style="font-size:11px; color:#fff; opacity:0.6;"></i>';
-            // Show recovery modal if we have the booking data
+            // Show recovery modal — always, never alert()
             const savedRaw = sessionStorage.getItem('ltr_pendingBooking');
             if (savedRaw) {
                 try { mostrarRecuperacion(JSON.parse(savedRaw)); } catch(_) {}
             } else {
-                alert('⚠️ Error connecting to our payment server. Please try again or contact us via WhatsApp.');
+                // Fallback: build recovery data from datosCard + visible form fields
+                const monedaFb = document.getElementById('moneda') ? document.getElementById('moneda').value : 'USD';
+                const nombreFb = document.getElementById('nombre-' + id) ? document.getElementById('nombre-' + id).value.trim() : '';
+                const emailFb  = document.getElementById('email-' + id)  ? document.getElementById('email-' + id).value.trim()  : '';
+                const ladaFbEl = document.getElementById('lada-' + id);
+                const telFbEl  = document.getElementById('tel-' + id);
+                const telefonoFb = ladaFbEl && telFbEl ? ((ladaFbEl.value || ladaFbEl.textContent || '').trim() + ' ' + telFbEl.value.trim()).trim() : '';
+                const vueloFb  = document.getElementById('vuelo-' + id)  ? document.getElementById('vuelo-' + id).value.trim()  : '';
+                const extrasFb = getExtrasTotal(id);
+                const extrasTxtFb = extrasFb > 0 ? ('$' + extrasFb + ' ' + monedaFb) : '';
+                const fallback = {
+                    codigo:      'LTR-????',
+                    vehiculo:    datosCard.vehiculo || '',
+                    precio:      datosCard.precio   || '',
+                    precioTotal: '$' + totalFinal + ' ' + monedaFb,
+                    origen:      datosCard.origen   || (document.getElementById('origen')    ? document.getElementById('origen').value    : ''),
+                    destino:     datosCard.destino  || (document.getElementById('destino')   ? document.getElementById('destino').value   : ''),
+                    fecha:       document.getElementById('fechaIda') ? document.getElementById('fechaIda').value : '',
+                    hora:        document.getElementById('horaIda')  ? document.getElementById('horaIda').value  : '',
+                    pasajeros:   document.getElementById('pasajeros') ? document.getElementById('pasajeros').value : '',
+                    nombre:  nombreFb, email: emailFb, telefono: telefonoFb,
+                    vuelo:   vueloFb,  totalExtras: extrasTxtFb
+                };
+                mostrarRecuperacion(fallback);
             }
         }
     }
