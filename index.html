@@ -3107,17 +3107,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         document.getElementById('recovery-nombre').textContent  = datos.nombre   || '';
         document.getElementById('recovery-pax').textContent     = datos.pasajeros ? datos.pasajeros + ' Passenger' + (parseInt(datos.pasajeros) > 1 ? 's' : '') : '';
 
-        const showField = (rowId, elId, val) => {
-            const row = document.getElementById(rowId);
-            const el  = document.getElementById(elId);
-            if (val) { el.textContent = val; row.style.display = ''; }
-            else { row.style.display = 'none'; }
-        };
-        showField('recovery-row-email',  'recovery-email',  datos.email || '');
-        showField('recovery-row-tel',    'recovery-tel',    (datos.telefono || '').trim().replace(/^\+?\s*$/, '') ? datos.telefono : '');
-        showField('recovery-row-vuelo',  'recovery-vuelo',  datos.vuelo || '');
-        const extrasAmt = parseFloat((datos.totalExtras || '').replace(/[^0-9.]/g, '')) || 0;
-        showField('recovery-row-extras', 'recovery-extras', extrasAmt > 0 ? datos.totalExtras : '');
+        const _sf = (rowId, elId, val) => { const r=document.getElementById(rowId),e=document.getElementById(elId); if(val){e.textContent=val;r.style.display='';}else{r.style.display='none';} };
+        _sf('recovery-row-email',  'recovery-email',  datos.email || '');
+        _sf('recovery-row-tel',    'recovery-tel',    (datos.telefono||'').replace(/^\+?\s*$/,'') ? datos.telefono : '');
+        _sf('recovery-row-vuelo',  'recovery-vuelo',  datos.vuelo || '');
+        _sf('recovery-row-extras', 'recovery-extras', (parseFloat((datos.totalExtras||'').replace(/[^0-9.]/g,''))||0) > 0 ? datos.totalExtras : '');
 
         // Set vehicle image
         const vehKey = Object.keys(_vehicleImages).find(k => (datos.vehiculo || '').toUpperCase().includes(k));
