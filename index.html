@@ -1383,7 +1383,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     const CAPI_WORKER_URL = "https://meta-conversiones-api.luxurytransfersriviera2025.workers.dev";
 
     // ── PRICING WORKER ─────────────────────────────────────────────────────
-    const PRECIOS_WORKER_URL = 'https://luxuryprecios.luxurytransferiviera2025.workers.dev/precios';
+    const PRECIOS_WORKER_URL = 'https://precios.luxurytransfersriviera.com.mx/precios';
 
     // In-memory cache — loaded once per session on first cotizar() call
     let _precios = null;
@@ -1695,13 +1695,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         return null;
     }
 
-    function detectarZonaCompleta(lugar, lat, lng, cp, p) {
+    function detectarZonaCompleta(lugar, lat, lng, cp, preciosData) {
         let zona = null;
-        const diccionarioZonas    = p.diccionarioZonas;
-        const zonasGPS             = p.zonasGPS;
-        const zonasCP              = p.zonasCP;
-        const zonasLargaDistancia  = p.zonasLargaDistancia;
-        const zonasBlockeadas      = p.zonasBlockeadas;
+        const diccionarioZonas    = preciosData.diccionarioZonas;
+        const zonasGPS             = preciosData.zonasGPS;
+        const zonasCP              = preciosData.zonasCP;
+        const zonasLargaDistancia  = preciosData.zonasLargaDistancia;
+        const zonasBlockeadas      = preciosData.zonasBlockeadas;
         if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
             zona = detectarZonaPorGPS(lat, lng, zonasGPS);
         }
@@ -1844,7 +1844,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
     async function cotizar(dispararMeta = true) {
         try {
-            const p = await cargarPrecios();
+            const preciosData = await cargarPrecios();
 
             const rawHora = document.getElementById('horaIda').value;
             const fecha = document.getElementById('fechaIda').value;
@@ -1943,14 +1943,14 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 origenVal,
                 parseFloat(document.getElementById('latitudOrigen').value),
                 parseFloat(document.getElementById('longitudOrigen').value),
-                document.getElementById('cpOrigen').value, p
+                document.getElementById('cpOrigen').value, preciosData
             );
             // Detect destination zone
             const zonaDestino = detectarZonaCompleta(
                 destinoVal,
                 parseFloat(document.getElementById('latitudDestino').value),
                 parseFloat(document.getElementById('longitudDestino').value),
-                document.getElementById('cpDestino').value, p
+                document.getElementById('cpDestino').value, preciosData
             );
 
             if (!zonaOrigen || !zonaDestino) {
@@ -1974,7 +1974,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             }
 
             // Buscar precio en la matriz
-            const preciosSencillo = p.tarifasMatrizUSD[zonaOrigen] && p.tarifasMatrizUSD[zonaOrigen][zonaDestino];
+            const preciosSencillo = preciosData.tarifasMatrizUSD[zonaOrigen] && preciosData.tarifasMatrizUSD[zonaOrigen][zonaDestino];
 
             const divRes = document.getElementById('resultados');
             divRes.innerHTML = "";
