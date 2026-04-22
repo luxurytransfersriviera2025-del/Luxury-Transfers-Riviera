@@ -1382,6 +1382,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7Fc9DMmnbwoc2Xt8xoRdem8jOoRNlnrofAx0JjFUNzlBLvVzpX5zi8Hj5OaojlGw/exec"; 
     const CAPI_WORKER_URL = "https://meta-conversiones-api.luxurytransfersriviera2025.workers.dev";
 
+    // Currency conversion utility
+    function convertirPrecio(usd, moneda) {
+        if (moneda === 'MXN') return usd === 2 ? 35 : usd === 4 ? 70 : Math.round(usd * 18.5);
+        if (moneda === 'CAD') return Math.round(usd * 18.5 / 11.5);
+        return usd;
+    }
+
     // ── PRICING WORKER ─────────────────────────────────────────────────────
     const PRECIOS_WORKER_URL = 'https://precios.luxurytransfersriviera.com.mx/precios';
 
