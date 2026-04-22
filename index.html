@@ -610,133 +610,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             .tarjeta-info h3 { font-size: 18px; }
             .tarjeta-price { border-left: none; padding-left: 0; border-top: 1px solid #eee; padding-top: 15px; text-align: right; flex-direction: column; align-items: flex-end; justify-content: flex-start; flex: auto; width: 100%; gap: 10px; } 
             .btn-reservar { width: 100%; padding: 14px 20px; margin-top: 0; font-size: 14px; }
-            /* RT carousel mobile: switch to horizontal scroll */
-            /* RT desktop: both cards visible, no arrows needed */
-            @media (min-width: 701px) {
-                .rt-nav-arrow { display: none !important; }
-                .rt-track-viewport { overflow: visible !important; }
-                div[id^="rt-track-"] {
-                    transform: none !important;
-                    overflow: visible !important;
-                }
-                div[id^="rt-track-"] > div {
-                    flex: 1 1 0 !important;
-                    max-width: none !important;
-                    min-width: 0 !important;
-                }
-            }
 
-            @media (max-width: 700px) {
-                /* RT arrows on mobile: styled like OW */
-                button[onclick*="rtSlide"] {
-                    width: 34px !important;
-                    height: 34px !important;
-                    background: #fff !important;
-                    color: #000 !important;
-                    border: 2px solid #ccc !important;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.12) !important;
-                    font-size: 20px !important;
-                    transition: all 0.2s !important;
-                    display: flex !important;
-                }
-                button[onclick*="rtSlide"]:hover {
-                    background: #000 !important;
-                    color: #fff !important;
-                    border-color: #000 !important;
-                }
-                /* RT viewport scrollable on mobile */
-                div[style*="overflow:hidden; padding:2px"] {
-                    overflow-x: auto !important;
-                    -webkit-overflow-scrolling: touch !important;
-                    scrollbar-width: none !important;
-                }
-                div[style*="overflow:hidden; padding:2px"]::-webkit-scrollbar { display: none; }
-                div[id^="rt-track-"] {
-                    transform: none !important;
-                    transition: none !important;
-                    overflow-x: auto !important;
-                    -webkit-overflow-scrolling: touch !important;
-                    scroll-snap-type: x mandatory !important;
-                    scrollbar-width: none !important;
-                }
-                div[id^="rt-track-"]::-webkit-scrollbar { display: none; }
-                div[id^="rt-track-"] > div {
-                    flex: 0 0 100% !important;
-                    min-width: 0 !important;
-                    max-width: none !important;
-                    scroll-snap-align: start !important;
-                    text-align: center !important;
-                }
-                div[id^="rt-track-"] > div > div {
-                    text-align: center !important;
-                }
-                div[id^="rt-track-"] > div > div > div {
-                    justify-content: center !important;
-                }
-            }
-
-  /* EXTRAS: carrusel horizontal en mobile */
-            .extras-carousel-wrapper {
-                position: relative;
-            }
-            .extras-carousel-btn {
-                display: none; /* replaced by ow-flex-wrapper */
-                position: absolute;
-                top: 50%; transform: translateY(-50%);
-                z-index: 10;
-                width: 34px; height: 34px;
-                border-radius: 50%;
-                background: #fff;
-                color: #000;
-                border: 2px solid #ddd;
-                border: none;
-                cursor: pointer;
-                align-items: center;
-                justify-content: center;
-                font-size: 14px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            }
-            .extras-carousel-btn.prev { left: -14px; }
-            .extras-carousel-btn.next { right: -14px; }
-            .extras-grid-4, .extras-ow-grid,
-            div[style*="grid-template-columns:repeat(3,1fr)"] {
-                display: flex !important;
-                flex-direction: row !important;
-                overflow-x: auto !important;
-                gap: 0 !important;
-                scroll-snap-type: x mandatory !important;
-                -webkit-overflow-scrolling: touch !important;
-                padding-bottom: 0 !important;
-                scrollbar-width: none !important;
-                grid-template-columns: unset !important;
-                flex-wrap: nowrap !important;
-                scroll-behavior: smooth !important;
-            }
-            .extras-grid-4::-webkit-scrollbar,
-            .extras-ow-grid::-webkit-scrollbar { display: none !important; }
-
-            .extras-grid-4 > div, .extras-ow-grid > div,
-            div[style*="grid-template-columns:repeat(3,1fr)"] > div {
-                flex: 0 0 100% !important;
-                min-width: 0 !important;
-                max-width: none !important;
-                scroll-snap-align: start !important;
-                box-sizing: border-box !important;
-                align-items: center !important;
-            }
-            /* Center card content on mobile */
-            .extras-grid-4 > div > div,
-            .extras-ow-grid > div > div,
-            div[style*="grid-template-columns:repeat(3,1fr)"] > div > div {
-                text-align: center !important;
-            }
-            .extras-grid-4 > div > div > div,
-            .extras-ow-grid > div > div > div,
-            div[style*="grid-template-columns:repeat(3,1fr)"] > div > div > div {
-                justify-content: center !important;
-            }
-            .extra-card-ow { flex-direction: column !important; align-items: flex-start !important; gap: 6px !important; padding: 8px 10px !important; }
-            .extra-card-ow > div { width: 100% !important; justify-content: center !important; }
             .feature-grid { flex-wrap: wrap; gap: 6px; }
             .feature-tag { font-size: 11px; padding: 4px 8px; }
             .vehicle-img-clean { height: auto; }
@@ -1059,8 +933,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                             .tarjeta-booking-form { padding: 12px; }
                         }
                         .extras-grid-2 { display:grid !important; grid-template-columns:1fr 1fr !important; gap:8px; }
-                        .extras-grid-4 { display:grid !important; grid-template-columns:1fr 1fr 1fr 1fr !important; gap:8px; }
-                        @media (max-width: 480px) { .extras-grid-4 { grid-template-columns:1fr 1fr !important; } }
+
                     </style>
 
                     <!-- FILA 1 ONE WAY: Origen | Destino -->
@@ -1197,24 +1070,24 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
     <section id="servicios" class="section-wrapper">
         <div class="section-header">
-            <h2 id="servicios-title">Nuestros Servicios</h2>
-            <p id="servicios-subtitle">Soluciones de transporte exclusivas diseñadas para superar tus expectativas.</p>
+            <h2 id="servicios-title">Our Services</h2>
+            <p id="servicios-subtitle">Exclusive transport solutions designed to exceed your expectations.</p>
         </div>
         <div class="services-grid">
             <a href="#seccion-quote" class="service-card" style="text-decoration:none;">
                 <img loading="lazy" src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&h=400&fit=crop" class="service-img" alt="Airport">
                 <div class="service-info">
                     <div class="service-icon"><i class="fas fa-plane-departure"></i></div>
-                    <div class="service-title" id="serv-title-1">Aeropuerto</div>
-                    <div class="service-desc" id="serv-desc-1">Transfer premium desde y hacia los aeropuertos de Cancún, Tulum y Mérida con monitoreo de vuelo.</div>
+                    <div class="service-title" id="serv-title-1">Airport</div>
+                    <div class="service-desc" id="serv-desc-1">Private transfer to and from Cancun Airport and Tulum Airport. Flight monitoring included, own vehicles, no agencies.</div>
                 </div>
             </a>
             <a href="#seccion-quote" class="service-card" style="text-decoration:none;">
                 <img loading="lazy" src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&h=400&fit=crop" class="service-img" alt="Hotel">
                 <div class="service-info">
                     <div class="service-icon"><i class="fas fa-building"></i></div>
-                    <div class="service-title" id="serv-title-2">Hoteles</div>
-                    <div class="service-desc" id="serv-desc-2">Traslados directos y exclusivos a cualquier hotel, resort o Airbnb en la Riviera Maya.</div>
+                    <div class="service-title" id="serv-title-2">Hotel to Hotel</div>
+                    <div class="service-desc" id="serv-desc-2">Direct and exclusive transfers between any hotel, resort or Airbnb across the Riviera Maya — Playa del Carmen, Tulum, Cancun and beyond.</div>
                 </div>
             </a>
             <a href="#servicio-personalizado" class="service-card" style="text-decoration:none;" onclick="document.getElementById('custom-tipo').value=document.getElementById('custom-tipo').options[4]?document.getElementById('custom-tipo').options[4].value:'';document.getElementById('servicio-personalizado').scrollIntoView({behavior:'smooth'});return false;">
@@ -1222,15 +1095,15 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 <div class="service-info">
                     <div class="service-icon"><i class="fas fa-globe-americas"></i></div>
                     <div class="service-title" id="serv-title-3">Tours</div>
-                    <div class="service-desc" id="serv-desc-3">¿Quieres visitar Chichén Itzá o Xcaret? Te llevamos con un servicio privado y flexible.</div>
+                    <div class="service-desc" id="serv-desc-3">Want to visit Chichen Itza or Xcaret? We take you with private, flexible service in our own vehicles.</div>
                 </div>
             </a>
             <a href="#servicio-personalizado" class="service-card" style="text-decoration:none;" onclick="document.getElementById('custom-tipo').value=document.getElementById('custom-tipo').options[2]?document.getElementById('custom-tipo').options[2].value:'';document.getElementById('servicio-personalizado').scrollIntoView({behavior:'smooth'});return false;">
                 <img loading="lazy" src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=600&h=400&fit=crop" class="service-img" alt="Hourly">
                 <div class="service-info">
                     <div class="service-icon"><i class="fas fa-clock"></i></div>
-                    <div class="service-title" id="serv-title-4">Por Horas</div>
-                    <div class="service-desc" id="serv-desc-4">Disponibilidad total del vehículo y chofer por horas para eventos especiales, cenas o reuniones.</div>
+                    <div class="service-title" id="serv-title-4">Hourly</div>
+                    <div class="service-desc" id="serv-desc-4">Total vehicle and chauffeur availability by the hour for special events, dinners, or meetings.</div>
                 </div>
             </a>
         </div>
@@ -1238,8 +1111,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
     <section id="flota" class="fleet-section">
         <div class="section-header">
-            <h2 id="flota-title">Nuestra Flota Premium</h2>
-            <p id="flota-subtitle">Selecciona el vehículo ideal para tu viaje</p>
+            <h2 id="flota-title">Our Premium Fleet</h2>
+            <p id="flota-subtitle">Select the ideal vehicle for your trip</p>
         </div>
         <div class="slider-container">
             <div class="slider-track">
@@ -1248,9 +1121,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         <div class="image-container-clean"><img loading="lazy" src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Carrusel%20CLASSIC%20SEDAN.webp" alt="Sedán Ejecutivo" class="vehicle-img-clean"></div>
                         <div class="card-content-clean">
                             <h3 class="vehicle-name-clean" id="veh-title-1">Classic Sedan</h3>
-                            <p class="vehicle-desc-clean" id="fleet-desc-1">Viaja ligero y con total comodidad. Ideal para parejas o viajeros de negocios que buscan un traslado privado y eficiente.</p>
+                            <p class="vehicle-desc-clean" id="fleet-desc-1">Travel light and in total comfort. Ideal for couples or business travelers seeking a private and efficient transfer.</p>
                             <div><span class="vehicle-capacity-clean"><i class="fas fa-user"></i> 1-3 Pax</span></div>
-                            <a href="#seccion-quote" class="btn-reservar-clean" id="btn-quote-1">Cotizar Ahora</a>
+                            <a href="#seccion-quote" class="btn-reservar-clean" id="btn-quote-1">Quote Now</a>
                         </div>
                     </div>
                 </div>
@@ -1259,9 +1132,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         <div class="image-container-clean"><img loading="lazy" src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Carrusel%20LUXURY%20VIP.webp" alt="Luxury SUV" class="vehicle-img-clean"></div>
                         <div class="card-content-clean">
                             <h3 class="vehicle-name-clean" id="veh-title-2">Luxury VIP</h3>
-                            <p class="vehicle-desc-clean" id="fleet-desc-2">Exclusividad y potencia desde tu llegada. El recibimiento perfecto en el aeropuerto para ejecutivos y familias VIP.</p>
+                            <p class="vehicle-desc-clean" id="fleet-desc-2">Exclusivity and power upon arrival. The perfect airport welcome for executives and VIP families.</p>
                             <div><span class="vehicle-capacity-clean"><i class="fas fa-star"></i> 1-5 Pax</span></div>
-                            <a href="#seccion-quote" class="btn-reservar-clean" id="btn-quote-2">Cotizar Ahora</a>
+                            <a href="#seccion-quote" class="btn-reservar-clean" id="btn-quote-2">Quote Now</a>
                         </div>
                     </div>
                 </div>
@@ -1270,9 +1143,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         <div class="image-container-clean"><img loading="lazy" src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Carrusel%20COMFORT%20VAN.webp" alt="Van Ejecutiva" class="vehicle-img-clean"></div>
                         <div class="card-content-clean">
                             <h3 class="vehicle-name-clean" id="veh-title-3">Comfort Van</h3>
-                            <p class="vehicle-desc-clean" id="fleet-desc-3">Espacio inteligente y confort total. La opción ideal para familias o grupos de amigos que buscan viajar juntos con seguridad.</p>
+                            <p class="vehicle-desc-clean" id="fleet-desc-3">Smart space and total comfort. The ideal option for families or groups of friends looking to travel together safely.</p>
                             <div><span class="vehicle-capacity-clean"><i class="fas fa-users"></i> 1-7 Pax</span></div>
-                            <a href="#seccion-quote" class="btn-reservar-clean" id="btn-quote-3">Cotizar Ahora</a>
+                            <a href="#seccion-quote" class="btn-reservar-clean" id="btn-quote-3">Quote Now</a>
                         </div>
                     </div>
                 </div>
@@ -1281,9 +1154,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         <div class="image-container-clean"><img loading="lazy" src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Carrusel%20FAMILY%20VAN.webp" alt="Family Van" class="vehicle-img-clean"></div>
                         <div class="card-content-clean">
                             <h3 class="vehicle-name-clean" id="veh-title-5">Family Van</h3>
-                            <p class="vehicle-desc-clean" id="fleet-desc-5">Comodidad y espacio para toda la familia. La opción perfecta para grupos medianos que viajan juntos con equipaje.</p>
+                            <p class="vehicle-desc-clean" id="fleet-desc-5">Comfort and space for medium-sized groups. The perfect option for families traveling with luggage who need extra room.</p>
                             <div><span class="vehicle-capacity-clean"><i class="fas fa-users"></i> 1-10 Pax</span></div>
-                            <a href="#seccion-quote" class="btn-reservar-clean" id="btn-quote-5">Cotizar Ahora</a>
+                            <a href="#seccion-quote" class="btn-reservar-clean" id="btn-quote-5">Quote Now</a>
                         </div>
                     </div>
                 </div>
@@ -1292,9 +1165,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         <div class="image-container-clean"><img loading="lazy" src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Carrusel%20GRAND%20SPRINTER.webp" alt="Sprinter" class="vehicle-img-clean"></div>
                         <div class="card-content-clean">
                             <h3 class="vehicle-name-clean" id="veh-title-4">Grand Sprinter</h3>
-                            <p class="vehicle-desc-clean" id="fleet-desc-4">Ideal para bodas, eventos o familias numerosas. Viajen todos juntos, seguros y con aire acondicionado de primera.</p>
+                            <p class="vehicle-desc-clean" id="fleet-desc-4">Ideal for weddings, events, or large families. Travel all together, safely, and with top-notch air conditioning.</p>
                             <div><span class="vehicle-capacity-clean"><i class="fas fa-bus"></i> 1-15 Pax</span></div>
-                            <a href="#seccion-quote" class="btn-reservar-clean" id="btn-quote-4">Cotizar Ahora</a>
+                            <a href="#seccion-quote" class="btn-reservar-clean" id="btn-quote-4">Quote Now</a>
                         </div>
                     </div>
                 </div>
@@ -2601,44 +2474,20 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     </div>
 
                     ${tipo === 'REDONDO' ? `
-                    <!-- ROUND TRIP: carrusel 3+3, flechas laterales -->
-                    <div style="position:relative; display:flex; align-items:center; gap:0;">
-
-                        <!-- Flecha izquierda -->
-                        <button type="button" onclick="rtSlide('rt-track-${id}',-1)" class="rt-nav-arrow" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:2px solid #ccc;cursor:pointer;font-size:22px;display:none;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);z-index:2;margin-right:8px;transition:all 0.2s;" onmouseover="this.style.background='#000';this.style.color='#fff';this.style.borderColor='#000';" onmouseout="this.style.background='#fff';this.style.color='#000';this.style.borderColor='#ccc';">&#8249;</button>
-
-                        <!-- Viewport: overflow hidden -->
-                        <div style="flex:1; overflow:hidden;" class="rt-track-viewport">
-                            <div id="rt-track-${id}" data-page="0" style="display:flex;gap:10px;transition:transform 0.35s ease;will-change:transform;">
-
-
-
-                                <!-- TRIP: Stop -->
-                                <div style="background:#fff; border-radius:12px; border:1.5px solid #D4AF37; overflow:hidden; box-shadow:0 2px 8px rgba(212,175,55,0.15); display:flex; flex-direction:column; flex:0 0 calc(33.333% - 7px); min-width:0;">
-                                    <div style="position:relative;"><img src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Quick%2020%20Minute%20Stop.webp" loading="lazy" style="width:100%;height:90px;object-fit:cover;display:block;"><span style="position:absolute;top:8px;left:8px;background:var(--navy-bg);color:#fff;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;padding:3px 7px;border-radius:20px;font-family:var(--font-title);">Trip</span></div>
-                                    <div style="padding:10px 12px 12px; text-align:center;"><div style="font-size:13px;font-weight:600;color:#333;font-family:var(--font-body);margin-bottom:8px;">Quick 20-Minute Stop</div><div style="display:flex;align-items:center;justify-content:center;gap:6px;"><span style="font-size:15px;font-weight:800;color:var(--text-dark);font-family:var(--font-title);">${formatExtraPrice(25)}</span><button type="button" onclick="cambiarExtra('${id}','stop',-1)" style="width:28px;height:28px;border-radius:50%;border:1.5px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;">−</button><span id="extra-stop-${id}" style="font-weight:800;color:var(--navy-bg);min-width:20px;text-align:center;font-size:15px;">0</span><button type="button" onclick="cambiarExtra('${id}','stop',+1)" style="width:28px;height:28px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">+</button></div></div>
-                                </div>
-
-
-                                <!-- RETURN: Stop -->
-                                <div style="background:#fff; border-radius:12px; border:1.5px solid #D4AF37; overflow:hidden; box-shadow:0 2px 8px rgba(212,175,55,0.15); display:flex; flex-direction:column; flex:0 0 calc(33.333% - 7px); min-width:0;">
-                                    <div style="position:relative;"><img src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Quick%2020%20Minute%20Stop.webp" loading="lazy" style="width:100%;height:90px;object-fit:cover;display:block;"><span style="position:absolute;top:8px;left:8px;background:#555;color:#fff;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;padding:3px 7px;border-radius:20px;font-family:var(--font-title);">Return</span></div>
-                                    <div style="padding:10px 12px 12px; text-align:center;"><div style="font-size:13px;font-weight:600;color:#333;font-family:var(--font-body);margin-bottom:8px;">Quick 20-Minute Stop</div><div style="display:flex;align-items:center;justify-content:center;gap:6px;"><span style="font-size:15px;font-weight:800;color:var(--text-dark);font-family:var(--font-title);">${formatExtraPrice(25)}</span><button type="button" onclick="cambiarExtra('${id}','stopR',-1)" style="width:28px;height:28px;border-radius:50%;border:1.5px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;">−</button><span id="extra-stopR-${id}" style="font-weight:800;color:var(--navy-bg);min-width:20px;text-align:center;font-size:15px;">0</span><button type="button" onclick="cambiarExtra('${id}','stopR',+1)" style="width:28px;height:28px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">+</button></div></div>
-                                </div>
-
-                            </div>
+                    <!-- ROUND TRIP: layout estático -->
+                    <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                        <div style="background:#fff; border-radius:12px; border:1.5px solid #D4AF37; overflow:hidden; box-shadow:0 2px 8px rgba(212,175,55,0.15); display:flex; flex-direction:column; flex:1 1 200px; min-width:200px;">
+                            <div style="position:relative;"><img src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Quick%2020%20Minute%20Stop.webp" loading="lazy" style="width:100%;height:90px;object-fit:cover;display:block;"><span style="position:absolute;top:8px;left:8px;background:var(--navy-bg);color:#fff;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;padding:3px 7px;border-radius:20px;font-family:var(--font-title);">Trip</span></div>
+                            <div style="padding:10px 12px 12px; text-align:center;"><div style="font-size:13px;font-weight:600;color:#333;font-family:var(--font-body);margin-bottom:8px;">Quick 20-Minute Stop</div><div style="display:flex;align-items:center;justify-content:center;gap:6px;"><span style="font-size:15px;font-weight:800;color:var(--text-dark);font-family:var(--font-title);">${formatExtraPrice(25)}</span><button type="button" onclick="cambiarExtra('${id}','stop',-1)" style="width:28px;height:28px;border-radius:50%;border:1.5px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;">−</button><span id="extra-stop-${id}" style="font-weight:800;color:var(--navy-bg);min-width:20px;text-align:center;font-size:15px;">0</span><button type="button" onclick="cambiarExtra('${id}','stop',+1)" style="width:28px;height:28px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">+</button></div></div>
                         </div>
-
-                        <!-- Flecha derecha -->
-                        <button type="button" onclick="rtSlide('rt-track-${id}',1)" style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:#fff;color:#000;border:2px solid #ccc;cursor:pointer;font-size:22px;display:none;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);z-index:2;margin-left:8px;transition:all 0.2s;" onmouseover="this.style.background='#000';this.style.color='#fff';this.style.borderColor='#000';" onmouseout="this.style.background='#fff';this.style.color='#000';this.style.borderColor='#ccc';">&#8250;</button>
-
+                        <div style="background:#fff; border-radius:12px; border:1.5px solid #D4AF37; overflow:hidden; box-shadow:0 2px 8px rgba(212,175,55,0.15); display:flex; flex-direction:column; flex:1 1 200px; min-width:200px;">
+                            <div style="position:relative;"><img src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Quick%2020%20Minute%20Stop.webp" loading="lazy" style="width:100%;height:90px;object-fit:cover;display:block;"><span style="position:absolute;top:8px;left:8px;background:#555;color:#fff;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;padding:3px 7px;border-radius:20px;font-family:var(--font-title);">Return</span></div>
+                            <div style="padding:10px 12px 12px; text-align:center;"><div style="font-size:13px;font-weight:600;color:#333;font-family:var(--font-body);margin-bottom:8px;">Quick 20-Minute Stop</div><div style="display:flex;align-items:center;justify-content:center;gap:6px;"><span style="font-size:15px;font-weight:800;color:var(--text-dark);font-family:var(--font-title);">${formatExtraPrice(25)}</span><button type="button" onclick="cambiarExtra('${id}','stopR',-1)" style="width:28px;height:28px;border-radius:50%;border:1.5px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;">−</button><span id="extra-stopR-${id}" style="font-weight:800;color:var(--navy-bg);min-width:20px;text-align:center;font-size:15px;">0</span><button type="button" onclick="cambiarExtra('${id}','stopR',+1)" style="width:28px;height:28px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">+</button></div></div>
+                        </div>
                     </div>` : `
-                    <!-- ONE WAY: solo parada -->
-                    <div style="display:flex; justify-content:flex-start;">
-                        <div style="width:200px;">
-
-                        <!-- Parada 20 min -->
-                        <div style="background:#fff; border-radius:12px; border:1.5px solid #D4AF37; overflow:hidden; box-shadow:0 2px 8px rgba(212,175,55,0.15); display:flex; flex-direction:column;">
+                    <!-- ONE WAY: solo parada ida -->
+                    <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                        <div style="background:#fff; border-radius:12px; border:1.5px solid #D4AF37; overflow:hidden; box-shadow:0 2px 8px rgba(212,175,55,0.15); display:flex; flex-direction:column; flex:1 1 200px; min-width:200px;">
                             <img src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Quick%2020%20Minute%20Stop.webp" loading="lazy" style="width:100%; height:140px; object-fit:cover; display:block;">
                             <div style="padding:12px 12px 14px; flex:1; display:flex; flex-direction:column; justify-content:space-between;">
                                 <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:10px;">Quick 20-Minute Stop</div>
@@ -2651,8 +2500,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                                     </div>
                                 </div>
                             </div>
-                        </div></div>
                         </div>
+                    </div>
                     `}
 
                     <div id="extras-total-${id}" style="margin-top:10px; text-align:right; font-size:13px; font-weight:700; color:var(--navy-bg); display:none;">
@@ -2840,8 +2689,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     // Extras opcionales
     const _extrasPrecios = { stop: 25, stopR: 25 };
     const _extrasNombres = {
-        stop:   { en: '20-Min Stop (Trip)',   es: 'Parada 20 Min (Ida)' },
-        stopR:  { en: '20-Min Stop (Return)', es: 'Parada 20 Min (Regreso)' }
+        stop:  '20-Min Stop (Trip)',
+        stopR: '20-Min Stop (Return)'
     };
 
     function getExtrasMoneda() {
@@ -2939,7 +2788,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     localUnit = usdUnit;
                 }
                 const lineTotal = parseInt(el.innerText) * localUnit;
-                parts.push(`${_extrasNombres[t][lang]} x${el.innerText} (${symbol}${lineTotal} ${monedaActual})`);
+                parts.push(`${_extrasNombres[t]} x${el.innerText} (${symbol}${lineTotal} ${monedaActual})`);
             }
         });
         return parts.length > 0 ? parts.join(', ') : '';
@@ -3723,10 +3572,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         if (email.length < 5)   { alert('⚠️ Please enter your email address.'); return; }
         if (tel.length < 5)     { alert('Enter your phone number.'); return; }
 
-        // META PIXEL — Lead con eventID (formulario de servicio personalizado)
-        // CAPI se envía dentro de iniciarEnvio(datos) que ejecuta justo abajo
-        if(typeof fbq !== 'undefined') fbq('track', 'Lead', {}, { eventID: datos.codigo });
-
         const codigoUnico = generarCodigo();
         const datos = {
             esVenta: false,
@@ -3745,6 +3590,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             precio: 'To Be Quoted',
             idioma: 'en'
         };
+        // META PIXEL — Lead con eventID (formulario de servicio personalizado)
+        if(typeof fbq !== 'undefined') fbq('track', 'Lead', {}, { eventID: datos.codigo });
         document.getElementById('codigoDisplay').innerText = codigoUnico;
         iniciarEnvio(datos);
     }
@@ -3800,106 +3647,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             document.body.style.overflow = 'hidden';
         }
     }
-    // ── EXTRAS CAROUSEL ARROWS (mobile only) ─────────────────────────────────
-    function slideRTCarousel(trackId, direction) {
-        const track = document.getElementById(trackId);
-        if (!track) return;
-        const cardWidth = track.querySelector('.extras-rt-card') ? track.querySelector('.extras-rt-card').offsetWidth + 10 : 180;
-        const totalWidth = cardWidth * 3;
-        // Get current scroll-like offset via transform or data attribute
-        let current = parseInt(track.dataset.offset || '0');
-        const maxOffset = 0; // can't go beyond 0 (start)
-        const minOffset = 0; // only 3 cards total, nothing to scroll in RT
-        // Since we only have 3 cards per group, arrows do nothing extra
-        // But this is ready if more cards are added
-        current = 0;
-        track.dataset.offset = current;
-    }
 
-    function rtSlide(trackId, direction) {
-        const track = document.getElementById(trackId);
-        if (!track) return;
-        const cards = track.children;
-        if (!cards.length) return;
-        const isMobile = window.innerWidth <= 700;
-        if (isMobile) {
-            // On mobile: clamp page between 0 and total cards - 1
-            const total = cards.length;
-            let page = parseInt(track.dataset.mobilePage || '0');
-            page = Math.max(0, Math.min(total - 1, page + direction));
-            track.dataset.mobilePage = page;
-            const cardW = cards[0].offsetWidth;
-            track.scrollTo({ left: page * cardW, behavior: 'smooth' });
-            // Dim arrows at boundaries
-            const wrapper = track.closest('[style*="position:relative"]');
-            if (wrapper) {
-                wrapper.querySelectorAll('button[onclick*="rtSlide"]').forEach(function(btn) {
-                    const isNext = btn.getAttribute('onclick').includes(',1)');
-                    btn.style.opacity = (isNext && page === total-1) || (!isNext && page === 0) ? '0.3' : '1';
-                });
-            }
-        } else {
-            // Desktop: translateX toggle between page 0 (Trip) and page 1 (Return)
-            const cardW = cards[0].offsetWidth + 12;
-            const pageW = cardW * 3;
-            let page = parseInt(track.dataset.page || '0');
-            page = page === 0 ? 1 : 0;
-            track.dataset.page = page;
-            track.style.transform = "translateX(-" + (page * pageW) + "px)";
-        }
-    }
-
-    function initExtrasCarousels() {
-        if (window.innerWidth > 700) return; // Only on mobile
-        document.querySelectorAll('.extras-grid-4, .extras-ow-grid, [style*="grid-template-columns:repeat(3,1fr)"]').forEach(function(grid) {
-            if (grid.closest('.extras-ow-flex-wrapper')) return; // Already wrapped
-            // Build flanking flex layout: [← btn] [scrollable grid] [→ btn]
-            const wrapper = document.createElement('div');
-            wrapper.className = 'extras-ow-flex-wrapper';
-            wrapper.style.cssText = 'display:flex;align-items:center;gap:6px;width:100%;';
-            grid.parentNode.insertBefore(wrapper, grid);
-
-            const btnPrev = document.createElement('button');
-            btnPrev.setAttribute('type', 'button');
-            btnPrev.innerHTML = '&#8249;';
-            btnPrev.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fff;color:#000;border:2px solid #ccc;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);transition:all 0.2s;';
-            btnPrev.onmouseover = function(){ this.style.background='#000'; this.style.color='#fff'; this.style.borderColor='#000'; };
-            btnPrev.onmouseout  = function(){ this.style.background='#fff'; this.style.color='#000'; this.style.borderColor='#ccc'; };
-            let owPage = 0;
-            const owTotal = grid.children.length;
-            function owScroll(dir) {
-                owPage = Math.max(0, Math.min(owTotal - 1, owPage + dir));
-                const cardW = grid.children[0] ? grid.children[0].offsetWidth : scrollWrap.offsetWidth;
-                grid.scrollTo({ left: owPage * cardW, behavior: 'smooth' });
-                btnPrev.style.opacity = owPage === 0 ? '0.3' : '1';
-                btnNext.style.opacity = owPage === owTotal - 1 ? '0.3' : '1';
-            }
-            btnPrev.onclick = function() { owScroll(-1); };
-
-            const scrollWrap = document.createElement('div');
-            scrollWrap.style.cssText = 'flex:1;overflow:hidden;';
-            grid.parentNode.insertBefore(scrollWrap, grid);
-            scrollWrap.appendChild(grid);
-
-            const btnNext = document.createElement('button');
-            btnNext.setAttribute('type', 'button');
-            btnNext.innerHTML = '&#8250;';
-            btnNext.style.cssText = 'flex-shrink:0;width:34px;height:34px;border-radius:50%;background:#fff;color:#000;border:2px solid #ccc;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.12);transition:all 0.2s;';
-            btnNext.onmouseover = function(){ this.style.background='#000'; this.style.color='#fff'; this.style.borderColor='#000'; };
-            btnNext.onmouseout  = function(){ this.style.background='#fff'; this.style.color='#000'; this.style.borderColor='#ccc'; };
-            btnNext.onclick = function() { owScroll(1); };
-
-            wrapper.appendChild(btnPrev);
-            wrapper.appendChild(scrollWrap);
-            wrapper.appendChild(btnNext);
-        });
-    }
-    // Re-init carousels whenever results render (MutationObserver on results container)
-    (function() {
-        const target = document.getElementById('resultados') || document.body;
-        const obs = new MutationObserver(function() { setTimeout(initExtrasCarousels, 100); });
-        obs.observe(target, { childList: true, subtree: true });
-    })();
 
     function cerrarCupon() {
         document.getElementById('cupon-overlay').style.display = 'none';
