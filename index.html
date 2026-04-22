@@ -37,8 +37,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 <!-- End Meta Pixel Code -->
     <link rel="icon" type="image/webp" href="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Favicon%20200%20x%20200%20px.webp">
     <!-- Preconnect for faster external resource loading -->
-    <link rel="preconnect" href="https://i.imgur.com" crossorigin>
-    <link rel="preconnect" href="https://imgur.com" crossorigin>
     <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,8 +45,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     <link rel="preload" as="image" href="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/hero%201920%20x%201080%20px.webp">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- ══ STRIPE SDK ══ -->
-    <script src="https://js.stripe.com/v3/"></script>
     <!-- ══ PAYPAL SDK ══
          Replace TU_PAYPAL_CLIENT_ID with your Client ID (Sandbox for testing, Live for production).
          Find it at developer.paypal.com → My Apps & Credentials
@@ -553,12 +549,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             width: auto; max-width: 90%;
         }
 
-        .modal-pay-text { 
-            font-size: 13px; color: rgba(255,255,255,0.90); font-weight: 600;
-            background: rgba(255,255,255,0.08); border-radius: 10px;
-            padding: 10px 14px; margin-bottom: 12px; text-align: center;
-            border: 1px solid rgba(255,255,255,0.15);
-        }
 
         .modal-warning-box {
             background: rgba(255,255,255,0.07);
@@ -583,13 +573,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         .btn-wa { background: #25d366; color: #fff; box-shadow: 0 6px 20px rgba(37,211,102,0.35); }
         .btn-wa i { font-size: 22px; }
         .btn-call { display: none; }
-        .btn-mail { background: #333; color: white; }
 
-        /* --- ESTILO TYC JUSTIFICADO Y BONITO --- */
-        .tyc-content { text-align: justify; }
-        .tyc-content h4 { color: var(--gold); margin-bottom: 5px; margin-top: 15px; font-size: 16px; font-weight: 800; font-family: var(--font-title); text-transform: uppercase; }
-        .tyc-content p { font-size: 14px; color: #333; line-height: 1.6; margin-bottom: 10px; }
-        .tyc-content strong { color: #111; }
 
         .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); z-index: 20000; display: none; align-items: center; justify-content: center; flex-direction: column; }
         .spinner { width: 60px; height: 60px; border: 6px solid #f3f3f3; border-top: 6px solid var(--action-green); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
@@ -890,8 +874,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         <input type="text" id="nombreCliente"><input type="email" id="emailCliente"><input type="tel" id="telefonoCliente">
                         <input type="text" id="aerolinea"><input type="text" id="numVuelo">
                         <textarea id="notasCliente"></textarea><textarea id="itinerarioCliente"></textarea>
-                        <input type="checkbox" id="termsCheck" checked>
-                    </div>
+                                            </div>
 
                     <!-- FILA PRINCIPAL SIMPLIFICADA -->
                     <style>
@@ -1339,8 +1322,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     </p>
     <div class="footer-links-bar">
         <a href="index.html">Home</a>
-        <a href="terminos.html">Terms &amp; Conditions</a>
-        <a href="privacidad.html">Privacy Policy</a>
+        <a href="terminos.html" target="_blank">Terms &amp; Conditions</a>
+        <a href="privacidad.html" target="_blank">Privacy Policy</a>
     </div>
     <p style="margin-bottom: 5px;" >&copy; 2026 Luxury Transfers Riviera. All rights reserved.</p>
     
@@ -1459,12 +1442,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         col.scrollTop = idx * WHEEL_ITEM_H;
     }
 
-    function to24h(h, ap) {
-        let hNum = parseInt(h);
-        if(ap === 'AM' && hNum === 12) hNum = 0;
-        if(ap === 'PM' && hNum !== 12) hNum += 12;
-        return String(hNum).padStart(2,'0');
-    }
 
     function from24h(val) {
         const parts = val.split(':');
@@ -1587,7 +1564,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     window.addEventListener('load', adjustScrollMargin);
     window.addEventListener('resize', adjustScrollMargin);
 
-    const airportNameES = "Aeropuerto Internacional de Cancún";
     const airportNameEN = "Cancun International Airport";
 
     // --- CORRECCION 1: TYC EN FORMATO HTML DE NUEVO ---
@@ -1737,47 +1713,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         return zona;
     }
 
-    function setDireccion(modo) {
-        direccionMode = modo;
-        const origen = document.getElementById('origen');
-        const destino = document.getElementById('destino');
-        const btnAccion = document.getElementById('btnAccion');
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        const btnPerso = document.getElementById('btnPersonalizado'); if(modo === 'personalizado' && btnPerso) btnPerso.classList.add('active');
-        document.getElementById('divSubtipoServicio').style.display = 'none';
-        document.getElementById('radioTipoViaje').style.display = 'flex';
-        document.getElementById('divVueloInfo').style.display = 'contents';
-        document.getElementById('divDestinoInput').style.display = 'flex';
-        document.getElementById('divHorasInput').style.display = 'none';
-        document.getElementById('divItinerario').style.display = 'none';
-        document.getElementById('resultados').style.display = 'none';
-        const ro = "color:#777; background:#f5f5f5;";
-        const ed = "color:var(--text-dark); background:transparent;";
-        
-        const activeLangAirportName = airportNameEN;
-
-        if (modo === 'desdeAero') {
-            origen.value = activeLangAirportName; origen.setAttribute('readonly', true); origen.style.cssText = ro;
-            destino.value = ""; destino.removeAttribute('readonly'); destino.style.cssText = ed; 
-            destino.placeholder = "Ex: CUN/TQO Airport, Hotel, Airbnb, Resort...";
-            btnAccion.innerText = 'Search Prices';
-        } else if (modo === 'haciaAero') {
-            destino.value = activeLangAirportName; destino.setAttribute('readonly', true); destino.style.cssText = ro;
-            origen.value = ""; origen.removeAttribute('readonly'); origen.style.cssText = ed; 
-            origen.placeholder = "Ex: CUN/TQO Airport, Hotel, Airbnb, Resort...";
-            btnAccion.innerText = 'Search Prices';
-        } else if (modo === 'personalizado') {
-            document.getElementById('divSubtipoServicio').style.display = 'flex';
-            document.getElementById('divVueloInfo').style.display = 'none';
-            origen.value = ""; origen.removeAttribute('readonly'); origen.style.cssText = ed; 
-            origen.placeholder = "Ex: CUN/TQO Airport, Hotel, Airbnb, Resort...";
-            destino.value = ""; destino.removeAttribute('readonly'); destino.style.cssText = ed; 
-            destino.placeholder = "Ex: CUN/TQO Airport, Hotel, Airbnb, Resort...";
-            btnAccion.innerText = 'Request Quote';
-            updateTipoServicio(document.getElementById('tipoServicio').value);
-            ajustarCamposPersonalizados();
-        }
-    }
 
     function updateTipoServicio(valor) {
         document.getElementById('tipoServicio').value = valor;
@@ -2687,10 +2622,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
     }
 
-    function enviarDesdeCard(id, datosCard) {
-        // This function is no longer called directly — payment is triggered from validarYMostrarPago()
-        // Se mantiene por compatibilidad interna
-    }
 
     function _construirDatosVenta(id, datosCard, metodoPago) {
         const nombre = document.getElementById('nombre-' + id).value.trim();
@@ -2752,17 +2683,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     // Tu Cloudflare Worker de pagos
     const WORKER_PAGOS_URL = 'https://checkout.luxurytransfersriviera.com.mx';
 
-    // Stripe public key (pk_test_... for testing, pk_live_... for production)
-    const STRIPE_PUBLISHABLE_KEY = 'pk_test_51TN67lJjHdBIePeJ48T49veLxD0HxlXh9kJmTELedVm0I0GwQVsVsfyJS0VGXg4amdh2RLXlozKX2UzDsVRnsnjx00EIThWaVt';
-
-    // Instancia global de Stripe — se inicializa solo cuando el cliente paga (lazy)
-    let _stripe = null;
-    function getStripe() {
-        if (!_stripe) _stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
-        return _stripe;
-    }
-    // Store of Stripe elements mounted per card id
-    const _stripeElements = {};
     // Store of pending sale data awaiting payment
     const _datosPendientes = {};
 
