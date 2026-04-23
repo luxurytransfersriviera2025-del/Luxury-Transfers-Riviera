@@ -3130,6 +3130,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     // ════════════════════════════════════════════════════════════
     let _recoveryDatos = null; // holds the saved booking for retry
     let _datosVentaConfirmada = null; // holds confirmed booking for PDF download
+    let _pdfImgCache = { logo: null, vehicle: null, ready: false };
 
     async function _loadImgDataUrl(url) {
         return new Promise(resolve => {
@@ -3156,10 +3157,17 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const vehKey   = Object.keys(_vehicleImages).find(k => (datos.vehiculo || '').toUpperCase().includes(k));
         const VEH_URL  = vehKey ? _vehicleImages[vehKey] : null;
 
-        const [logoDataUrl, vehDataUrl] = await Promise.all([
-            _loadImgDataUrl(LOGO_URL),
-            VEH_URL ? _loadImgDataUrl(VEH_URL) : Promise.resolve(null)
-        ]);
+        var logoDataUrl, vehDataUrl;
+        if (!soloBase64 && _pdfImgCache.ready) {
+            logoDataUrl = _pdfImgCache.logo;
+            vehDataUrl  = _pdfImgCache.vehicle;
+        } else {
+            var _imgs = await Promise.all([
+                _loadImgDataUrl(LOGO_URL),
+                VEH_URL ? _loadImgDataUrl(VEH_URL) : Promise.resolve(null)
+            ]);
+            logoDataUrl = _imgs[0]; vehDataUrl = _imgs[1];
+        }
 
         const doc  = new jsPDF({ unit: 'mm', format: 'a4' });
         const navy = [0, 40, 85], gold = [212, 175, 55], white = [255,255,255];
@@ -3301,7 +3309,16 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         doc.text('luxurytransfersriviera.com.mx  ·  +52 984 241 1158  ·  reservas@luxurytransfersriviera.com.mx', L + 13, 287);
 
         if (soloBase64) return doc.output('datauristring').split(',')[1];
-        doc.save('Voucher-' + (datos.codigo || 'LTR') + '.pdf');
+        var _bytes  = doc.output('arraybuffer');
+        var _blob   = new Blob([_bytes], { type: 'application/pdf' });
+        var _bUrl   = URL.createObjectURL(_blob);
+        var _a      = document.createElement('a');
+        _a.href     = _bUrl;
+        _a.download = 'Voucher-' + (datos.codigo || 'LTR') + '.pdf';
+        document.body.appendChild(_a);
+        _a.click();
+        document.body.removeChild(_a);
+        setTimeout(function(){ URL.revokeObjectURL(_bUrl); }, 2000);
         return null;
     }
 
@@ -3322,6 +3339,17 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
         const waMsg = encodeURIComponent('Hello! I just made a booking with code *' + (data.codigo || '') + '*. I need quick assistance.');
         document.getElementById('btnWhatsapp').href = 'https://wa.me/529842411158?text=' + waMsg;
+
+        // Pre-load PDF images in background — ensures download button works without async delay
+        var _LOGO = 'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Favicon%20200%20x%20200%20px.webp';
+        var _vkPdf = Object.keys(_vehicleImages).find(function(k){ return (data.vehiculo||'').toUpperCase().indexOf(k) > -1; });
+        var _VEHU  = _vkPdf ? _vehicleImages[_vkPdf] : null;
+        _pdfImgCache = { logo: null, vehicle: null, ready: false };
+        Promise.all([
+            _loadImgDataUrl(_LOGO),
+            _VEHU ? _loadImgDataUrl(_VEHU) : Promise.resolve(null)
+        ]).then(function(r){ _pdfImgCache.logo = r[0]; _pdfImgCache.vehicle = r[1]; _pdfImgCache.ready = true; });
+
         document.getElementById('modalConfirmacion').style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
