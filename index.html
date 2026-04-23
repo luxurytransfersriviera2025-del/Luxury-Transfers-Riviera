@@ -3218,10 +3218,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         doc.text('* Illustrative image. Color and model may vary.', padL + imgW / 2, imgY + imgH + 4, { align: 'center' });
 
         // Client info to the right of the image
-        const qrSize = 28;
+        const qrSize = 36;
         const infoX  = padL + imgW + 7;
         const infoW  = cW - imgW - 7;
-        const textW  = infoW - qrSize - 5;   // leave room for QR on the right
+        const textW  = infoW - qrSize - 9;   // leave room for QR
         let infoY = imgY;
 
         const sideField = (label, value) => {
@@ -3241,17 +3241,21 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         sideField('Email',  datos.email    || '');
         sideField('Phone',  datos.telefono || '');
 
-        // WhatsApp QR — right edge of the info column, vertically centered
-        const qrX = pageW - padR - qrSize;
+        // WhatsApp QR — shifted left, bigger, gold border on top
+        const qrX = infoX + textW + 9;
         const qrY = imgY + (imgH - qrSize) / 2 - 2;
         if (_whatsappQrB64) {
             try {
                 doc.addImage(_whatsappQrB64, 'PNG', qrX, qrY, qrSize, qrSize);
             } catch(e) {}
         }
+        // Gold border drawn on top of QR image
+        doc.setDrawColor(...gold);
+        doc.setLineWidth(0.5);
+        doc.rect(qrX - 1.2, qrY - 1.2, qrSize + 2.4, qrSize + 2.4, 'S');
         doc.setTextColor(...grey);
         doc.setFontSize(5.5); doc.setFont('helvetica', 'normal');
-        doc.text('Scan for WhatsApp', qrX + qrSize / 2, qrY + qrSize + 3.5, { align: 'center' });
+        doc.text('Scan for WhatsApp', qrX + qrSize / 2, qrY + qrSize + 4, { align: 'center' });
 
         y = Math.max(imgY + imgH + 8, infoY + 2);
 
@@ -3385,7 +3389,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         // ── NOTICE BOX ────────────────────────────────────────────────────
         const noticeText = 'Please save your booking code ' + (datos.codigo || 'LTR-????') +
             '. Our team will contact you shortly to confirm your trip details.' +
-            ' For questions, WhatsApp us at +52 984 241 1158';
+            ' If your service is to or from an airport, our agent will send you the meeting point through this channel.' +
+            ' We invite you to download the WhatsApp app and contact us at +52 984 241 1158 to make the process faster.';
         doc.setFontSize(8.5); doc.setFont('helvetica', 'normal');
         const noticeLines = doc.splitTextToSize(noticeText, cW - 10);
         const noticeH = noticeLines.length * 5.2 + 10;
@@ -3397,11 +3402,45 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         doc.text(noticeLines, padL + 5, y + 7);
         y += noticeH + 9;
 
-        // ── FOOTER ────────────────────────────────────────────────────────
-        doc.setTextColor(...grey);
-        doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
-        doc.text("Silver's Shuttles Services  \u00b7  luxurytransfersriviera.com.mx  \u00b7  +52 984 241 1158",
-                 pageW / 2, y, { align: 'center' });
+        // ── FOOTER negro con redes sociales ──────────────────────────────
+        const footerH  = 33;
+        const footerY  = 297 - footerH;
+        doc.setFillColor(...black);
+        doc.rect(0, footerY, pageW, footerH, 'F');
+
+        doc.setTextColor(...white);
+        doc.setFontSize(7.5); doc.setFont('helvetica', 'bold');
+        doc.text('Follow us & Contact us', pageW / 2, footerY + 9, { align: 'center' });
+
+        const socialIcons = [
+            { color: [37, 211, 102],  lbl: 'W'  },   // WhatsApp
+            { color: [24, 119, 242],  lbl: 'f'  },   // Facebook
+            { color: [225, 48, 108],  lbl: 'ig' },   // Instagram
+            { color: [30,  30,  30],  lbl: 'Tk', border: true }, // TikTok
+            { color: [255,  0,   0],  lbl: '\u25B6' }, // YouTube
+            { color: [52, 195, 143],  lbl: 'TA' },   // Tripadvisor
+            { color: [100,100,100],   lbl: '@'  },   // Email
+            { color: [33, 150, 243],  lbl: '\u260E' }, // Phone
+        ];
+        const iconR     = 5;
+        const iconGap   = 16;
+        const iconsStartX = pageW / 2 - ((socialIcons.length - 1) * iconGap) / 2;
+        const iconCY    = footerY + 22;
+
+        socialIcons.forEach((ic, i) => {
+            const cx = iconsStartX + i * iconGap;
+            doc.setFillColor(...ic.color);
+            if (ic.border) {
+                doc.setDrawColor(180, 180, 180); doc.setLineWidth(0.3);
+                doc.circle(cx, iconCY, iconR, 'FD');
+            } else {
+                doc.circle(cx, iconCY, iconR, 'F');
+            }
+            doc.setTextColor(255, 255, 255);
+            const isSmall = ic.lbl.length > 1;
+            doc.setFontSize(isSmall ? 5 : 7); doc.setFont('helvetica', 'bold');
+            doc.text(ic.lbl, cx, iconCY + (isSmall ? 1.0 : 1.5), { align: 'center', baseline: 'middle' });
+        });
 
         if (soloBase64) return doc.output('datauristring').split(',')[1];
         doc.save('Voucher-' + (datos.codigo || 'LTR') + '.pdf');
