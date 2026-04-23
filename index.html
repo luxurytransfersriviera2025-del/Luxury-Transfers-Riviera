@@ -3142,86 +3142,153 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     let _recoveryDatos = null; // holds the saved booking for retry
     let _datosVentaConfirmada = null; // holds confirmed booking for PDF download
 
-    function generarVoucherPDF(datos, soloBase64 = false) {
+    function generarVoucherPDF(datos, soloBase64 = false) {  // eslint-disable-line
         if (!datos || !window.jspdf) return null;
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ unit: 'mm', format: 'a4' });
 
-        // ── Palette ──────────────────────────────────────────────────────────
-        const black   = [14, 14, 20];
-        const gold    = [212, 175, 55];
-        const white   = [255, 255, 255];
-        const dark    = [34, 34, 34];
-        const grey    = [130, 130, 130];
-        const lgrey   = [246, 246, 248];
-        const greyLn  = [220, 220, 220];
-        const green   = [39, 174, 96];
-        const navy    = [0, 40, 85];
+        // ── Palette ───────────────────────────────────────────────────────
+        const black  = [14, 14, 20];
+        const gold   = [212, 175, 55];
+        const white  = [255, 255, 255];
+        const dark   = [34, 34, 34];
+        const grey   = [130, 130, 130];
+        const lgrey  = [246, 246, 248];
+        const greyLn = [220, 220, 220];
+        const green  = [39, 174, 96];
+        const navy   = [0, 40, 85];
 
         const pageW = 210, padL = 20, padR = 20, cW = pageW - padL - padR;
 
-        // ── Helper: format date YYYY-MM-DD → DD/MM/YYYY ──────────────────────
         const fmtDate = (d) => {
             if (!d) return '';
             const m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})$/);
             return m ? `${m[3]}/${m[2]}/${m[1]}` : d;
         };
 
-        // ── HEADER ───────────────────────────────────────────────────────────
+        // ── HEADER compact — left/right alineados a la misma altura ──────
         doc.setFillColor(...black);
-        doc.rect(0, 0, pageW, 42, 'F');
+        doc.rect(0, 0, pageW, 35, 'F');
 
-        // Left: favicon icon (if loaded) + company name + URL
-        let textStartX = padL;
+        let textX = padL;
         if (_faviconB64) {
-            try { doc.addImage(_faviconB64, 'PNG', padL, 11, 12, 12); textStartX = padL + 16; } catch(e) {}
+            try { doc.addImage(_faviconB64, 'PNG', padL, 9, 13, 13); textX = padL + 17; } catch(e) {}
         }
+        // Left y=16 / y=25
         doc.setTextColor(...gold);
-        doc.setFontSize(12); doc.setFont('helvetica', 'bold');
-        doc.text('LUXURY TRANSFERS RIVIERA', textStartX, 19);
+        doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+        doc.text('LUXURY TRANSFERS RIVIERA', textX, 16);
         doc.setTextColor(150, 150, 165);
-        doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
-        doc.text('luxurytransfersriviera.com.mx', textStartX, 27);
-
-        // Right: "Booking confirmation" label + code (compact, stacked close)
+        doc.setFontSize(7); doc.setFont('helvetica', 'normal');
+        doc.text('luxurytransfersriviera.com.mx', textX, 25);
+        // Right — same y=16 / y=25
         doc.setTextColor(150, 150, 165);
-        doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
-        doc.text('Booking confirmation', pageW - padR, 20, { align: 'right' });
+        doc.setFontSize(7); doc.setFont('helvetica', 'normal');
+        doc.text('Booking confirmation', pageW - padR, 16, { align: 'right' });
         doc.setTextColor(...gold);
-        doc.setFontSize(16); doc.setFont('helvetica', 'bold');
-        doc.text(datos.codigo || 'LTR-????', pageW - padR, 30, { align: 'right' });
+        doc.setFontSize(15); doc.setFont('helvetica', 'bold');
+        doc.text(datos.codigo || 'LTR-????', pageW - padR, 25, { align: 'right' });
 
-        // ── INFO GRID (2 × 2 cells) ──────────────────────────────────────────
-        let y = 52;
-        const cellW = (cW - 4) / 2;
-        const cellH = 17;
+        // ── VEHICLE IMAGE + CLIENT INFO ───────────────────────────────────
+        let y = 43;
+        const imgW = 66, imgH = 38;
 
-        const drawCell = (cx, cy, label, value) => {
+        // Vehicle name above the image
+        doc.setTextColor(...dark);
+        doc.setFontSize(8.5); doc.setFont('helvetica', 'bold');
+        doc.text((datos.vehiculo || '').toUpperCase(), padL + imgW / 2, y, { align: 'center' });
+        y += 5;
+
+        // Vehicle image (or grey placeholder)
+        const vehKey = Object.keys(_vehicleImages).find(k => (datos.vehiculo || '').toUpperCase().includes(k));
+        const vehB64 = vehKey ? (_vehicleImgB64[vehKey] || null) : null;
+        const imgY = y;
+        if (vehB64) {
+            try { doc.addImage(vehB64, 'PNG', padL, imgY, imgW, imgH); } catch(e) {
+                doc.setFillColor(...lgrey); doc.rect(padL, imgY, imgW, imgH, 'F');
+            }
+        } else {
+            doc.setFillColor(...lgrey); doc.rect(padL, imgY, imgW, imgH, 'F');
+            doc.setTextColor(...grey); doc.setFontSize(8);
+            doc.text(datos.vehiculo || '', padL + imgW / 2, imgY + imgH / 2, { align: 'center' });
+        }
+        // Disclaimer below image
+        doc.setTextColor(...grey);
+        doc.setFontSize(5.5); doc.setFont('helvetica', 'normal');
+        doc.text('* Illustrative image. Color and model may vary.', padL + imgW / 2, imgY + imgH + 4, { align: 'center' });
+
+        // Client info to the right of the image
+        const infoX = padL + imgW + 7;
+        const infoW = cW - imgW - 7;
+        let infoY = imgY;
+
+        const sideField = (label, value) => {
+            if (!value || String(value).trim() === '') return;
+            doc.setTextColor(...grey);
+            doc.setFontSize(7); doc.setFont('helvetica', 'normal');
+            doc.text(label, infoX, infoY);
+            infoY += 4.5;
+            doc.setTextColor(...dark);
+            doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+            const lines = doc.splitTextToSize(String(value), infoW);
+            doc.text(lines, infoX, infoY);
+            infoY += lines.length * 5 + 4;
+        };
+
+        sideField('Client', datos.nombre   || '');
+        sideField('Email',  datos.email    || '');
+        sideField('Phone',  datos.telefono || '');
+
+        y = Math.max(imgY + imgH + 8, infoY + 2);
+
+        // ── DATE / PASSENGERS / NOTES / RETURN ───────────────────────────
+        const cellW2 = (cW - 4) / 2;
+        const cellH2 = 15;
+
+        const drawCell2 = (cx, cy, label, value, fullW) => {
+            const w = fullW || cellW2;
             doc.setFillColor(...lgrey);
-            doc.rect(cx, cy, cellW, cellH, 'F');
+            doc.rect(cx, cy, w, cellH2, 'F');
             doc.setTextColor(...grey);
             doc.setFontSize(7); doc.setFont('helvetica', 'normal');
             doc.text(label, cx + 4, cy + 5.5);
             doc.setTextColor(...dark);
-            doc.setFontSize(9); doc.setFont('helvetica', 'bold');
-            const val = doc.splitTextToSize(String(value || ''), cellW - 8);
-            doc.text(val[0] || '', cx + 4, cy + 12.5);
+            doc.setFontSize(8.5); doc.setFont('helvetica', 'bold');
+            const lines = doc.splitTextToSize(String(value || ''), w - 8);
+            doc.text(lines[0] || '', cx + 4, cy + 11);
         };
 
         const dateTimeStr = fmtDate(datos.fecha) + (datos.hora ? ' — ' + datos.hora : '');
-        drawCell(padL,             y,            'Client',      datos.nombre || '');
-        drawCell(padL + cellW + 4, y,            'Date & time', dateTimeStr);
-        drawCell(padL,             y + cellH + 2, 'Vehicle',    datos.vehiculo || '');
-        drawCell(padL + cellW + 4, y + cellH + 2, 'Passengers', (datos.pasajeros || '') + ' pax');
+        drawCell2(padL,              y, 'Date & time', dateTimeStr);
+        drawCell2(padL + cellW2 + 4, y, 'Passengers',  (datos.pasajeros || '') + ' pax');
+        y += cellH2 + 3;
 
-        y += cellH * 2 + 2 + 8;
+        if (datos.notas) {
+            drawCell2(padL, y, 'Notes', datos.notas, cW);
+            y += cellH2 + 3;
+        }
+        if (datos.fechaRegreso) {
+            const retStr = fmtDate(datos.fechaRegreso) + (datos.horaRegreso ? ' — ' + datos.horaRegreso : '');
+            drawCell2(padL, y, 'Return date & time', retStr, cW);
+            y += cellH2 + 3;
+        }
+        if (datos.vuelo) {
+            drawCell2(padL, y, 'Flight number', datos.vuelo, cW);
+            y += cellH2 + 3;
+        }
+        if (datos.vueloRegreso) {
+            drawCell2(padL, y, 'Return flight', datos.vueloRegreso, cW);
+            y += cellH2 + 3;
+        }
 
-        // ── DIVIDER ──────────────────────────────────────────────────────────
+        y += 3;
+
+        // ── DIVIDER ───────────────────────────────────────────────────────
         doc.setDrawColor(...greyLn); doc.setLineWidth(0.3);
         doc.line(padL, y, pageW - padR, y);
         y += 8;
 
-        // ── ROUTE (pickup / dropoff) ──────────────────────────────────────────
+        // ── ROUTE ─────────────────────────────────────────────────────────
         const routeRow = (dotColor, labelTxt, address) => {
             doc.setFillColor(...dotColor);
             doc.circle(padL + 3, y + 2, 2, 'F');
@@ -3234,65 +3301,24 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             doc.text(lines, padL + 9, y + 6.5);
             y += lines.length * 5 + 9;
         };
+        routeRow([255, 193, 7],  'Pick-up',  datos.origen  || '');
+        routeRow([41, 128, 185], 'Drop-off', datos.destino || '');
 
-        routeRow([255, 193, 7],   'Pick-up',  datos.origen  || '');
-        routeRow([41, 128, 185],  'Drop-off', datos.destino || '');
-
-        if (datos.vuelo) {
-            doc.setTextColor(...grey); doc.setFontSize(8); doc.setFont('helvetica', 'normal');
-            doc.text('Flight: ', padL + 9, y);
-            doc.setTextColor(...dark); doc.setFont('helvetica', 'bold');
-            doc.text(datos.vuelo, padL + 24, y);
-            y += 6;
-        }
-        if (datos.fechaRegreso) {
-            doc.setTextColor(...grey); doc.setFontSize(8); doc.setFont('helvetica', 'normal');
-            doc.text('Return: ', padL + 9, y);
-            doc.setTextColor(...dark); doc.setFont('helvetica', 'bold');
-            doc.text(fmtDate(datos.fechaRegreso) + (datos.horaRegreso ? ' — ' + datos.horaRegreso : ''), padL + 24, y);
-            y += 6;
-        }
-
-        // ── CLIENT DETAILS ───────────────────────────────────────────────────
-        const clientRows = [];
-        if (datos.telefono) clientRows.push(['Phone',  datos.telefono]);
-        if (datos.email)    clientRows.push(['Email',  datos.email]);
-        if (datos.notas)    clientRows.push(['Notes',  datos.notas]);
-
-        if (clientRows.length > 0) {
-            doc.setDrawColor(...greyLn); doc.setLineWidth(0.3);
-            doc.line(padL, y, pageW - padR, y);
-            y += 6;
-            clientRows.forEach(([lbl, val]) => {
-                doc.setTextColor(...grey);
-                doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
-                doc.text(lbl, padL, y + 0.5);
-                doc.setTextColor(...dark);
-                doc.setFontSize(8.5); doc.setFont('helvetica', 'normal');
-                const vLines = doc.splitTextToSize(String(val), cW - 28);
-                doc.text(vLines, padL + 26, y + 0.5);
-                y += vLines.length * 5 + 3;
-            });
-            y += 2;
-        }
-
-        // ── DIVIDER ──────────────────────────────────────────────────────────
+        // ── DIVIDER ───────────────────────────────────────────────────────
         doc.setDrawColor(...greyLn); doc.setLineWidth(0.3);
         doc.line(padL, y, pageW - padR, y);
         y += 7;
 
-        // ── PRICING TABLE ─────────────────────────────────────────────────────
+        // ── PRICING TABLE ─────────────────────────────────────────────────
         const monedaStr = (datos.precioTotal || datos.precio || '').includes('MXN') ? 'MXN'
                         : (datos.precioTotal || datos.precio || '').includes('CAD') ? 'CAD' : 'USD';
-
-        const baseNum  = parseFloat((datos.precio       || '0').replace(/[^0-9.]/g, '')) || 0;
-        const totalNum = parseFloat((datos.precioTotal  || datos.precio || '0').replace(/[^0-9.]/g, '')) || baseNum;
-
+        const baseNum  = parseFloat((datos.precio      || '0').replace(/[^0-9.]/g, '')) || 0;
+        const totalNum = parseFloat((datos.precioTotal || datos.precio || '0').replace(/[^0-9.]/g, '')) || baseNum;
         const cuponCode = (datos.cupon || '').toUpperCase();
         const discPct   = (cuponCode === 'LTR-10' || cuponCode === 'LTR10') ? 0.10
                         : (cuponCode === 'LUX-20' || cuponCode === 'LUX20') ? 0.20 : 0;
 
-        const fmt = (n) => '$' + (Math.round(n * 100) / 100).toFixed(2) + ' ' + monedaStr;
+        const fmt  = (n) => '$' + (Math.round(n * 100) / 100).toFixed(2) + ' ' + monedaStr;
         const rowH = 8;
 
         const priceRow = (label, amount, txtColor, bold, bgColor) => {
@@ -3316,49 +3342,57 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
 
         const stopPrc = monedaStr === 'MXN' ? 500 : monedaStr === 'CAD' ? 40 : 25;
-        if (parseInt(datos.extraStop) > 0) {
-            priceRow(`Extra stop x${datos.extraStop}`, '+' + fmt(datos.extraStop * stopPrc), dark, false, null);
-        }
-        if (parseInt(datos.extraStopR) > 0) {
+        if (parseInt(datos.extraStop)  > 0)
+            priceRow(`Extra stop x${datos.extraStop}`,          '+' + fmt(datos.extraStop  * stopPrc), dark, false, null);
+        if (parseInt(datos.extraStopR) > 0)
             priceRow(`Extra stop (return) x${datos.extraStopR}`, '+' + fmt(datos.extraStopR * stopPrc), dark, false, null);
-        }
 
-        // Total — gold background
         y += 1;
         priceRow('Total', fmt(totalNum), navy, true, gold);
 
-        // Paid online (100% — no split)
+        // Paid online — fondo BLANCO, texto oscuro, borde gris
         if (datos.esVenta && datos.pago) {
             const pagoLabel = datos.pagoLabel
                 || (datos.pago || '').replace(' ✅ Paid Online', '').replace('Checkout', '').trim();
-            priceRow(`Paid online – ${pagoLabel}`, fmt(totalNum), white, true, navy);
+            doc.setFillColor(...white);
+            doc.rect(padL, y, cW, rowH, 'F');
+            doc.setDrawColor(...greyLn); doc.setLineWidth(0.3);
+            doc.rect(padL, y, cW, rowH, 'S');
+            doc.setTextColor(...dark);
+            doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+            doc.text('Paid online \u2013 ' + pagoLabel, padL + 4, y + 5.5);
+            doc.setTextColor(39, 174, 96);
+            doc.text(fmt(totalNum), pageW - padR - 4, y + 5.5, { align: 'right' });
+            y += rowH;
         }
 
         y += 8;
 
-        // ── NOTICE BOX ───────────────────────────────────────────────────────
-        const noticeText = `Please save your booking code ${datos.codigo || 'LTR-????'}. Our team will contact you shortly to confirm your trip details. For questions, WhatsApp us at +52 984 241 1158`;
+        // ── NOTICE BOX ────────────────────────────────────────────────────
+        const noticeText = 'Please save your booking code ' + (datos.codigo || 'LTR-????') +
+            '. Our team will contact you shortly to confirm your trip details.' +
+            ' For questions, WhatsApp us at +52 984 241 1158';
         doc.setFontSize(8.5); doc.setFont('helvetica', 'normal');
         const noticeLines = doc.splitTextToSize(noticeText, cW - 10);
         const noticeH = noticeLines.length * 5.2 + 10;
-
         doc.setFillColor(255, 252, 220);
         doc.setDrawColor(220, 185, 60);
         doc.setLineWidth(0.6);
         doc.rect(padL, y, cW, noticeH, 'FD');
         doc.setTextColor(100, 75, 0);
         doc.text(noticeLines, padL + 5, y + 7);
-
         y += noticeH + 9;
 
-        // ── FOOTER ───────────────────────────────────────────────────────────
+        // ── FOOTER ────────────────────────────────────────────────────────
         doc.setTextColor(...grey);
         doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
-        doc.text("Silver's Shuttles Services  ·  luxurytransfersriviera.com.mx  ·  +52 984 241 1158", pageW / 2, y, { align: 'center' });
+        doc.text("Silver's Shuttles Services  \u00b7  luxurytransfersriviera.com.mx  \u00b7  +52 984 241 1158",
+                 pageW / 2, y, { align: 'center' });
 
         if (soloBase64) return doc.output('datauristring').split(',')[1];
         doc.save('Voucher-' + (datos.codigo || 'LTR') + '.pdf');
     }
+
 
     function mostrarModalExito(data) {
         _datosVentaConfirmada = data;
@@ -3404,6 +3438,24 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         'GRAND SPRINTER': 'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/GRAND%20SPRINTER%20Desglose%20de%20Precios.webp',
         'FAMILY VAN':     'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/FAMILY%20VAN%20Desglose%20de%20Precios.webp',
     };
+
+    // Vehicle images preloaded as base64 for jsPDF
+    const _vehicleImgB64 = {};
+    (function _preloadVehicleImgs() {
+        Object.entries(_vehicleImages).forEach(([key, url]) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+                try {
+                    const c = document.createElement('canvas');
+                    c.width = img.naturalWidth; c.height = img.naturalHeight;
+                    c.getContext('2d').drawImage(img, 0, 0);
+                    _vehicleImgB64[key] = c.toDataURL('image/png');
+                } catch(e) {}
+            };
+            img.src = url;
+        });
+    })();
 
     function mostrarRecuperacion(datos) {
         _recoveryDatos = datos;
