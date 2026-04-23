@@ -3447,10 +3447,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             img.crossOrigin = 'anonymous';
             img.onload = function() {
                 try {
+                    const MAX_W = 420, MAX_H = 260;
+                    const ratio = Math.min(MAX_W / img.naturalWidth, MAX_H / img.naturalHeight, 1);
                     const c = document.createElement('canvas');
-                    c.width = img.naturalWidth; c.height = img.naturalHeight;
-                    c.getContext('2d').drawImage(img, 0, 0);
-                    _vehicleImgB64[key] = c.toDataURL('image/png');
+                    c.width  = Math.round(img.naturalWidth  * ratio);
+                    c.height = Math.round(img.naturalHeight * ratio);
+                    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+                    _vehicleImgB64[key] = c.toDataURL('image/jpeg', 0.82);
                 } catch(e) {}
             };
             img.src = url;
