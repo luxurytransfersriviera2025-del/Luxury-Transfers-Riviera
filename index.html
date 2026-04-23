@@ -3565,23 +3565,26 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
                     // Recuperar last4 y brand de la tarjeta desde el Worker
                     if (datosVenta.stripeSessionId) {
-                        try {
-                            const cardRes = await fetch(WORKER_PAGOS_URL + '/process-payment', {
-                                method:  'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ method: 'stripe', action: 'retrieve-session', sessionId: datosVenta.stripeSessionId })
-                            });
-                            if (cardRes.ok) {
-                                const cardInfo = await cardRes.json();
-                                if (cardInfo.last4) {
-                                    const brand = cardInfo.brand ? (cardInfo.brand.charAt(0).toUpperCase() + cardInfo.brand.slice(1)) : 'Card';
-                                    datosVenta.pagoLabel = `${brand} **** ${cardInfo.last4}`;
+                        (async () => {
+                            try {
+                                const cardRes = await fetch(WORKER_PAGOS_URL + '/process-payment', {
+                                    method:  'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ method: 'stripe', action: 'retrieve-session', sessionId: datosVenta.stripeSessionId })
+                                });
+                                if (cardRes.ok) {
+                                    const cardInfo = await cardRes.json();
+                                    if (cardInfo.last4) {
+                                        const brand = cardInfo.brand ? (cardInfo.brand.charAt(0).toUpperCase() + cardInfo.brand.slice(1)) : 'Card';
+                                        datosVenta.pagoLabel = `${brand} **** ${cardInfo.last4}`;
+                                    }
                                 }
-                            }
-                        } catch(e) { /* no bloquear si falla */ }
+                            } catch(e) { /* no bloquear si falla */ }
+                            setTimeout(() => _finalizarDesdeStripe(datosVenta), 600);
+                        })();
+                    } else {
+                        setTimeout(() => _finalizarDesdeStripe(datosVenta), 600);
                     }
-
-                    setTimeout(() => _finalizarDesdeStripe(datosVenta), 600);
                 } catch (e) {
                     console.error('Error procesando regreso de Stripe:', e);
                 }
