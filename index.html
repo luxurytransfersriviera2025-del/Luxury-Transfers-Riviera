@@ -1521,7 +1521,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 </a>
 
                 <!-- Descargar voucher -->
-                <button onclick="generarVoucherPDF(_datosVentaConfirmada)" style="width:100%; background:transparent; border:2px solid #002855; color:#002855; border-radius:12px; padding:13px; font-size:13px; font-weight:700; cursor:pointer; font-family:'Montserrat',sans-serif; display:flex; align-items:center; justify-content:center; gap:8px;">
+                <button onclick="this.disabled=true;this.innerHTML='<i class=\'fas fa-spinner fa-spin\'></i> Generating...';generarVoucherPDF(_datosVentaConfirmada).finally(()=>{this.disabled=false;this.innerHTML='<i class=\'fas fa-download\'></i> Download Voucher (PDF)';})" style="width:100%; background:transparent; border:2px solid #002855; color:#002855; border-radius:12px; padding:13px; font-size:13px; font-weight:700; cursor:pointer; font-family:'Montserrat',sans-serif; display:flex; align-items:center; justify-content:center; gap:8px;">
                     <i class="fas fa-download"></i> Download Voucher (PDF)
                 </button>
 
@@ -3131,71 +3131,178 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     let _recoveryDatos = null; // holds the saved booking for retry
     let _datosVentaConfirmada = null; // holds confirmed booking for PDF download
 
-    function generarVoucherPDF(datos, soloBase64 = false) {
+    async function _loadImgDataUrl(url) {
+        return new Promise(resolve => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+                try {
+                    const c = document.createElement('canvas');
+                    c.width = img.naturalWidth; c.height = img.naturalHeight;
+                    c.getContext('2d').drawImage(img, 0, 0);
+                    resolve(c.toDataURL('image/png'));
+                } catch(e) { resolve(null); }
+            };
+            img.onerror = () => resolve(null);
+            img.src = url;
+        });
+    }
+
+    async function generarVoucherPDF(datos, soloBase64 = false) {
         if (!datos || !window.jspdf) return null;
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-        const navy = [0, 40, 85], gold = [212, 175, 55], white = [255,255,255], dark = [34,34,34], grey = [120,120,120];
-        const L = 20, R = 85, maxW = 115;
 
-        // Header
-        doc.setFillColor(...navy); doc.rect(0, 0, 210, 42, 'F');
-        doc.setTextColor(...gold); doc.setFontSize(10); doc.setFont('helvetica','bold');
-        doc.text('LUXURY TRANSFERS RIVIERA', 105, 14, { align:'center' });
-        doc.setTextColor(...white); doc.setFontSize(20);
-        doc.text('BOOKING VOUCHER', 105, 28, { align:'center' });
-        doc.setFontSize(10); doc.setFont('helvetica','normal');
-        doc.text('luxurytransfersriviera.com.mx', 105, 37, { align:'center' });
+        const LOGO_URL = 'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Favicon%20200%20x%20200%20px.webp';
+        const vehKey   = Object.keys(_vehicleImages).find(k => (datos.vehiculo || '').toUpperCase().includes(k));
+        const VEH_URL  = vehKey ? _vehicleImages[vehKey] : null;
 
-        // Booking code badge
-        doc.setFillColor(...gold); doc.roundedRect(60, 46, 90, 14, 3, 3, 'F');
-        doc.setTextColor(...navy); doc.setFontSize(14); doc.setFont('helvetica','bold');
-        doc.text(datos.codigo || 'LTR-????', 105, 56, { align:'center' });
+        const [logoDataUrl, vehDataUrl] = await Promise.all([
+            _loadImgDataUrl(LOGO_URL),
+            VEH_URL ? _loadImgDataUrl(VEH_URL) : Promise.resolve(null)
+        ]);
 
-        let y = 72;
-        const row = (label, value) => {
-            if (!value || String(value).trim() === '') return;
+        const doc  = new jsPDF({ unit: 'mm', format: 'a4' });
+        const navy = [0, 40, 85], gold = [212, 175, 55], white = [255,255,255];
+        const dark = [30, 30, 30], grey = [110, 110, 110], lightgrey = [245, 246, 250];
+        const amber = [255, 248, 220];
+        const PAGE_W = 210, L = 14, R = PAGE_W - 14;
+
+        // ── HEADER ──────────────────────────────────────────────────
+        doc.setFillColor(...navy); doc.rect(0, 0, PAGE_W, 38, 'F');
+
+        if (logoDataUrl) doc.addImage(logoDataUrl, 'PNG', L, 7, 14, 14);
+
+        doc.setTextColor(...gold); doc.setFontSize(12); doc.setFont('helvetica','bold');
+        doc.text('LUXURY TRANSFERS RIVIERA', L + 17, 14);
+        doc.setTextColor(180, 200, 230); doc.setFontSize(8); doc.setFont('helvetica','normal');
+        doc.text('luxurytransfersriviera.com.mx', L + 17, 20);
+
+        doc.setTextColor(180, 200, 230); doc.setFontSize(8);
+        doc.text('Booking confirmation', R, 12, { align:'right' });
+        doc.setFillColor(...gold); doc.roundedRect(R - 38, 16, 38, 12, 2, 2, 'F');
+        doc.setTextColor(...navy); doc.setFontSize(11); doc.setFont('helvetica','bold');
+        doc.text(datos.codigo || 'LTR-????', R - 19, 24, { align:'center' });
+
+        // ── INFO GRID ────────────────────────────────────────────────
+        let y = 44;
+        doc.setFillColor(...lightgrey); doc.roundedRect(L, y, PAGE_W - L*2, 30, 2, 2, 'F');
+
+        const infoLabel = (txt, x, iy) => { doc.setTextColor(...grey); doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.text(txt, x, iy); };
+        const infoVal   = (txt, x, iy, maxw) => { doc.setTextColor(...dark); doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.text(doc.splitTextToSize(String(txt||''), maxw||60)[0], x, iy); };
+
+        const midX = PAGE_W / 2 + 2;
+        infoLabel('Client',      L + 4, y + 7);   infoVal(datos.nombre || '', L + 4, y + 13, 75);
+        infoLabel('Date & time', midX,  y + 7);    infoVal((datos.fecha||'') + ' — ' + (datos.hora||''), midX, y + 13, 75);
+        infoLabel('Vehicle',     L + 4, y + 21);   infoVal(datos.vehiculo || '', L + 4, y + 27, 75);
+        infoLabel('Passengers',  midX,  y + 21);   infoVal((datos.pasajeros||'1') + ' pax', midX, y + 27, 75);
+
+        y += 36;
+
+        // ── VEHICLE IMAGE ────────────────────────────────────────────
+        if (vehDataUrl) {
+            const imgW = 70, imgH = 46;
+            doc.addImage(vehDataUrl, 'PNG', PAGE_W - L - imgW, y, imgW, imgH);
+            y += imgH + 4;
+        } else { y += 4; }
+
+        // ── ROUTE ───────────────────────────────────────────────────
+        doc.setFontSize(8); doc.setFont('helvetica','bold');
+        doc.setTextColor(...grey); doc.text('Pick-up', L, y);
+        y += 5;
+        doc.setFillColor(212, 175, 55); doc.circle(L + 2, y - 1.5, 2, 'F');
+        doc.setTextColor(...dark); doc.setFontSize(9); doc.setFont('helvetica','normal');
+        const orLines = doc.splitTextToSize(datos.origen || '', PAGE_W - L*2 - 8);
+        doc.text(orLines, L + 6, y); y += orLines.length * 5 + 4;
+
+        doc.setFontSize(8); doc.setFont('helvetica','bold');
+        doc.setTextColor(...grey); doc.text('Drop-off', L, y);
+        y += 5;
+        doc.setFillColor(0, 100, 200); doc.circle(L + 2, y - 1.5, 2, 'F');
+        doc.setTextColor(...dark); doc.setFontSize(9); doc.setFont('helvetica','normal');
+        const dstLines = doc.splitTextToSize(datos.destino || '', PAGE_W - L*2 - 8);
+        doc.text(dstLines, L + 6, y); y += dstLines.length * 5 + 4;
+
+        if (datos.fechaRegreso) {
+            doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(...grey); doc.text('Return', L, y); y += 5;
+            doc.setFillColor(212, 175, 55); doc.circle(L + 2, y - 1.5, 2, 'F');
+            doc.setTextColor(...dark); doc.setFontSize(9); doc.setFont('helvetica','normal');
+            doc.text(datos.fechaRegreso + ' — ' + (datos.horaRegreso||''), L + 6, y); y += 9;
+        }
+
+        if (datos.vuelo || datos.vueloRegreso) {
             doc.setTextColor(...grey); doc.setFontSize(8); doc.setFont('helvetica','normal');
-            doc.text(label.toUpperCase(), L, y);
-            doc.setTextColor(...dark); doc.setFontSize(10); doc.setFont('helvetica','bold');
-            const lines = doc.splitTextToSize(String(value), maxW);
-            doc.text(lines, R, y);
-            y += lines.length * 6 + 3;
+            if (datos.vuelo)        doc.text('Flight: ' + datos.vuelo,               L + 6, y); y += (datos.vuelo ? 5 : 0);
+            if (datos.vueloRegreso) doc.text('Return flight: ' + datos.vueloRegreso, L + 6, y); y += (datos.vueloRegreso ? 5 : 0);
+        }
+
+        y += 2;
+
+        // ── PRICE TABLE ──────────────────────────────────────────────
+        doc.setDrawColor(220, 220, 220); doc.setLineWidth(0.3); doc.line(L, y, R, y); y += 6;
+
+        const monedaStr = (datos.precioTotal||'').includes('MXN') ? 'MXN' : (datos.precioTotal||'').includes('CAD') ? 'CAD' : 'USD';
+        const baseNum   = parseFloat((datos.precio||'0').replace(/[^0-9.]/g,'')) || 0;
+        const totalNum  = parseFloat((datos.precioTotal||'0').replace(/[^0-9.]/g,'')) || 0;
+        const extNum    = parseFloat((datos.totalExtras||'0').replace(/[^0-9.]/g,'')) || 0;
+        const is3070    = datos.pago && (datos.pago.includes('30%') || datos.pago.includes('Cash') || datos.pago.includes('Efectivo'));
+        const now3070   = is3070 ? Math.ceil(totalNum * 0.30 * 100) / 100 : totalNum;
+        const board3070 = is3070 ? Math.floor(totalNum * 0.70 * 100) / 100 : 0;
+
+        const priceRow = (label, amount, bold, color) => {
+            doc.setFont('helvetica', bold ? 'bold' : 'normal');
+            doc.setFontSize(bold ? 11 : 10);
+            doc.setTextColor(color ? color : (bold ? dark : grey));
+            doc.text(label, L + 2, y);
+            doc.text(amount, R - 2, y, { align:'right' });
+            y += 7;
         };
-        const divider = () => { doc.setDrawColor(...gold); doc.setLineWidth(0.3); doc.line(L, y, 190, y); y += 5; };
 
-        row('Vehicle', datos.vehiculo);
-        row('Passengers', datos.pasajeros);
-        divider();
-        row('Pick-up', datos.origen);
-        row('Destination', datos.destino);
-        row('Date', datos.fecha); row('Time', datos.hora);
-        if (datos.vuelo) row('Flight', datos.vuelo);
-        if (datos.fechaRegreso) row('Return Date', datos.fechaRegreso + (datos.horaRegreso ? '  ' + datos.horaRegreso : ''));
-        if (datos.vueloRegreso) row('Return Flight', datos.vueloRegreso);
-        divider();
-        row('Passenger Name', datos.nombre);
-        row('Email', datos.email);
-        row('Phone', datos.telefono);
-        divider();
-        const extLines = [];
-        if (parseInt(datos.extraStop)  > 0) extLines.push('Quick 20-Min Stop Trip: '        + datos.extraStop);
-        if (parseInt(datos.extraStopR) > 0) extLines.push('Quick 20-Min Stop Return Trip: ' + datos.extraStopR);
-        if (extLines.length) row('Extras', extLines.join(' | '));
-        if (datos.notas) row('Notes', datos.notas);
-        divider();
-        row('Total', datos.precioTotal);
-        row('Payment', datos.pago);
+        priceRow('Service price', '$' + baseNum.toFixed(2).replace(/\.00$/,'') + ' ' + monedaStr, false);
+        if (datos.cupon) priceRow('Discount applied (10%)', '-$' + (baseNum * 0.1).toFixed(2) + ' ' + monedaStr, false, [0,150,80]);
 
-        // Footer
-        doc.setFillColor(...navy); doc.rect(0, 272, 210, 25, 'F');
+        if (parseInt(datos.extraStop)  > 0) priceRow('Extra stop x' + datos.extraStop,  '+$' + (parseInt(datos.extraStop)  * (monedaStr==='MXN'?500:monedaStr==='CAD'?40:25)) + ' ' + monedaStr, false);
+        if (parseInt(datos.extraStopR) > 0) priceRow('Extra stop return x' + datos.extraStopR, '+$' + (parseInt(datos.extraStopR) * (monedaStr==='MXN'?500:monedaStr==='CAD'?40:25)) + ' ' + monedaStr, false);
+
+        doc.setDrawColor(220,220,220); doc.line(L, y - 2, R, y - 2);
+        priceRow('Total', '$' + totalNum.toFixed(2).replace(/\.00$/,'') + ' ' + monedaStr, true);
+
+        if (is3070) {
+            priceRow('Charged now (30%)',     '$' + now3070.toFixed(2).replace(/\.00$/,'')   + ' ' + monedaStr, false);
+            priceRow('Due on board (70% cash)', '$' + board3070.toFixed(2).replace(/\.00$/,'') + ' ' + monedaStr, false);
+        }
+
+        y += 2;
+
+        // ── YELLOW NOTICE ────────────────────────────────────────────
+        doc.setFillColor(...amber); doc.setDrawColor(212,175,55); doc.setLineWidth(0.4);
+        doc.roundedRect(L, y, PAGE_W - L*2, 18, 2, 2, 'FD');
+        doc.setTextColor(100, 70, 0); doc.setFontSize(8.5); doc.setFont('helvetica','normal');
+        const noticeLines = doc.splitTextToSize(
+            'Please save your booking code ' + (datos.codigo||'') + '. Our team will contact you shortly to confirm your trip details. For questions, WhatsApp us at +52 984 241 1158.',
+            PAGE_W - L*2 - 6
+        );
+        doc.text(noticeLines, L + 3, y + 6);
+        y += 22;
+
+        // Notes
+        if (datos.notas && datos.notas.trim()) {
+            doc.setTextColor(...grey); doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.text('Notes:', L, y); y += 5;
+            doc.setFont('helvetica','normal'); doc.setTextColor(...dark);
+            const noteLines = doc.splitTextToSize(datos.notas, PAGE_W - L*2);
+            doc.text(noteLines, L, y); y += noteLines.length * 5 + 4;
+        }
+
+        // ── FOOTER ───────────────────────────────────────────────────
+        doc.setFillColor(...navy); doc.rect(0, 272, PAGE_W, 25, 'F');
+        if (logoDataUrl) doc.addImage(logoDataUrl, 'PNG', L, 275, 10, 10);
         doc.setTextColor(...gold); doc.setFontSize(9); doc.setFont('helvetica','bold');
-        doc.text('One of our agents will contact you as soon as possible. Thank you for choosing us!', 105, 281, { align:'center' });
-        doc.setTextColor(...white); doc.setFontSize(8); doc.setFont('helvetica','normal');
-        doc.text('+52 984 241 1158  |  reservas@luxurytransfersriviera.com.mx', 105, 290, { align:'center' });
+        doc.text('Luxury Transfers Riviera', L + 13, 280);
+        doc.setTextColor(180,200,230); doc.setFontSize(8); doc.setFont('helvetica','normal');
+        doc.text('luxurytransfersriviera.com.mx  ·  +52 984 241 1158  ·  reservas@luxurytransfersriviera.com.mx', L + 13, 287);
 
         if (soloBase64) return doc.output('datauristring').split(',')[1];
         doc.save('Voucher-' + (datos.codigo || 'LTR') + '.pdf');
+        return null;
     }
 
     function mostrarModalExito(data) {
@@ -3524,7 +3631,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
     }
 
-    function iniciarEnvio(data) {
+    async function iniciarEnvio(data) {
         if(SCRIPT_URL.includes("PEGAR")) { alert("Falta configurar la URL del Script."); return; }
         document.getElementById('loadingOverlay').style.display = 'flex';
 
@@ -3604,7 +3711,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         // 5. GENERAR PDF Y ENVIAR AL GOOGLE SHEET
         if (data.esVenta) {
-            try { data.pdfBase64 = generarVoucherPDF(data, true); } catch(e) { console.warn('PDF gen error:', e); }
+            try { data.pdfBase64 = await generarVoucherPDF(data, true); } catch(e) { console.warn('PDF gen error:', e); }
         }
 
         fetch(SCRIPT_URL, {
