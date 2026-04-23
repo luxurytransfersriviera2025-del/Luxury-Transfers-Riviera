@@ -3234,6 +3234,16 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
     }
 
+    // Detecta regreso por botón "atrás" del browser (bfcache)
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            const raw = sessionStorage.getItem('ltr_pendingBooking');
+            if (raw) {
+                try { setTimeout(() => mostrarRecuperacion(JSON.parse(raw)), 400); } catch(_) {}
+            }
+        }
+    });
+
     (function detectarRetornoPago() {
         const params  = new URLSearchParams(window.location.search);
         const payment = params.get('payment');
