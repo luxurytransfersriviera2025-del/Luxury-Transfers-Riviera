@@ -1471,7 +1471,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
     <div class="loading-overlay" id="loadingOverlay">
         <div class="spinner"></div>
-        <p id="loadingTextDisplay" style="margin-top: 15px; font-weight: 700; color: #333; font-size: 14px;">GENERATING BOOKING...</p>
+        <p id="loadingTextDisplay" style="margin-top: 15px; font-weight: 700; color: #222; font-size: 15px; text-align:center;">We are generating your booking...</p>
+        <p id="loadingSubText" style="margin-top: 6px; color: #555; font-size: 12px; text-align:center; max-width:270px; line-height:1.5;">Please do not close this window.<br>This may take a few seconds.</p>
     </div>
 
     <div class="modal-overlay" id="modalConfirmacion">
@@ -2917,6 +2918,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     },
 
                     onApprove: async (data) => {
+                        _setLoadingMsg('Confirming your payment...', 'Please do not close this window.<br>We are processing your booking.');
                         document.getElementById('loadingOverlay').style.display = 'flex';
                         _setPayPalError(id, '');
                         try {
@@ -2935,7 +2937,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                             const captureStatus = capture.status ||
                                 capture.purchase_units?.[0]?.payments?.captures?.[0]?.status;
                             if (captureStatus !== 'COMPLETED') throw new Error('Status: ' + captureStatus);
-                            _finalizarReserva(id, datosCard, 'PayPal');
+                            const paypalEmail = capture.payerEmail || '';
+                            _finalizarReserva(id, datosCard, 'PayPal', paypalEmail);
                         } catch (e) {
                             document.getElementById('loadingOverlay').style.display = 'none';
                             console.error('PayPal capture error:', e);
@@ -2975,6 +2978,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const totalFinal   = Math.round((basePrice + extras) * 100) / 100;
         const currencyCode = moneda === 'MXN' ? 'MXN' : moneda === 'CAD' ? 'CAD' : 'USD';
 
+        _setLoadingMsg('Redirecting to Stripe...', 'Please do not close this window.<br>You will be redirected to complete your payment.');
         document.getElementById('loadingOverlay').style.display = 'flex';
 
         const siteUrl = window.location.origin + window.location.pathname;
@@ -3081,7 +3085,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             const json = await res.json();
             if (!json.url) throw new Error('No redirect URL from Worker');
 
-            // Redirigir a la p\u00e1gina oficial de Stripe
+            // Guardar sessionId para recuperar last4 al volver de Stripe
+            if (json.sessionId) {
+                datosVenta.stripeSessionId = json.sessionId;
+                sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datosVenta));
+            }
+
+            // Redirigir a la página oficial de Stripe
             window.location.href = json.url;
 
         } catch (e) {
@@ -3099,8 +3109,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     }
 
     // ─── PASO 3: Finalizar reserva — tras pago verificado ────────────
-    function _finalizarReserva(id, datosCard, metodoPago) {
+    function _finalizarReserva(id, datosCard, metodoPago, paypalEmail) {
         const datosVenta = _construirDatosVenta(id, datosCard, metodoPago);
+        if (paypalEmail) datosVenta.pagoLabel = 'PayPal (' + paypalEmail + ')';
         document.getElementById('codigoDisplay').innerText = datosVenta.codigo;
         _dispararPurchaseYEnviar(datosVenta);
     }
@@ -3137,7 +3148,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const doc = new jsPDF({ unit: 'mm', format: 'a4' });
 
         // ── Palette ──────────────────────────────────────────────────────────
-        const navy    = [0, 40, 85];
+        const black   = [14, 14, 20];
         const gold    = [212, 175, 55];
         const white   = [255, 255, 255];
         const dark    = [34, 34, 34];
@@ -3145,6 +3156,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const lgrey   = [246, 246, 248];
         const greyLn  = [220, 220, 220];
         const green   = [39, 174, 96];
+        const navy    = [0, 40, 85];
 
         const pageW = 210, padL = 20, padR = 20, cW = pageW - padL - padR;
 
@@ -3156,24 +3168,28 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         };
 
         // ── HEADER ───────────────────────────────────────────────────────────
-        doc.setFillColor(...navy);
+        doc.setFillColor(...black);
         doc.rect(0, 0, pageW, 42, 'F');
 
-        // Left: company name + URL
-        doc.setTextColor(...white);
-        doc.setFontSize(12); doc.setFont('helvetica', 'bold');
-        doc.text('LUXURY TRANSFERS RIVIERA', padL, 17);
-        doc.setTextColor(160, 175, 200);
-        doc.setFontSize(8); doc.setFont('helvetica', 'normal');
-        doc.text('luxurytransfersriviera.com.mx', padL, 25);
-
-        // Right: label + booking code
-        doc.setTextColor(160, 175, 200);
-        doc.setFontSize(8); doc.setFont('helvetica', 'normal');
-        doc.text('Booking confirmation', pageW - padR, 14, { align: 'right' });
+        // Left: favicon icon (if loaded) + company name + URL
+        let textStartX = padL;
+        if (_faviconB64) {
+            try { doc.addImage(_faviconB64, 'PNG', padL, 11, 12, 12); textStartX = padL + 16; } catch(e) {}
+        }
         doc.setTextColor(...gold);
-        doc.setFontSize(20); doc.setFont('helvetica', 'bold');
-        doc.text(datos.codigo || 'LTR-????', pageW - padR, 32, { align: 'right' });
+        doc.setFontSize(12); doc.setFont('helvetica', 'bold');
+        doc.text('LUXURY TRANSFERS RIVIERA', textStartX, 19);
+        doc.setTextColor(150, 150, 165);
+        doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+        doc.text('luxurytransfersriviera.com.mx', textStartX, 27);
+
+        // Right: "Booking confirmation" label + code (compact, stacked close)
+        doc.setTextColor(150, 150, 165);
+        doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+        doc.text('Booking confirmation', pageW - padR, 20, { align: 'right' });
+        doc.setTextColor(...gold);
+        doc.setFontSize(16); doc.setFont('helvetica', 'bold');
+        doc.text(datos.codigo || 'LTR-????', pageW - padR, 30, { align: 'right' });
 
         // ── INFO GRID (2 × 2 cells) ──────────────────────────────────────────
         let y = 52;
@@ -3237,6 +3253,29 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             y += 6;
         }
 
+        // ── CLIENT DETAILS ───────────────────────────────────────────────────
+        const clientRows = [];
+        if (datos.telefono) clientRows.push(['Phone',  datos.telefono]);
+        if (datos.email)    clientRows.push(['Email',  datos.email]);
+        if (datos.notas)    clientRows.push(['Notes',  datos.notas]);
+
+        if (clientRows.length > 0) {
+            doc.setDrawColor(...greyLn); doc.setLineWidth(0.3);
+            doc.line(padL, y, pageW - padR, y);
+            y += 6;
+            clientRows.forEach(([lbl, val]) => {
+                doc.setTextColor(...grey);
+                doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+                doc.text(lbl, padL, y + 0.5);
+                doc.setTextColor(...dark);
+                doc.setFontSize(8.5); doc.setFont('helvetica', 'normal');
+                const vLines = doc.splitTextToSize(String(val), cW - 28);
+                doc.text(vLines, padL + 26, y + 0.5);
+                y += vLines.length * 5 + 3;
+            });
+            y += 2;
+        }
+
         // ── DIVIDER ──────────────────────────────────────────────────────────
         doc.setDrawColor(...greyLn); doc.setLineWidth(0.3);
         doc.line(padL, y, pageW - padR, y);
@@ -3288,13 +3327,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         y += 1;
         priceRow('Total', fmt(totalNum), navy, true, gold);
 
-        // Charged now / Due on board
-        if (datos.esVenta) {
-            const dep      = Math.round(totalNum * 0.30 * 100) / 100;
-            const due      = Math.round((totalNum - dep) * 100) / 100;
-            const pagoLabel = (datos.pago || '').replace(' ✅ Paid Online', '').replace('Checkout', '').trim();
-            priceRow(`Charged now (30%) – ${pagoLabel}`, fmt(dep), dark,  false, null);
-            priceRow('Due on board (70% cash)',           fmt(due), white, true,  navy);
+        // Paid online (100% — no split)
+        if (datos.esVenta && datos.pago) {
+            const pagoLabel = datos.pagoLabel
+                || (datos.pago || '').replace(' ✅ Paid Online', '').replace('Checkout', '').trim();
+            priceRow(`Paid online – ${pagoLabel}`, fmt(totalNum), white, true, navy);
         }
 
         y += 8;
@@ -3343,6 +3380,22 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         document.getElementById('modalConfirmacion').style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
+
+    // Favicon preloaded as base64 for jsPDF (loaded once on page ready)
+    let _faviconB64 = null;
+    (function() {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function() {
+            try {
+                const c = document.createElement('canvas');
+                c.width = img.naturalWidth; c.height = img.naturalHeight;
+                c.getContext('2d').drawImage(img, 0, 0);
+                _faviconB64 = c.toDataURL('image/png');
+            } catch(e) { _faviconB64 = null; }
+        };
+        img.src = 'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Favicon%20200%20x%20200%20px.webp';
+    })();
 
     const _vehicleImages = {
         'CLASSIC SEDAN':  'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/CLASSIC%20SEDAN%201%20Desglose%20de%20Precios.webp',
@@ -3509,6 +3562,25 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 try {
                     const datosVenta = JSON.parse(raw);
                     sessionStorage.removeItem('ltr_pendingBooking');
+
+                    // Recuperar last4 y brand de la tarjeta desde el Worker
+                    if (datosVenta.stripeSessionId) {
+                        try {
+                            const cardRes = await fetch(WORKER_PAGOS_URL + '/process-payment', {
+                                method:  'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ method: 'stripe', action: 'retrieve-session', sessionId: datosVenta.stripeSessionId })
+                            });
+                            if (cardRes.ok) {
+                                const cardInfo = await cardRes.json();
+                                if (cardInfo.last4) {
+                                    const brand = cardInfo.brand ? (cardInfo.brand.charAt(0).toUpperCase() + cardInfo.brand.slice(1)) : 'Card';
+                                    datosVenta.pagoLabel = `${brand} **** ${cardInfo.last4}`;
+                                }
+                            }
+                        } catch(e) { /* no bloquear si falla */ }
+                    }
+
                     setTimeout(() => _finalizarDesdeStripe(datosVenta), 600);
                 } catch (e) {
                     console.error('Error procesando regreso de Stripe:', e);
@@ -3562,8 +3634,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         capture.purchase_units?.[0]?.payments?.captures?.[0]?.status;
 
                     if (captureStatus === 'COMPLETED') {
-                        // ✅ Pago capturado — finalizar reserva
-                        _finalizarDesdeStripe(datosVenta); // reusing same function
+                        // ✅ Pago capturado — adjuntar email de PayPal al label
+                        if (capture.payerEmail) datosVenta.pagoLabel = 'PayPal (' + capture.payerEmail + ')';
+                        _finalizarDesdeStripe(datosVenta);
                     } else {
                         throw new Error('Capture status: ' + captureStatus);
                     }
@@ -3649,8 +3722,20 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
     }
 
+    function _setLoadingMsg(title, sub) {
+        const t = document.getElementById('loadingTextDisplay');
+        const s = document.getElementById('loadingSubText');
+        if (t) t.textContent = title;
+        if (s) s.innerHTML  = sub;
+    }
+
     function iniciarEnvio(data) {
         if(SCRIPT_URL.includes("PEGAR")) { alert("Falta configurar la URL del Script."); return; }
+        if (data.esVenta) {
+            _setLoadingMsg('We are generating your booking...', 'Please do not close this window.<br>This may take a few seconds.');
+        } else {
+            _setLoadingMsg('Sending your request...', 'One moment please.');
+        }
         document.getElementById('loadingOverlay').style.display = 'flex';
 
         // META PIXEL + CAPI
