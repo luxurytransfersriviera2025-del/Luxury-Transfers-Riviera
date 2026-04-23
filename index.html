@@ -797,7 +797,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         "https://www.tripadvisor.es/Attraction_Review-g150812-d34109769-Reviews-Luxury_Transfers_Riviera-Playa_del_Carmen_Yucatan_Peninsula.html"
       ]
     }
+    @keyframes popIn {
+        0%   { transform: scale(0); opacity: 0; }
+        70%  { transform: scale(1.15); }
+        100% { transform: scale(1); opacity: 1; }
+    }
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 </head>
 <body>
 
@@ -1469,26 +1475,56 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     </div>
 
     <div class="modal-overlay" id="modalConfirmacion">
-        <div class="modal-box">
-            <div class="modal-header-fixed">
-                <h2 class="modal-title-fixed">Booking Confirmed!</h2>
-                <button class="btn-close-fixed" onclick="cerrarModal()">Close <i class="fas fa-times"></i></button>
+        <div style="background:#fff; width:100%; max-width:500px; border-radius:20px; overflow:hidden; box-shadow:0 40px 80px rgba(0,0,0,0.5); max-height:92vh; display:flex; flex-direction:column;">
+
+            <!-- Header -->
+            <div style="background:#002855; padding:28px 24px 24px; text-align:center; position:relative;">
+                <button onclick="cerrarModal()" style="position:absolute; top:14px; right:14px; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:6px 12px; color:rgba(255,255,255,0.8); cursor:pointer; font-size:13px; font-weight:700;">✕</button>
+                <div style="width:64px; height:64px; background:#00a651; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; animation:popIn 0.45s ease;">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M6 16L13 23L26 9" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div style="color:#D4AF37; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:2px; font-family:'Montserrat',sans-serif; margin-bottom:6px;">Payment Confirmed</div>
+                <div style="color:#fff; font-size:19px; font-weight:900; font-family:'Montserrat',sans-serif;">Your booking is confirmed!</div>
+                <div id="codigoDisplay" style="display:inline-block; margin-top:12px; background:transparent; border:2px solid #D4AF37; color:#fff; font-size:20px; font-weight:900; letter-spacing:4px; padding:8px 22px; border-radius:10px; font-family:'Montserrat',sans-serif;">LTR-????</div>
             </div>
-            <div class="modal-scrollable-content" style="text-align:center;">
-                <p style="margin:0 0 6px 0; font-size:11px; color:rgba(255,255,255,0.5); text-transform:uppercase; font-weight:700; letter-spacing:2px;">YOUR BOOKING NUMBER</p>
-                <div id="codigoDisplay" class="codigo-reserva">LTR-????</div>
 
-                <p class="modal-text" id="modalText">Thank you! Your booking is confirmed and your payment has been successfully processed. Our team will send you a WhatsApp confirmation shortly with your trip details.</p>
+            <!-- Scrollable content -->
+            <div style="overflow-y:auto; padding:24px; flex:1;">
 
-                <div class="modal-warning-box">
-                    <i class="fas fa-bookmark" style="color:var(--gold); margin-right:6px;"></i><strong>IMPORTANT:</strong><br>
-                    <span>Please save your booking number. You will also receive a confirmation email — check your SPAM folder if you don't see it.</span>
+                <!-- Vehicle card -->
+                <div style="display:flex; align-items:center; gap:14px; background:#f8f9ff; border-radius:12px; padding:14px; margin-bottom:20px;">
+                    <img id="modal-confirm-img" src="" alt="" style="width:80px; height:58px; object-fit:contain; flex-shrink:0; background:#fff; border-radius:8px; padding:4px;">
+                    <div>
+                        <div id="modal-confirm-vehicle" style="font-size:15px; font-weight:900; color:#002855; font-family:'Montserrat',sans-serif; text-transform:uppercase;"></div>
+                        <div id="modal-confirm-pax" style="font-size:13px; color:#666; margin-top:2px;"></div>
+                    </div>
+                    <div style="margin-left:auto; text-align:right;">
+                        <div id="modal-confirm-price" style="font-size:20px; font-weight:900; color:#002855; font-family:'Montserrat',sans-serif;"></div>
+                    </div>
                 </div>
 
-                <div class="modal-actions">
-                    <a href="#" target="_blank" class="modal-btn btn-wa" id="btnWhatsapp"><i class="fab fa-whatsapp"></i> <span>Confirm via WhatsApp</span></a>
-                    <a href="tel:+529842411158" class="modal-btn btn-call" id="btn-modal-call"><i class="fas fa-phone"></i> <span>Call Us Now</span></a>
+                <!-- Mensaje formal -->
+                <p id="modalText" style="font-size:14px; color:#333; line-height:1.75; margin:0 0 20px; text-align:center;">
+                    Thank you for choosing <strong>Luxury Transfers Riviera</strong>. Your payment has been successfully processed and your reservation is confirmed. One of our agents will contact you as soon as possible to provide you with all the details of your service.
+                </p>
+
+                <!-- Spam notice -->
+                <div style="background:#fff8e1; border:1px solid #D4AF37; border-radius:10px; padding:12px 14px; margin-bottom:16px; display:flex; gap:10px; align-items:flex-start;">
+                    <span style="font-size:16px; flex-shrink:0;">📧</span>
+                    <span style="font-size:12px; color:#555; line-height:1.5;">A confirmation email has been sent to you. <strong>If you don't see it in your inbox, please check your spam or junk folder.</strong></span>
                 </div>
+
+                <!-- WhatsApp -->
+                <a href="https://wa.me/529842411158" target="_blank" id="btnWhatsapp" style="display:flex; align-items:center; justify-content:center; gap:10px; width:100%; background:#25d366; color:#fff; border:none; border-radius:12px; padding:15px; font-size:14px; font-weight:700; cursor:pointer; text-decoration:none; margin-bottom:12px; box-sizing:border-box; font-family:'Montserrat',sans-serif;">
+                    <i class="fab fa-whatsapp" style="font-size:18px;"></i>
+                    Need a quick response? Contact us via WhatsApp
+                </a>
+
+                <!-- Descargar voucher -->
+                <button onclick="generarVoucherPDF(_datosVentaConfirmada)" style="width:100%; background:transparent; border:2px solid #002855; color:#002855; border-radius:12px; padding:13px; font-size:13px; font-weight:700; cursor:pointer; font-family:'Montserrat',sans-serif; display:flex; align-items:center; justify-content:center; gap:8px;">
+                    <i class="fas fa-download"></i> Download Voucher (PDF)
+                </button>
+
             </div>
         </div>
     </div>
@@ -3093,6 +3129,95 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     //  PAYMENT RECOVERY MODAL
     // ════════════════════════════════════════════════════════════
     let _recoveryDatos = null; // holds the saved booking for retry
+    let _datosVentaConfirmada = null; // holds confirmed booking for PDF download
+
+    function generarVoucherPDF(datos, soloBase64 = false) {
+        if (!datos || !window.jspdf) return null;
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+        const navy = [0, 40, 85], gold = [212, 175, 55], white = [255,255,255], dark = [34,34,34], grey = [120,120,120];
+        const L = 20, R = 85, maxW = 115;
+
+        // Header
+        doc.setFillColor(...navy); doc.rect(0, 0, 210, 42, 'F');
+        doc.setTextColor(...gold); doc.setFontSize(10); doc.setFont('helvetica','bold');
+        doc.text('LUXURY TRANSFERS RIVIERA', 105, 14, { align:'center' });
+        doc.setTextColor(...white); doc.setFontSize(20);
+        doc.text('BOOKING VOUCHER', 105, 28, { align:'center' });
+        doc.setFontSize(10); doc.setFont('helvetica','normal');
+        doc.text('luxurytransfersriviera.com.mx', 105, 37, { align:'center' });
+
+        // Booking code badge
+        doc.setFillColor(...gold); doc.roundedRect(60, 46, 90, 14, 3, 3, 'F');
+        doc.setTextColor(...navy); doc.setFontSize(14); doc.setFont('helvetica','bold');
+        doc.text(datos.codigo || 'LTR-????', 105, 56, { align:'center' });
+
+        let y = 72;
+        const row = (label, value) => {
+            if (!value || String(value).trim() === '') return;
+            doc.setTextColor(...grey); doc.setFontSize(8); doc.setFont('helvetica','normal');
+            doc.text(label.toUpperCase(), L, y);
+            doc.setTextColor(...dark); doc.setFontSize(10); doc.setFont('helvetica','bold');
+            const lines = doc.splitTextToSize(String(value), maxW);
+            doc.text(lines, R, y);
+            y += lines.length * 6 + 3;
+        };
+        const divider = () => { doc.setDrawColor(...gold); doc.setLineWidth(0.3); doc.line(L, y, 190, y); y += 5; };
+
+        row('Vehicle', datos.vehiculo);
+        row('Passengers', datos.pasajeros);
+        divider();
+        row('Pick-up', datos.origen);
+        row('Destination', datos.destino);
+        row('Date', datos.fecha); row('Time', datos.hora);
+        if (datos.vuelo) row('Flight', datos.vuelo);
+        if (datos.fechaRegreso) row('Return Date', datos.fechaRegreso + (datos.horaRegreso ? '  ' + datos.horaRegreso : ''));
+        if (datos.vueloRegreso) row('Return Flight', datos.vueloRegreso);
+        divider();
+        row('Passenger Name', datos.nombre);
+        row('Email', datos.email);
+        row('Phone', datos.telefono);
+        divider();
+        const extLines = [];
+        if (parseInt(datos.extraStop)  > 0) extLines.push('Quick 20-Min Stop Trip: '        + datos.extraStop);
+        if (parseInt(datos.extraStopR) > 0) extLines.push('Quick 20-Min Stop Return Trip: ' + datos.extraStopR);
+        if (extLines.length) row('Extras', extLines.join(' | '));
+        if (datos.notas) row('Notes', datos.notas);
+        divider();
+        row('Total', datos.precioTotal);
+        row('Payment', datos.pago);
+
+        // Footer
+        doc.setFillColor(...navy); doc.rect(0, 272, 210, 25, 'F');
+        doc.setTextColor(...gold); doc.setFontSize(9); doc.setFont('helvetica','bold');
+        doc.text('One of our agents will contact you as soon as possible. Thank you for choosing us!', 105, 281, { align:'center' });
+        doc.setTextColor(...white); doc.setFontSize(8); doc.setFont('helvetica','normal');
+        doc.text('+52 984 241 1158  |  reservas@luxurytransfersriviera.com.mx', 105, 290, { align:'center' });
+
+        if (soloBase64) return doc.output('datauristring').split(',')[1];
+        doc.save('Voucher-' + (datos.codigo || 'LTR') + '.pdf');
+    }
+
+    function mostrarModalExito(data) {
+        _datosVentaConfirmada = data;
+        document.getElementById('codigoDisplay').textContent = data.codigo || 'LTR-????';
+        document.getElementById('modal-confirm-vehicle').textContent = data.vehiculo || '';
+        document.getElementById('modal-confirm-pax').textContent = data.pasajeros ? data.pasajeros + ' Passenger' + (parseInt(data.pasajeros) > 1 ? 's' : '') : '';
+        document.getElementById('modal-confirm-price').textContent = data.precioTotal || data.precio || '';
+        const vehKey = Object.keys(_vehicleImages).find(k => (data.vehiculo || '').toUpperCase().includes(k));
+        const img = document.getElementById('modal-confirm-img');
+        img.src = vehKey ? _vehicleImages[vehKey] : _vehicleImages['CLASSIC SEDAN'];
+        img.alt = data.vehiculo || '';
+        if (data.esVenta) {
+            document.getElementById('modalText').innerHTML = 'Thank you for choosing <strong>Luxury Transfers Riviera</strong>. Your payment has been successfully processed and your reservation is confirmed. One of our agents will contact you as soon as possible to provide you with all the details of your service.';
+        } else {
+            document.getElementById('modalText').innerHTML = 'Thank you for choosing <strong>Luxury Transfers Riviera</strong>. We have received your request and one of our agents will contact you shortly with a personalized quote.';
+        }
+        const waMsg = encodeURIComponent('Hello! I just made a booking with code *' + (data.codigo || '') + '*. I need quick assistance.');
+        document.getElementById('btnWhatsapp').href = 'https://wa.me/529842411158?text=' + waMsg;
+        document.getElementById('modalConfirmacion').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
 
     const _vehicleImages = {
         'CLASSIC SEDAN':  'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/CLASSIC%20SEDAN%201%20Desglose%20de%20Precios.webp',
@@ -3477,10 +3602,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         // For email we use the same text ensuring line breaks work correctly en body
         const mailBody = encodeURIComponent(msg); 
 
-        document.getElementById('btnWhatsapp').href = `https://wa.me/529842411158?text=${encodedMsg}`; 
-        // btnMail removed from modal
+        // 5. GENERAR PDF Y ENVIAR AL GOOGLE SHEET
+        if (data.esVenta) {
+            try { data.pdfBase64 = generarVoucherPDF(data, true); } catch(e) { console.warn('PDF gen error:', e); }
+        }
 
-        // 5. ENVIAR AL GOOGLE SHEET
         fetch(SCRIPT_URL, {
             method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
         })
@@ -3491,15 +3617,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
           'transaction_id': data.codigo
       });
             document.getElementById('loadingOverlay').style.display = 'none';
-            if(data.esVenta) {
-                document.getElementById('modalTitle').innerText = 'Booking Confirmed!';
-                document.getElementById('modalText').innerText = 'Thank you! Your booking is confirmed and your payment has been successfully processed. Our team will send you a WhatsApp confirmation shortly with your trip details.';
-            } else {
-                document.getElementById('modalTitle').innerText = 'Booking Confirmed!';
-                document.getElementById('modalText').innerText = "Thank you! We've received your request. One of our agents will contact you shortly with a personalized quote.";
-            }
-            document.getElementById('modalConfirmacion').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+            mostrarModalExito(data);
         })
         .catch(e => {
             console.error(e);
