@@ -3400,10 +3400,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         doc.rect(padL, y, cW, noticeH, 'FD');
         doc.setTextColor(100, 75, 0);
         doc.text(noticeLines, padL + 5, y + 7);
-        y += noticeH + 9;
+        y += noticeH + 14;  // separación visible antes del footer
 
         // ── FOOTER negro con redes sociales ──────────────────────────────
-        const footerH  = 42;
+        const footerH  = 46;
         const footerY  = 297 - footerH;
         doc.setFillColor(...black);
         doc.rect(0, footerY, pageW, footerH, 'F');
@@ -3419,19 +3419,17 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             { key: 'tiktok',      color: [30,   30,  30], lbl: 'Tk' },
             { key: 'youtube',     color: [255,   0,   0], lbl: 'YT' },
             { key: 'tripadvisor', color: [52,  195, 143], lbl: 'TA' },
-            { key: 'email',       color: [100, 100, 100], lbl: '@'  },
-            { key: 'phone',       color: [33,  150, 243], lbl: 'P'  },
         ];
-        const iconR       = 5.5;
-        const iconGap     = 17;
+        const iconR       = 6;
+        const iconGap     = 20;
         const iconsStartX = pageW / 2 - ((socialIcons.length - 1) * iconGap) / 2;
-        const iconCY      = footerY + 22;
+        const iconCY      = footerY + 23;
 
         const _drawIconFallback = (cx, ic) => {
             doc.setFillColor(...ic.color);
             doc.circle(cx, iconCY, iconR, 'F');
             doc.setTextColor(255, 255, 255);
-            doc.setFontSize(ic.lbl.length > 1 ? 5 : 7); doc.setFont('helvetica', 'bold');
+            doc.setFontSize(ic.lbl.length > 1 ? 5.5 : 7.5); doc.setFont('helvetica', 'bold');
             doc.text(ic.lbl, cx, iconCY + 1, { align: 'center', baseline: 'middle' });
         };
 
@@ -3449,7 +3447,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         doc.setTextColor(...white);
         doc.setFontSize(7); doc.setFont('helvetica', 'normal');
-        doc.text('@LuxuryTransfersRiviera', pageW / 2, footerY + 35, { align: 'center' });
+        doc.text('@LuxuryTransfersRiviera', pageW / 2, footerY + 36, { align: 'center' });
+        doc.setFontSize(6.5); doc.setFont('helvetica', 'normal');
+        doc.text('reservas@luxurytransfersriviera.com', pageW / 2, footerY + 42, { align: 'center' });
 
         if (soloBase64) return doc.output('datauristring').split(',')[1];
         doc.save('Voucher-' + (datos.codigo || 'LTR') + '.pdf');
