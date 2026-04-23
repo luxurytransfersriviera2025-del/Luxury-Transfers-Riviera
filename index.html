@@ -3218,8 +3218,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         doc.text('* Illustrative image. Color and model may vary.', padL + imgW / 2, imgY + imgH + 4, { align: 'center' });
 
         // Client info to the right of the image
-        const infoX = padL + imgW + 7;
-        const infoW = cW - imgW - 7;
+        const qrSize = 28;
+        const infoX  = padL + imgW + 7;
+        const infoW  = cW - imgW - 7;
+        const textW  = infoW - qrSize - 5;   // leave room for QR on the right
         let infoY = imgY;
 
         const sideField = (label, value) => {
@@ -3230,7 +3232,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             infoY += 4.5;
             doc.setTextColor(...dark);
             doc.setFontSize(9); doc.setFont('helvetica', 'bold');
-            const lines = doc.splitTextToSize(String(value), infoW);
+            const lines = doc.splitTextToSize(String(value), textW);
             doc.text(lines, infoX, infoY);
             infoY += lines.length * 5 + 4;
         };
@@ -3238,6 +3240,18 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         sideField('Client', datos.nombre   || '');
         sideField('Email',  datos.email    || '');
         sideField('Phone',  datos.telefono || '');
+
+        // WhatsApp QR — right edge of the info column, vertically centered
+        const qrX = pageW - padR - qrSize;
+        const qrY = imgY + (imgH - qrSize) / 2 - 2;
+        if (_whatsappQrB64) {
+            try {
+                doc.addImage(_whatsappQrB64, 'PNG', qrX, qrY, qrSize, qrSize);
+            } catch(e) {}
+        }
+        doc.setTextColor(...grey);
+        doc.setFontSize(5.5); doc.setFont('helvetica', 'normal');
+        doc.text('Scan for WhatsApp', qrX + qrSize / 2, qrY + qrSize + 3.5, { align: 'center' });
 
         y = Math.max(imgY + imgH + 8, infoY + 2);
 
@@ -3458,6 +3472,23 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             };
             img.src = url;
         });
+    })();
+
+    // WhatsApp QR preloaded for PDF
+    let _whatsappQrB64 = null;
+    (function _preloadWhatsappQr() {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function() {
+            try {
+                const c = document.createElement('canvas');
+                c.width = 200; c.height = 200;
+                c.getContext('2d').drawImage(img, 0, 0, 200, 200);
+                _whatsappQrB64 = c.toDataURL('image/png');
+            } catch(e) {}
+        };
+        img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' +
+                  encodeURIComponent('https://wa.me/529842411158') + '&margin=5';
     })();
 
     function mostrarRecuperacion(datos) {
