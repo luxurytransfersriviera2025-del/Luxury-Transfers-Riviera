@@ -3259,68 +3259,109 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         y = Math.max(imgY + imgH + 8, infoY + 2);
 
-        // ── DATE / PASSENGERS / NOTES / RETURN ───────────────────────────
-        const cellW2 = (cW - 4) / 2;
-        const cellH2 = 15;
+        // ── GRID: 4 casos según viaje y vuelo ────────────────────────────
+        const hasVuelo   = !!(datos.vuelo && String(datos.vuelo).trim());
+        const hasRegreso = !!(datos.fechaRegreso && String(datos.fechaRegreso).trim());
+        const gap  = 4;
+        const cellH = 15;
+        const dateStr = fmtDate(datos.fecha) + (datos.hora ? ' \u2014 ' + datos.hora : '');
+        const retStr  = fmtDate(datos.fechaRegreso) + (datos.horaRegreso ? ' \u2014 ' + datos.horaRegreso : '');
+        const paxStr  = (datos.pasajeros || '') + ' pax';
+        const notasVal = datos.notas || '';
 
-        const drawCell2 = (cx, cy, label, value, fullW) => {
-            const w = fullW || cellW2;
+        const drawCell = (cx, cy, w, h, label, value) => {
             doc.setFillColor(...lgrey);
-            doc.rect(cx, cy, w, cellH2, 'F');
+            doc.rect(cx, cy, w, h, 'F');
             doc.setTextColor(...grey);
             doc.setFontSize(7); doc.setFont('helvetica', 'normal');
             doc.text(label, cx + 4, cy + 5.5);
             doc.setTextColor(...dark);
             doc.setFontSize(8.5); doc.setFont('helvetica', 'bold');
-            const lines = doc.splitTextToSize(String(value || ''), w - 8);
-            doc.text(lines[0] || '', cx + 4, cy + 11);
+            const ls = doc.splitTextToSize(String(value || ''), w - 8);
+            ls.forEach((line, i) => doc.text(line, cx + 4, cy + 11 + i * 5));
         };
 
-        const dateTimeStr = fmtDate(datos.fecha) + (datos.hora ? ' — ' + datos.hora : '');
-        drawCell2(padL,              y, 'Date & time', dateTimeStr);
-        drawCell2(padL + cellW2 + 4, y, 'Passengers',  (datos.pasajeros || '') + ' pax');
-        y += cellH2 + 3;
+        const notaLines = notasVal ? doc.splitTextToSize(notasVal, cW - 8) : [];
+        const notaH = notasVal ? Math.max(cellH, notaLines.length * 5 + 10) : 0;
 
-        if (datos.notas) {
-            drawCell2(padL, y, 'Notes', datos.notas, cW);
-            y += cellH2 + 3;
-        }
-        if (datos.fechaRegreso) {
-            const retStr = fmtDate(datos.fechaRegreso) + (datos.horaRegreso ? ' — ' + datos.horaRegreso : '');
-            drawCell2(padL, y, 'Return date & time', retStr, cW);
-            y += cellH2 + 3;
-        }
-        if (datos.vuelo) {
-            drawCell2(padL, y, 'Flight number', datos.vuelo, cW);
-            y += cellH2 + 3;
-        }
-        if (datos.vueloRegreso) {
-            drawCell2(padL, y, 'Return flight', datos.vueloRegreso, cW);
-            y += cellH2 + 3;
+        // Caso 1: ida + vuelo
+        if (!hasRegreso && hasVuelo) {
+            const w3 = (cW - gap * 2) / 3;
+            drawCell(padL,               y, w3, cellH, 'Date & time',   dateStr);
+            drawCell(padL + w3 + gap,    y, w3, cellH, 'Flight number', datos.vuelo || '');
+            drawCell(padL + (w3+gap)*2,  y, w3, cellH, 'Passengers',    paxStr);
+            y += cellH + gap;
+            if (notasVal) { drawCell(padL, y, cW, notaH, 'Notes', notasVal); y += notaH + gap; }
         }
 
-        y += 3;
+        // Caso 2: ida y vuelta + vuelo
+        if (hasRegreso && hasVuelo) {
+            const w3 = (cW - gap * 2) / 3;
+            drawCell(padL,               y, w3, cellH, 'Date & time',    dateStr);
+            drawCell(padL + w3 + gap,    y, w3, cellH, 'Flight number',  datos.vuelo || '');
+            drawCell(padL + (w3+gap)*2,  y, w3, cellH, 'Passengers',     paxStr);
+            y += cellH + gap;
+            const w2 = (cW - gap) / 2;
+            drawCell(padL,        y, w2, cellH, 'Return date & time', retStr);
+            drawCell(padL+w2+gap, y, w2, cellH, 'Return flight',      datos.vueloRegreso || '-');
+            y += cellH + gap;
+            if (notasVal) { drawCell(padL, y, cW, notaH, 'Notes', notasVal); y += notaH + gap; }
+        }
 
-        // ── DIVIDER ───────────────────────────────────────────────────────
-        doc.setDrawColor(...greyLn); doc.setLineWidth(0.3);
-        doc.line(padL, y, pageW - padR, y);
-        y += 8;
+        // Caso 3: ida sin vuelo
+        if (!hasRegreso && !hasVuelo) {
+            const w2 = (cW - gap) / 2;
+            drawCell(padL,        y, w2, cellH, 'Date & time', dateStr);
+            drawCell(padL+w2+gap, y, w2, cellH, 'Passengers',  paxStr);
+            y += cellH + gap;
+            if (notasVal) { drawCell(padL, y, cW, notaH, 'Notes', notasVal); y += notaH + gap; }
+        }
 
-        // ── ROUTE ─────────────────────────────────────────────────────────
-        const routeRow = (dotColor, labelTxt, address) => {
-            doc.setFillColor(...dotColor);
-            doc.circle(padL + 3, y + 2, 2, 'F');
-            doc.setTextColor(...grey);
-            doc.setFontSize(7); doc.setFont('helvetica', 'normal');
-            doc.text(labelTxt, padL + 9, y + 0.5);
-            doc.setTextColor(...dark);
-            doc.setFontSize(9); doc.setFont('helvetica', 'bold');
-            const lines = doc.splitTextToSize(address || '', cW - 13);
-            doc.text(lines, padL + 9, y + 6.5);
-            y += lines.length * 5 + 9;
-        };
-        routeRow([255, 193, 7],  'Pick-up',  datos.origen  || '');
-        routeRow([41, 128, 185], 'Drop-off', datos.destino || '');
+        // Caso 4: ida y vuelta sin vuelo
+        if (hasRegreso && !hasVuelo) {
+            const w3 = (cW - gap * 2) / 3;
+            drawCell(padL,               y, w3, cellH, 'Date & time',        dateStr);
+            drawCell(padL + w3 + gap,    y, w3, cellH, 'Return date & time', retStr);
+            drawCell(padL + (w3+gap)*2,  y, w3, cellH, 'Passengers',         paxStr);
+            y += cellH + gap;
+            if (notasVal) { drawCell(padL, y, cW, notaH, 'Notes', notasVal); y += notaH + gap; }
+        }
+
+        y += 2;
+
+        // ── ROUTE CELLS con flecha ────────────────────────────────────────
+        const arrowW = 12;
+        doc.setFontSize(8.5); doc.setFont('helvetica', 'bold');
+        const origLns = doc.splitTextToSize(datos.origen  || '', (cW - arrowW - gap*2) / 2 - 8);
+        const destLns = doc.splitTextToSize(datos.destino || '', (cW - arrowW - gap*2) / 2 - 8);
+        const routeH  = Math.max(cellH, Math.max(origLns.length, destLns.length) * 5 + 10);
+        const rW      = (cW - arrowW - gap * 2) / 2;
+
+        drawCell(padL,                    y, rW,     routeH, 'Pick-up',  datos.origen  || '');
+        drawCell(padL + rW*2 + arrowW + gap*2, y, rW, routeH, 'Drop-off', datos.destino || '');
+
+        // Flecha centrada
+        const arrowX  = padL + rW + gap;
+        const midArrY = y + routeH / 2;
+        doc.setFillColor(...lgrey);
+        doc.rect(arrowX, y, arrowW, routeH, 'F');
+        doc.setDrawColor(...grey); doc.setLineWidth(0.6);
+        if (hasRegreso) {
+            // ⇄ dos flechas
+            doc.line(arrowX+2, midArrY-2, arrowX+arrowW-2, midArrY-2);
+            doc.line(arrowX+arrowW-2, midArrY-2, arrowX+arrowW-5, midArrY-4.5);
+            doc.line(arrowX+arrowW-2, midArrY-2, arrowX+arrowW-5, midArrY+0.5);
+            doc.line(arrowX+arrowW-2, midArrY+2, arrowX+2, midArrY+2);
+            doc.line(arrowX+2, midArrY+2, arrowX+5, midArrY-0.5);
+            doc.line(arrowX+2, midArrY+2, arrowX+5, midArrY+4.5);
+        } else {
+            // → una flecha
+            doc.line(arrowX+2, midArrY, arrowX+arrowW-2, midArrY);
+            doc.line(arrowX+arrowW-2, midArrY, arrowX+arrowW-5, midArrY-2.5);
+            doc.line(arrowX+arrowW-2, midArrY, arrowX+arrowW-5, midArrY+2.5);
+        }
+
+        y += routeH + gap;
 
         // ── DIVIDER ───────────────────────────────────────────────────────
         doc.setDrawColor(...greyLn); doc.setLineWidth(0.3);
