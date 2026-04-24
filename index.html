@@ -1885,7 +1885,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
         if (!zona && cp) zona = detectarZonaPorCP(cp, zonasCP);
         if (!zona && lugar) {
-            const up = lugar.toUpperCase();
+            const up = lugar.slice(0, 600).toUpperCase();
             for (let key in diccionarioZonas) {
                 const esLargaDistancia = zonasLargaDistancia.includes(key);
                 for (let kw of diccionarioZonas[key]) {
@@ -2160,11 +2160,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             if (descuento > 0) {
                 divRes.innerHTML += `<div style="background:linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 100%);border-left:4px solid var(--gold);border-radius:8px;padding:14px 20px;margin-bottom:16px;display:flex;align-items:center;gap:12px;">
                     <i class="fas fa-tag" style="color:var(--gold);font-size:16px;"></i>
-                    <span style="font-weight:700;color:var(--gold);font-size:13px;letter-spacing:1px;text-transform:uppercase;font-family:var(--font-title);">Code ${promoCode} — ${Math.round(descuento * 100)}% exclusive discount applied</span>
+                    <span style="font-weight:700;color:var(--gold);font-size:13px;letter-spacing:1px;text-transform:uppercase;font-family:var(--font-title);">Code ${escapeHTML(promoCode)} — ${Math.round(descuento * 100)}% exclusive discount applied</span>
                 </div>`;
             }
-
-            const cap15 = "Up to 15 Pax";
 
             // Show vehicles from lowest to highest price (max 15 pax)
             if (pax > 15) {
@@ -2196,7 +2194,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             setTimeout(initErtigaSliders, 100);
         } catch (error) {
             console.error(error);
-            alert("An error occurred while processing the quote. Technical detail: " + error.message);
+            console.error("Quote processing error:", error);
+            alert("An error occurred while processing the quote. Please try again or contact us via WhatsApp.");
         }
     }
 
@@ -3643,7 +3642,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         // Populate modal fields
         document.getElementById('recovery-code').textContent    = datos.codigo || 'LTR-????';
         document.getElementById('recovery-vehicle').textContent = datos.vehiculo || '';
-        document.getElementById('recovery-precio' in document.getElementById('recovery-price') ? 'recovery-price' : 'recovery-price').textContent = datos.precioTotal || datos.precio || '';
         document.getElementById('recovery-price').textContent   = datos.precioTotal || datos.precio || '';
         document.getElementById('recovery-origen').textContent  = datos.origen   || '';
         document.getElementById('recovery-destino').textContent = datos.destino  || '';
@@ -4089,6 +4087,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             try { data.pdfBase64 = generarVoucherPDF(data, true); } catch(e) { console.warn('PDF gen error:', e); }
         }
 
+        data._token = "LTR-SEC-2025-XK9M7P";
         fetch(SCRIPT_URL, {
             method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
         })
