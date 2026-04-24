@@ -1473,6 +1473,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         <div class="spinner"></div>
         <p id="loadingTextDisplay" style="margin-top: 15px; font-weight: 700; color: #222; font-size: 15px; text-align:center;">We are generating your booking...</p>
         <p id="loadingSubText" style="margin-top: 6px; color: #555; font-size: 12px; text-align:center; max-width:270px; line-height:1.5;">Please do not close this window.<br>This may take a few seconds.</p>
+        <p id="loadingCountdown" style="display:none; margin-top:10px; font-size:13px; font-weight:700; color:#222; text-align:center;"></p>
     </div>
 
     <div class="modal-overlay" id="modalConfirmacion">
@@ -3276,11 +3277,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             doc.setTextColor(...dark);
             doc.setFontSize(8.5); doc.setFont('helvetica', 'bold');
             const ls = doc.splitTextToSize(String(value || ''), w - 8);
-            ls.forEach((line, i) => doc.text(line, cx + 4, cy + 11 + i * 5));
+            ls.forEach((line, i) => doc.text(line, cx + 4, cy + 11 + i * 5.5));
         };
 
         const notaLines = notasVal ? doc.splitTextToSize(notasVal, cW - 8) : [];
-        const notaH = notasVal ? Math.max(cellH, notaLines.length * 5 + 10) : 0;
+        const notaH = notasVal ? Math.max(cellH, notaLines.length * 5.5 + 12) : 0;
 
         // Caso 1: ida + vuelo
         if (!hasRegreso && hasVuelo) {
@@ -3332,7 +3333,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         doc.setFontSize(8.5); doc.setFont('helvetica', 'bold');
         const origLns = doc.splitTextToSize(datos.origen  || '', (cW - arrowW - gap*2) / 2 - 8);
         const destLns = doc.splitTextToSize(datos.destino || '', (cW - arrowW - gap*2) / 2 - 8);
-        const routeH  = Math.max(cellH, Math.max(origLns.length, destLns.length) * 5 + 10);
+        const routeH  = Math.max(cellH, Math.max(origLns.length, destLns.length) * 5.5 + 12);
         const rW      = (cW - arrowW - gap * 2) / 2;
 
         drawCell(padL,                         y, rW, routeH, 'Pick-up',  datos.origen  || '');
@@ -3429,11 +3430,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const footerH  = 20;
         const footerY  = 297 - footerH;
         const noticeTextPreview = 'Please save your booking code ' + (datos.codigo || 'LTR-????') +
-            '. Our team will contact you shortly to confirm your trip details.' +
-            ' If your service is to or from an airport, our agent will send you the meeting point through this channel.' +
-            ' We invite you to download the WhatsApp app and contact us at +52 984 241 1158 to make the process faster.';
+            '. We invite you to download the WhatsApp app and contact us at +52 984 241 1158 for faster communication.';
         doc.setFontSize(8.5);
-        const noticeHPreview = doc.splitTextToSize(noticeTextPreview, cW - 10).length * 5.2 + 10;
+        const noticeHPreview = doc.splitTextToSize(noticeTextPreview, cW - 10).length * 5.2 + 8;
         if (y + noticeHPreview + 10 > footerY) {
             doc.addPage();
             y = 20;
@@ -3441,12 +3440,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         // ── NOTICE BOX ────────────────────────────────────────────────────
         const noticeText = 'Please save your booking code ' + (datos.codigo || 'LTR-????') +
-            '. Our team will contact you shortly to confirm your trip details.' +
-            ' If your service is to or from an airport, our agent will send you the meeting point through this channel.' +
-            ' We invite you to download the WhatsApp app and contact us at +52 984 241 1158 to make the process faster.';
+            '. We invite you to download the WhatsApp app and contact us at +52 984 241 1158 for faster communication.';
         doc.setFontSize(8.5); doc.setFont('helvetica', 'normal');
         const noticeLines = doc.splitTextToSize(noticeText, cW - 10);
-        const noticeH = noticeLines.length * 5.2 + 10;
+        const noticeH = noticeLines.length * 5.2 + 8;
         doc.setFillColor(255, 252, 220);
         doc.setDrawColor(220, 185, 60);
         doc.setLineWidth(0.6);
@@ -3932,11 +3929,49 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
     }
 
+    (function _watchOverlay() {
+        const el = document.getElementById('loadingOverlay');
+        if (!el) return;
+        new MutationObserver(() => {
+            if (el.style.display === 'none') _stopCountdown();
+        }).observe(el, { attributes: true, attributeFilter: ['style'] });
+    })();
+
+    let _countdownInterval = null;
+    function _startCountdown(seconds) {
+        const el = document.getElementById('loadingCountdown');
+        if (!el) return;
+        if (_countdownInterval) clearInterval(_countdownInterval);
+        let remaining = seconds;
+        el.style.display = 'block';
+        el.textContent = remaining + 's';
+        _countdownInterval = setInterval(() => {
+            remaining--;
+            if (remaining <= 0) {
+                clearInterval(_countdownInterval);
+                _countdownInterval = null;
+                el.style.display = 'none';
+            } else {
+                el.textContent = remaining + 's';
+            }
+        }, 1000);
+    }
+    function _stopCountdown() {
+        if (_countdownInterval) { clearInterval(_countdownInterval); _countdownInterval = null; }
+        const el = document.getElementById('loadingCountdown');
+        if (el) el.style.display = 'none';
+    }
+
     function _setLoadingMsg(title, sub) {
         const t = document.getElementById('loadingTextDisplay');
         const s = document.getElementById('loadingSubText');
         if (t) t.textContent = title;
         if (s) s.innerHTML  = sub;
+        if (title && title.toLowerCase().includes('generating your booking')) {
+            _startCountdown(30);
+        } else {
+            _stopCountdown();
+        }
     }
 
     function iniciarEnvio(data) {
