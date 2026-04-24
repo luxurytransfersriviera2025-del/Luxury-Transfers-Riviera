@@ -3191,11 +3191,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         // ── VEHICLE IMAGE + CLIENT INFO ───────────────────────────────────
         let y = 32;
         const imgW = 66, imgH = 38;
+        const hasRegreso = !!(datos.fechaRegreso && String(datos.fechaRegreso).trim());
 
-        // Vehicle name above the image
+        // Vehicle name + trip type on the same line
+        const tripLabel = hasRegreso ? 'ROUND TRIP' : 'ONE WAY';
         doc.setTextColor(...dark);
         doc.setFontSize(8.5); doc.setFont('helvetica', 'bold');
-        doc.text((datos.vehiculo || '').toUpperCase(), padL + imgW / 2, y, { align: 'center' });
+        doc.text((datos.vehiculo || '').toUpperCase() + '  |  ' + tripLabel, padL + imgW / 2, y, { align: 'center' });
         y += 5;
 
         // Vehicle image (or grey placeholder)
@@ -3260,7 +3262,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         // ── GRID: 4 casos según viaje y vuelo ────────────────────────────
         const hasVuelo   = !!(datos.vuelo && String(datos.vuelo).trim());
-        const hasRegreso = !!(datos.fechaRegreso && String(datos.fechaRegreso).trim());
         const gap  = 4;
         const cellH = 15;
         const dateStr = fmtDate(datos.fecha) + (datos.hora ? ' \u2014 ' + datos.hora : '');
@@ -3268,16 +3269,23 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const paxStr  = (datos.pasajeros || '') + ' pax';
         const notasVal = datos.notas || '';
 
-        const drawCell = (cx, cy, w, h, label, value) => {
+        const drawCell = (cx, cy, w, h, label, value, dotColor = null) => {
             doc.setFillColor(...lgrey);
             doc.rect(cx, cy, w, h, 'F');
+            const hasD  = Array.isArray(dotColor);
+            const offX  = hasD ? 9 : 4;
+            const textW = w - offX - 4;
+            if (hasD) {
+                doc.setFillColor(...dotColor);
+                doc.circle(cx + 4, cy + 5.2, 1.8, 'F');
+            }
             doc.setTextColor(...grey);
             doc.setFontSize(7); doc.setFont('helvetica', 'normal');
-            doc.text(label, cx + 4, cy + 5.5);
+            doc.text(label, cx + offX, cy + 5.5);
             doc.setTextColor(...dark);
             doc.setFontSize(8.5); doc.setFont('helvetica', 'bold');
-            const ls = doc.splitTextToSize(String(value || ''), w - 8);
-            ls.forEach((line, i) => doc.text(line, cx + 4, cy + 11 + i * 5.5));
+            const ls = doc.splitTextToSize(String(value || ''), textW);
+            ls.forEach((line, i) => doc.text(line, cx + offX, cy + 11 + i * 5.5));
         };
 
         doc.setFontSize(8.5); doc.setFont('helvetica', 'bold');
@@ -3329,39 +3337,17 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         y += 2;
 
-        // ── ROUTE CELLS con flecha ────────────────────────────────────────
-        const arrowW = 12;
+        // ── ROUTE CELLS verticales ───────────────────────────────────────
         doc.setFontSize(8.5); doc.setFont('helvetica', 'bold');
-        const origLns = doc.splitTextToSize(datos.origen  || '', (cW - arrowW - gap*2) / 2 - 8);
-        const destLns = doc.splitTextToSize(datos.destino || '', (cW - arrowW - gap*2) / 2 - 8);
-        const routeH  = Math.max(cellH, Math.max(origLns.length, destLns.length) * 5.5 + 12);
-        const rW      = (cW - arrowW - gap * 2) / 2;
+        const origLns = doc.splitTextToSize(datos.origen  || '', cW - 8);
+        const destLns = doc.splitTextToSize(datos.destino || '', cW - 8);
+        const pickH = Math.max(cellH, origLns.length * 5.5 + 12);
+        const dropH = Math.max(cellH, destLns.length * 5.5 + 12);
 
-        drawCell(padL,                         y, rW, routeH, 'Pick-up',  datos.origen  || '');
-        drawCell(padL + rW + gap + arrowW + gap, y, rW, routeH, 'Drop-off', datos.destino || '');
-
-        // Flecha centrada
-        const arrowX  = padL + rW + gap;
-        const midArrY = y + routeH / 2;
-        doc.setFillColor(...lgrey);
-        doc.rect(arrowX, y, arrowW, routeH, 'F');
-        doc.setDrawColor(...grey); doc.setLineWidth(0.6);
-        if (hasRegreso) {
-            // ⇄ dos flechas
-            doc.line(arrowX+2, midArrY-2, arrowX+arrowW-2, midArrY-2);
-            doc.line(arrowX+arrowW-2, midArrY-2, arrowX+arrowW-5, midArrY-4.5);
-            doc.line(arrowX+arrowW-2, midArrY-2, arrowX+arrowW-5, midArrY+0.5);
-            doc.line(arrowX+arrowW-2, midArrY+2, arrowX+2, midArrY+2);
-            doc.line(arrowX+2, midArrY+2, arrowX+5, midArrY-0.5);
-            doc.line(arrowX+2, midArrY+2, arrowX+5, midArrY+4.5);
-        } else {
-            // → una flecha
-            doc.line(arrowX+2, midArrY, arrowX+arrowW-2, midArrY);
-            doc.line(arrowX+arrowW-2, midArrY, arrowX+arrowW-5, midArrY-2.5);
-            doc.line(arrowX+arrowW-2, midArrY, arrowX+arrowW-5, midArrY+2.5);
-        }
-
-        y += routeH + gap;
+        drawCell(padL, y, cW, pickH, 'Pick-up',  datos.origen  || '', [212, 175, 55]);
+        y += pickH + gap;
+        drawCell(padL, y, cW, dropH, 'Drop-off', datos.destino || '', [30, 100, 200]);
+        y += dropH + gap;
 
         // ── DIVIDER ───────────────────────────────────────────────────────
         doc.setDrawColor(...greyLn); doc.setLineWidth(0.3);
