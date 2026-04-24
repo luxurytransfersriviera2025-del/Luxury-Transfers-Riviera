@@ -570,7 +570,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         .modal-btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
         .btn-wa { background: #25d366; color: #fff; box-shadow: 0 6px 20px rgba(37,211,102,0.35); }
         .btn-wa i { font-size: 22px; }
-        .btn-call { display: none; }
+
 
 
         .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); z-index: 20000; display: none; align-items: center; justify-content: center; flex-direction: column; }
@@ -1532,8 +1532,31 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     </div>
 
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7Fc9DMmnbwoc2Xt8xoRdem8jOoRNlnrofAx0JjFUNzlBLvVzpX5zi8Hj5OaojlGw/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7Fc9DMmnbwoc2Xt8xoRdem8jOoRNlnrofAx0JjFUNzlBLvVzpX5zi8Hj5OaojlGw/exec";
     const CAPI_WORKER_URL = "https://meta-conversiones-api.luxurytransfersriviera2025.workers.dev";
+
+    function escapeHTML(str) {
+        return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+    const _cardDataStore = {};
+    const _couponCache = {};
+    async function validateCoupon(code) {
+        if (!code) return { valid: false, discount: 0 };
+        const key = code.toUpperCase();
+        if (_couponCache[key] !== undefined) return _couponCache[key];
+        try {
+            const res = await fetch('https://checkout.luxurytransfersriviera.com.mx/validate-coupon', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: key }),
+            });
+            const data = await res.json();
+            _couponCache[key] = data;
+            return data;
+        } catch {
+            return { valid: false, discount: 0 };
+        }
+    }
 
     // Currency conversion utility
     function convertirPrecio(usd, moneda) {
@@ -2094,7 +2117,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             divRes.innerHTML = "";
             _cid = 0;
 
-            const rutaLabel = `${origenVal} <i class='fas fa-arrow-right'></i> ${destinoVal}`;
+            const rutaLabel = `${escapeHTML(origenVal)} <i class='fas fa-arrow-right'></i> ${escapeHTML(destinoVal)}`;
             divRes.innerHTML = `<div class="ruta-header">Results for: ${rutaLabel}</div>`;
 
             if (!preciosSencillo) {
@@ -2126,9 +2149,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             const promoCode = isRedondoMode
                 ? (document.getElementById('codigoPromo') ? document.getElementById('codigoPromo').value.trim().toUpperCase() : '')
                 : (document.getElementById('codigoPromoOneWay') ? document.getElementById('codigoPromoOneWay').value.trim().toUpperCase() : '');
-            const descuento = (promoCode === 'LTR-10' || promoCode === 'LTR10') ? 0.10
-                            : (promoCode === 'LUX-20' || promoCode === 'LUX20') ? 0.20
-                            : 0;
+            const _couponResult = await validateCoupon(promoCode);
+            const descuento = _couponResult.valid ? (_couponResult.discount / 100) : 0;
             const cp = (usd) => {
                 const base = convertirPrecio(usd, moneda);
                 return descuento > 0 ? Math.round(base * (1 - descuento)) : base;
@@ -2138,11 +2160,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             if (descuento > 0) {
                 divRes.innerHTML += `<div style="background:linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 100%);border-left:4px solid var(--gold);border-radius:8px;padding:14px 20px;margin-bottom:16px;display:flex;align-items:center;gap:12px;">
                     <i class="fas fa-tag" style="color:var(--gold);font-size:16px;"></i>
-                    <span style="font-weight:700;color:var(--gold);font-size:13px;letter-spacing:1px;text-transform:uppercase;font-family:var(--font-title);">${
-                        promoCode === 'LUX-20' || promoCode === 'LUX20'
-                            ? 'Code LUX-20 — 20% exclusive discount applied'
-                            : 'Promo LTR-10 — 10% exclusive discount applied'
-                    }</span>
+                    <span style="font-weight:700;color:var(--gold);font-size:13px;letter-spacing:1px;text-transform:uppercase;font-family:var(--font-title);">Code ${promoCode} — ${Math.round(descuento * 100)}% exclusive discount applied</span>
                 </div>`;
             }
 
@@ -2207,14 +2225,15 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const promoCode = (tipoActivo === 'REDONDO')
             ? (document.getElementById('codigoPromo') ? document.getElementById('codigoPromo').value.trim().toUpperCase() : '')
             : (document.getElementById('codigoPromoOneWay') ? document.getElementById('codigoPromoOneWay').value.trim().toUpperCase() : '');
-        const tieneDescuento = (promoCode === 'LTR-10' || promoCode === 'LTR10' || promoCode === 'LUX-20' || promoCode === 'LUX20');
+        const _cardCoupon = _couponCache[(promoCode || '').toUpperCase()] || { valid: false, discount: 0 };
+        const tieneDescuento = _cardCoupon.valid;
 
         // Displayed price already includes discount if promo code applied
         // precioOriginal = precio sin descuento (para segunda tacha)
-        const descuentoPct = (promoCode === 'LUX-20' || promoCode === 'LUX20') ? 0.80 : 0.90;
+        const descuentoPct = tieneDescuento ? (1 - _cardCoupon.discount / 100) : 1;
         const precioOriginal = tieneDescuento ? Math.round(precio / descuentoPct) : precio;
 
-        const dataStr = JSON.stringify({ esVenta: true, vehiculo: veh, precio: "$" + precio + " " + moneda, zona: zona, origen: document.getElementById('origen').value, destino: document.getElementById('destino').value }).replace(/"/g, "&quot;");
+        _cardDataStore[id] = { esVenta: true, vehiculo: veh, precio: "$" + precio + " " + moneda, zona: zona, origen: document.getElementById('origen').value, destino: document.getElementById('destino').value };
         const precioDisplay = '<span style="font-size:26px;font-weight:900;color:var(--navy-bg);font-family:var(--font-title);">$' + precio + ' <small style="font-size:14px;font-weight:600;" translate="no">' + moneda + '</small></span>';
         let tipoTexto = (tipo === 'SENCILLO') ? t.oneWay : t.roundTrip;
         let iconoTipo = (tipo === 'SENCILLO') ? "fa-arrow-right" : "fa-exchange-alt";
@@ -2255,7 +2274,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     ${precioHTML}
                 </div>
                 <div id="total-con-extras-${id}" style="display:none;"></div>
-                <button class="btn-reservar" style="width:100%;" onclick="abrirFormCard('${id}', ${dataStr})">${t.bookBtn} <i class="fas fa-chevron-down"></i></button>
+                <button class="btn-reservar" style="width:100%;" onclick="abrirFormCard('${id}')">${t.bookBtn} <i class="fas fa-chevron-down"></i></button>
             </div>
 
             <!-- FORMULARIO EXPANDIBLE -->
@@ -2397,7 +2416,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
                 <!-- ══ BOTÓN CONTINUAR — valida el form ══ -->
                 <button id="btn-continuar-${id}" class="btn-enviar-reserva"
-                    onclick="validarYMostrarPago('${id}', ${dataStr})">
+                    onclick="validarYMostrarPago('${id}')">
                     <i class="fas fa-lock"></i>
                     CONTINUE TO PAYMENT
                 </button>
@@ -2420,7 +2439,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     </p>
 
                     <!-- BOTON TARJETA: fondo BLANCO, borde sutil, logos reales -->
-                    <button id="btn-stripe-${id}" onclick="pagarConStripe('${id}', ${dataStr})"
+                    <button id="btn-stripe-${id}" onclick="pagarConStripe('${id}')"
                         style="width:100%; background:#0a0a0a; color:#fff; border:none; border-radius:10px; padding:14px 18px; font-size:14px; font-weight:700; cursor:pointer; font-family:var(--font-body); display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;"
                         >
                         <span style="display:flex; align-items:center; gap:12px;">
@@ -2463,7 +2482,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
                     <!-- PAYPAL FALLBACK con logo SVG oficial -->
                     <div id="paypal-fallback-${id}" style="display:none;">
-                        <button onclick="pagarConPayPal('${id}', ${dataStr})"
+                        <button onclick="pagarConPayPal('${id}')"
                             style="width:100%; background:#FFC439; border:none; border-radius:8px; padding:14px 20px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;"
                             >
                             <!-- Logo PayPal SVG oficial (azul oscuro + azul claro) -->
@@ -2683,7 +2702,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
 
 
-    function abrirFormCard(id, datosCard) {
+    function abrirFormCard(id) {
+        const datosCard = _cardDataStore[id] || {};
         const form = document.getElementById('form-' + id);
         const tarjeta = document.getElementById(id);
         const isOpen = form.classList.contains('open');
@@ -2858,7 +2878,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     const _datosPendientes = {};
 
     // ─── PASO 1: Validar formulario y mostrar botones de pago ────────
-    function validarYMostrarPago(id, datosCard) {
+    function validarYMostrarPago(id) {
+        const datosCard = _cardDataStore[id] || {};
 
         if (!document.getElementById('terms-' + id).checked) { alert('⚠️ You must read and agree to the Terms & Conditions to continue.'); return; }
         const nombre = document.getElementById('nombre-' + id).value.trim();
@@ -2972,7 +2993,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     }
 
     // ─── Static PayPal: creates order and redirects to PayPal ────────
-    async function pagarConPayPal(id, datosCard) {
+    async function pagarConPayPal(id) {
+        const datosCard = _cardDataStore[id] || {};
         const moneda       = document.getElementById('moneda') ? document.getElementById('moneda').value : 'USD';
         const basePrice    = parseFloat((datosCard.precio || '0').replace(/[^0-9.]/g, '')) || 0;
         const extras       = getExtrasTotal(id);
@@ -3047,7 +3069,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     }
 
     // ─── PASO 2: Stripe Checkout — redirige a stripe.com ─────────────
-    async function pagarConStripe(id, datosCard) {
+    async function pagarConStripe(id) {
+        const datosCard = _cardDataStore[id] || {};
         const btn  = document.getElementById('btn-stripe-' + id);
 
         btn.disabled = true;
@@ -3379,8 +3402,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const baseNum  = parseFloat((datos.precio      || '0').replace(/[^0-9.]/g, '')) || 0;
         const totalNum = parseFloat((datos.precioTotal || datos.precio || '0').replace(/[^0-9.]/g, '')) || baseNum;
         const cuponCode = (datos.cupon || '').toUpperCase();
-        const discPct   = (cuponCode === 'LTR-10' || cuponCode === 'LTR10') ? 0.10
-                        : (cuponCode === 'LUX-20' || cuponCode === 'LUX20') ? 0.20 : 0;
+        const _pdfCoupon = _couponCache[cuponCode] || { valid: false, discount: 0 };
+        const discPct   = _pdfCoupon.valid ? (_pdfCoupon.discount / 100) : 0;
 
         const fmt  = (n) => '$' + (Math.round(n * 100) / 100).toFixed(2) + ' ' + monedaStr;
         const rowH = 8;
@@ -4041,11 +4064,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
 
         // Agregar Extras si hay
-        if(false) {
-            msg += `\n*Extras:*\n`;
-            msg += `  💰 Total Extras: ${data.totalExtras}\n`;
-        }
-
         // Agregar Itinerario (Importante para tours)
         if(data.itinerario && data.itinerario.trim() !== "") {
             msg += `\n*${lblItinerary}:*\n${data.itinerario}\n`;
