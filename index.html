@@ -3403,14 +3403,14 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         y += noticeH + 6;
 
         // ── FOOTER negro con redes sociales ──────────────────────────────
-        const footerH  = 33;
+        const footerH  = 26;
         const footerY  = 297 - footerH;
         doc.setFillColor(...black);
         doc.rect(0, footerY, pageW, footerH, 'F');
 
         doc.setTextColor(...white);
-        doc.setFontSize(7); doc.setFont('helvetica', 'bold');
-        doc.text('Follow us & Contact us', pageW / 2, footerY + 7, { align: 'center' });
+        doc.setFontSize(6); doc.setFont('helvetica', 'bold');
+        doc.text('Follow us & Contact us', pageW / 2, footerY + 5.5, { align: 'center' });
 
         const socialIcons = [
             { key: 'whatsapp',    color: [37,  211, 102], lbl: 'WA' },
@@ -3420,16 +3420,16 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             { key: 'youtube',     color: [255,   0,   0], lbl: 'YT' },
             { key: 'tripadvisor', color: [52,  195, 143], lbl: 'TA' },
         ];
-        const iconR       = 4.5;
-        const iconGap     = 17;
+        const iconR       = 4;
+        const iconGap     = 16;
         const iconsStartX = pageW / 2 - ((socialIcons.length - 1) * iconGap) / 2;
-        const iconCY      = footerY + 16;
+        const iconCY      = footerY + 13;
 
         const _drawIconFallback = (cx, ic) => {
             doc.setFillColor(...ic.color);
             doc.circle(cx, iconCY, iconR, 'F');
             doc.setTextColor(255, 255, 255);
-            doc.setFontSize(ic.lbl.length > 1 ? 4.5 : 6); doc.setFont('helvetica', 'bold');
+            doc.setFontSize(ic.lbl.length > 1 ? 4 : 5.5); doc.setFont('helvetica', 'bold');
             doc.text(ic.lbl, cx, iconCY + 1, { align: 'center', baseline: 'middle' });
         };
 
@@ -3438,7 +3438,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             if (_socialIconsB64[ic.key]) {
                 try {
                     const d = iconR * 2;
-                    doc.addImage(_socialIconsB64[ic.key], 'PNG', cx - iconR, iconCY - iconR, d, d);
+                    doc.addImage(_socialIconsB64[ic.key], 'JPEG', cx - iconR, iconCY - iconR, d, d);
                 } catch(e) { _drawIconFallback(cx, ic); }
             } else {
                 _drawIconFallback(cx, ic);
@@ -3446,10 +3446,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         });
 
         doc.setTextColor(...white);
-        doc.setFontSize(6.5); doc.setFont('helvetica', 'normal');
-        doc.text('@LuxuryTransfersRiviera', pageW / 2, footerY + 25.5, { align: 'center' });
         doc.setFontSize(6); doc.setFont('helvetica', 'normal');
-        doc.text('reservas@luxurytransfersriviera.com', pageW / 2, footerY + 30.5, { align: 'center' });
+        doc.text('@LuxuryTransfersRiviera  |  reservas@luxurytransfersriviera.com', pageW / 2, footerY + 22, { align: 'center' });
 
         if (soloBase64) return doc.output('datauristring').split(',')[1];
         doc.save('Voucher-' + (datos.codigo || 'LTR') + '.pdf');
@@ -3556,11 +3554,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             img.crossOrigin = 'anonymous';
             img.onload = function() {
                 try {
-                    const S = 128;
+                    const S = 72;
                     const c = document.createElement('canvas');
                     c.width = c.height = S;
                     c.getContext('2d').drawImage(img, 0, 0, S, S);
-                    _socialIconsB64[key] = c.toDataURL('image/png');
+                    _socialIconsB64[key] = c.toDataURL('image/jpeg', 0.80);
                 } catch(e) {}
             };
             img.src = url;
