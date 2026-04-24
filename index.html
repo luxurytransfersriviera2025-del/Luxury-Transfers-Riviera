@@ -3166,31 +3166,29 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             return m ? `${m[3]}/${m[2]}/${m[1]}` : d;
         };
 
-        // ── HEADER compact — left/right alineados a la misma altura ──────
+        // ── HEADER compact ────────────────────────────────────────────────
         doc.setFillColor(...black);
-        doc.rect(0, 0, pageW, 35, 'F');
+        doc.rect(0, 0, pageW, 25, 'F');
 
         let textX = padL;
         if (_faviconB64) {
-            try { doc.addImage(_faviconB64, 'PNG', padL, 9, 13, 13); textX = padL + 17; } catch(e) {}
+            try { doc.addImage(_faviconB64, 'PNG', padL, 5, 10, 10); textX = padL + 14; } catch(e) {}
         }
-        // Left y=16 / y=25
         doc.setTextColor(...gold);
-        doc.setFontSize(11); doc.setFont('helvetica', 'bold');
-        doc.text('LUXURY TRANSFERS RIVIERA', textX, 16);
+        doc.setFontSize(10); doc.setFont('helvetica', 'bold');
+        doc.text('LUXURY TRANSFERS RIVIERA', textX, 11);
         doc.setTextColor(150, 150, 165);
-        doc.setFontSize(7); doc.setFont('helvetica', 'normal');
-        doc.text('luxurytransfersriviera.com.mx', textX, 25);
-        // Right — same y=16 / y=25
+        doc.setFontSize(6.5); doc.setFont('helvetica', 'normal');
+        doc.text('luxurytransfersriviera.com.mx', textX, 19);
         doc.setTextColor(150, 150, 165);
-        doc.setFontSize(7); doc.setFont('helvetica', 'normal');
-        doc.text('Booking confirmation', pageW - padR, 16, { align: 'right' });
+        doc.setFontSize(6.5); doc.setFont('helvetica', 'normal');
+        doc.text('Booking confirmation', pageW - padR, 11, { align: 'right' });
         doc.setTextColor(...gold);
-        doc.setFontSize(15); doc.setFont('helvetica', 'bold');
-        doc.text(datos.codigo || 'LTR-????', pageW - padR, 25, { align: 'right' });
+        doc.setFontSize(13); doc.setFont('helvetica', 'bold');
+        doc.text(datos.codigo || 'LTR-????', pageW - padR, 19, { align: 'right' });
 
         // ── VEHICLE IMAGE + CLIENT INFO ───────────────────────────────────
-        let y = 43;
+        let y = 32;
         const imgW = 66, imgH = 38;
 
         // Vehicle name above the image
@@ -3337,8 +3335,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const routeH  = Math.max(cellH, Math.max(origLns.length, destLns.length) * 5 + 10);
         const rW      = (cW - arrowW - gap * 2) / 2;
 
-        drawCell(padL,                    y, rW,     routeH, 'Pick-up',  datos.origen  || '');
-        drawCell(padL + rW*2 + arrowW + gap*2, y, rW, routeH, 'Drop-off', datos.destino || '');
+        drawCell(padL,                         y, rW, routeH, 'Pick-up',  datos.origen  || '');
+        drawCell(padL + rW + gap + arrowW + gap, y, rW, routeH, 'Drop-off', datos.destino || '');
 
         // Flecha centrada
         const arrowX  = padL + rW + gap;
@@ -3428,7 +3426,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         y += 8;
 
         // ── NUEVA PÁGINA si el contenido no cabe antes del footer ─────────
-        const footerH  = 26;
+        const footerH  = 20;
         const footerY  = 297 - footerH;
         const noticeTextPreview = 'Please save your booking code ' + (datos.codigo || 'LTR-????') +
             '. Our team will contact you shortly to confirm your trip details.' +
@@ -3461,10 +3459,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         doc.setFillColor(...black);
         doc.rect(0, footerY, pageW, footerH, 'F');
 
-        doc.setTextColor(...white);
-        doc.setFontSize(6); doc.setFont('helvetica', 'bold');
-        doc.text('Follow us & Contact us', pageW / 2, footerY + 5.5, { align: 'center' });
-
         const socialIcons = [
             { key: 'whatsapp',    color: [37,  211, 102], lbl: 'WA' },
             { key: 'facebook',    color: [24,  119, 242], lbl: 'Fb' },
@@ -3473,16 +3467,16 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             { key: 'youtube',     color: [255,   0,   0], lbl: 'YT' },
             { key: 'tripadvisor', color: [52,  195, 143], lbl: 'TA' },
         ];
-        const iconR       = 4;
-        const iconGap     = 16;
+        const iconR       = 3.5;
+        const iconGap     = 14;
         const iconsStartX = pageW / 2 - ((socialIcons.length - 1) * iconGap) / 2;
-        const iconCY      = footerY + 13;
+        const iconCY      = footerY + 10;
 
         const _drawIconFallback = (cx, ic) => {
             doc.setFillColor(...ic.color);
             doc.circle(cx, iconCY, iconR, 'F');
             doc.setTextColor(255, 255, 255);
-            doc.setFontSize(ic.lbl.length > 1 ? 4 : 5.5); doc.setFont('helvetica', 'bold');
+            doc.setFontSize(ic.lbl.length > 1 ? 3.5 : 5); doc.setFont('helvetica', 'bold');
             doc.text(ic.lbl, cx, iconCY + 1, { align: 'center', baseline: 'middle' });
         };
 
@@ -3499,8 +3493,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         });
 
         doc.setTextColor(...white);
-        doc.setFontSize(6); doc.setFont('helvetica', 'normal');
-        doc.text('@LuxuryTransfersRiviera  |  reservas@luxurytransfersriviera.com', pageW / 2, footerY + 22, { align: 'center' });
+        doc.setFontSize(5.5); doc.setFont('helvetica', 'normal');
+        doc.text('Follow us & Contact us  |  @LuxuryTransfersRiviera  |  reservas@luxurytransfersriviera.com', pageW / 2, footerY + 17.5, { align: 'center' });
 
         if (soloBase64) return doc.output('datauristring').split(',')[1];
         doc.save('Voucher-' + (datos.codigo || 'LTR') + '.pdf');
