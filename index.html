@@ -3193,11 +3193,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const imgW = 66, imgH = 38;
         const hasRegreso = !!(datos.fechaRegreso && String(datos.fechaRegreso).trim());
 
-        // Vehicle name + trip type on the same line
-        const tripLabel = hasRegreso ? 'ROUND TRIP' : 'ONE WAY';
+        // Vehicle name above the image
         doc.setTextColor(...dark);
         doc.setFontSize(8.5); doc.setFont('helvetica', 'bold');
-        doc.text((datos.vehiculo || '').toUpperCase() + '  |  ' + tripLabel, padL + imgW / 2, y, { align: 'center' });
+        doc.text((datos.vehiculo || '').toUpperCase(), padL + imgW / 2, y, { align: 'center' });
         y += 5;
 
         // Vehicle image (or grey placeholder)
@@ -3337,17 +3336,37 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         y += 2;
 
-        // ── ROUTE CELLS verticales ───────────────────────────────────────
+        // ── ROUTE CELLS con flecha ────────────────────────────────────────
+        const arrowW = 12;
         doc.setFontSize(8.5); doc.setFont('helvetica', 'bold');
-        const origLns = doc.splitTextToSize(datos.origen  || '', cW - 8);
-        const destLns = doc.splitTextToSize(datos.destino || '', cW - 8);
-        const pickH = Math.max(cellH, origLns.length * 5.5 + 12);
-        const dropH = Math.max(cellH, destLns.length * 5.5 + 12);
+        const origLns = doc.splitTextToSize(datos.origen  || '', (cW - arrowW - gap*2) / 2 - 8);
+        const destLns = doc.splitTextToSize(datos.destino || '', (cW - arrowW - gap*2) / 2 - 8);
+        const routeH  = Math.max(cellH, Math.max(origLns.length, destLns.length) * 5.5 + 12);
+        const rW      = (cW - arrowW - gap * 2) / 2;
 
-        drawCell(padL, y, cW, pickH, 'Pick-up',  datos.origen  || '', [212, 175, 55]);
-        y += pickH + gap;
-        drawCell(padL, y, cW, dropH, 'Drop-off', datos.destino || '', [30, 100, 200]);
-        y += dropH + gap;
+        drawCell(padL,                           y, rW, routeH, 'Pick-up',  datos.origen  || '');
+        drawCell(padL + rW + gap + arrowW + gap, y, rW, routeH, 'Drop-off', datos.destino || '');
+
+        // Flecha centrada
+        const arrowX  = padL + rW + gap;
+        const midArrY = y + routeH / 2;
+        doc.setFillColor(...lgrey);
+        doc.rect(arrowX, y, arrowW, routeH, 'F');
+        doc.setDrawColor(...grey); doc.setLineWidth(0.6);
+        if (hasRegreso) {
+            doc.line(arrowX+2, midArrY-2, arrowX+arrowW-2, midArrY-2);
+            doc.line(arrowX+arrowW-2, midArrY-2, arrowX+arrowW-5, midArrY-4.5);
+            doc.line(arrowX+arrowW-2, midArrY-2, arrowX+arrowW-5, midArrY+0.5);
+            doc.line(arrowX+arrowW-2, midArrY+2, arrowX+2, midArrY+2);
+            doc.line(arrowX+2, midArrY+2, arrowX+5, midArrY-0.5);
+            doc.line(arrowX+2, midArrY+2, arrowX+5, midArrY+4.5);
+        } else {
+            doc.line(arrowX+2, midArrY, arrowX+arrowW-2, midArrY);
+            doc.line(arrowX+arrowW-2, midArrY, arrowX+arrowW-5, midArrY-2.5);
+            doc.line(arrowX+arrowW-2, midArrY, arrowX+arrowW-5, midArrY+2.5);
+        }
+
+        y += routeH + gap;
 
         // ── DIVIDER ───────────────────────────────────────────────────────
         doc.setDrawColor(...greyLn); doc.setLineWidth(0.3);
