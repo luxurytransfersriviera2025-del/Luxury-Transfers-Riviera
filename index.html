@@ -3344,8 +3344,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const routeH  = Math.max(cellH, Math.max(origLns.length, destLns.length) * 6 + 14);
         const rW      = (cW - arrowW - gap * 2) / 2;
 
-        drawCell(padL,                           y, rW, routeH, 'Pick-up',  datos.origen  || '');
-        drawCell(padL + rW + gap + arrowW + gap, y, rW, routeH, 'Drop-off', datos.destino || '');
+        drawCell(padL,                           y, rW, routeH, 'Pick-up',  datos.origen  || '', [34, 197, 94]);
+        drawCell(padL + rW + gap + arrowW + gap, y, rW, routeH, 'Drop-off', datos.destino || '', [212, 175, 55]);
 
         // Flecha centrada
         const arrowX  = padL + rW + gap;
