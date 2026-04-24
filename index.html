@@ -3280,6 +3280,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             ls.forEach((line, i) => doc.text(line, cx + 4, cy + 11 + i * 5.5));
         };
 
+        doc.setFontSize(8.5); doc.setFont('helvetica', 'bold');
         const notaLines = notasVal ? doc.splitTextToSize(notasVal, cW - 8) : [];
         const notaH = notasVal ? Math.max(cellH, notaLines.length * 5.5 + 12) : 0;
 
@@ -3761,6 +3762,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         // ── Stripe returned successfully ────────────────────────────
         if (payment === 'success') {
+            _setLoadingMsg('We are generating your booking...', 'Please do not close this window.<br>This may take a few seconds.');
+            document.getElementById('loadingOverlay').style.display = 'flex';
             const raw = sessionStorage.getItem('ltr_pendingBooking');
             if (raw) {
                 try {
@@ -3822,6 +3825,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             }
 
             // Capturar el pago en el Worker
+            _setLoadingMsg('We are generating your booking...', 'Please do not close this window.<br>This may take a few seconds.');
             document.getElementById('loadingOverlay').style.display = 'flex';
             setTimeout(async () => {
                 try {
