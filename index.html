@@ -3386,6 +3386,20 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         y += 8;
 
+        // ── NUEVA PÁGINA si el contenido no cabe antes del footer ─────────
+        const footerH  = 26;
+        const footerY  = 297 - footerH;
+        const noticeTextPreview = 'Please save your booking code ' + (datos.codigo || 'LTR-????') +
+            '. Our team will contact you shortly to confirm your trip details.' +
+            ' If your service is to or from an airport, our agent will send you the meeting point through this channel.' +
+            ' We invite you to download the WhatsApp app and contact us at +52 984 241 1158 to make the process faster.';
+        doc.setFontSize(8.5);
+        const noticeHPreview = doc.splitTextToSize(noticeTextPreview, cW - 10).length * 5.2 + 10;
+        if (y + noticeHPreview + 10 > footerY) {
+            doc.addPage();
+            y = 20;
+        }
+
         // ── NOTICE BOX ────────────────────────────────────────────────────
         const noticeText = 'Please save your booking code ' + (datos.codigo || 'LTR-????') +
             '. Our team will contact you shortly to confirm your trip details.' +
@@ -3403,8 +3417,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         y += noticeH + 6;
 
         // ── FOOTER negro con redes sociales ──────────────────────────────
-        const footerH  = 26;
-        const footerY  = 297 - footerH;
         doc.setFillColor(...black);
         doc.rect(0, footerY, pageW, footerH, 'F');
 
@@ -3438,7 +3450,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             if (_socialIconsB64[ic.key]) {
                 try {
                     const d = iconR * 2;
-                    doc.addImage(_socialIconsB64[ic.key], 'JPEG', cx - iconR, iconCY - iconR, d, d);
+                    doc.addImage(_socialIconsB64[ic.key], 'PNG', cx - iconR, iconCY - iconR, d, d);
                 } catch(e) { _drawIconFallback(cx, ic); }
             } else {
                 _drawIconFallback(cx, ic);
@@ -3558,7 +3570,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     const c = document.createElement('canvas');
                     c.width = c.height = S;
                     c.getContext('2d').drawImage(img, 0, 0, S, S);
-                    _socialIconsB64[key] = c.toDataURL('image/jpeg', 0.80);
+                    _socialIconsB64[key] = c.toDataURL('image/png');
                 } catch(e) {}
             };
             img.src = url;
