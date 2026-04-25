@@ -1325,8 +1325,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     </p>
     <div class="footer-links-bar">
         <a href="index.html">Home</a>
-        <a href="terminos.html" target="_blank">Terms &amp; Conditions</a>
-        <a href="privacidad.html" target="_blank">Privacy Policy</a>
+        <a href="terms.html" target="_blank">Terms &amp; Conditions</a>
+        <a href="privacy.html" target="_blank">Privacy Policy</a>
     </div>
     <p style="margin-bottom: 5px;" >&copy; 2026 Luxury Transfers Riviera. All rights reserved.</p>
     
@@ -1550,6 +1550,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code: key }),
             });
+            if (!res.ok) return { valid: false, discount: 0 };
             const data = await res.json();
             _couponCache[key] = data;
             return data;
@@ -2399,7 +2400,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
                 <div class="form-card-notes">
                     <div class="input-wrapper">
-                        <label>Notes / Luggage / Baby Seats</label>
+                        <label>Notes / Luggage / Room Number</label>
                         <textarea id="notas-${id}" rows="3" placeholder="Ex: 4 large suitcases..." style="resize:none; height:80px;"></textarea>
                     </div>
                 </div>
@@ -2407,7 +2408,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 <div class="terms-container" style="margin-bottom:16px;">
                     <input type="checkbox" id="terms-${id}">
                     <span>I have read and agree to the
-                        <a href="terminos.html" target="_blank" class="terms-link">
+                        <a href="terms.html" target="_blank" class="terms-link">
                             Terms &amp; Conditions
                         </a>
                     </span>
@@ -3021,6 +3022,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     currency:         currencyCode,
                     bookingCode:      datosVenta.codigo,
                     vehicle:          datosCard.vehiculo || '',
+                    customerName:     datosVenta.nombre  || '',
+                    customerPhone:    datosVenta.telefono || '',
                     // Return URLs — PayPal will redirect here after payment
                     returnUrl:        siteUrl + '?payment=paypal-success',
                     cancelPayPalUrl:  siteUrl + '?payment=cancelled'
@@ -3094,14 +3097,16 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    method:      'stripe',
-                    action:      'create-checkout-session',
-                    amount:      totalFinal,
-                    currency:    currencyCode,
-                    bookingCode: datosVenta.codigo,
-                    vehicle:     datosCard.vehiculo || 'Transfer Privado',
-                    successUrl:  siteUrl + '?payment=success&code=' + datosVenta.codigo,
-                    cancelUrl:   siteUrl + '?payment=cancelled'
+                    method:        'stripe',
+                    action:        'create-checkout-session',
+                    amount:        totalFinal,
+                    currency:      currencyCode,
+                    bookingCode:   datosVenta.codigo,
+                    vehicle:       datosCard.vehiculo || 'Transfer Privado',
+                    customerName:  datosVenta.nombre  || '',
+                    customerPhone: datosVenta.telefono || '',
+                    successUrl:    siteUrl + '?payment=success&code=' + datosVenta.codigo,
+                    cancelUrl:     siteUrl + '?payment=cancelled'
                 })
             });
             if (!res.ok) throw new Error('Worker HTTP ' + res.status);
