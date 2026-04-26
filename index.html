@@ -3808,6 +3808,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         // ── Stripe returned successfully ────────────────────────────
         if (payment === 'success') {
             const _ov = document.getElementById('loadingOverlay');
+            _setLoadingMsg('We are generating your booking...', 'Please do not close this window.<br>This may take a few seconds.');
             if (_ov) _ov.style.display = 'flex';
             const raw = sessionStorage.getItem('ltr_pendingBooking');
             if (raw) {
@@ -3871,6 +3872,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
             // Capturar el pago en el Worker
             const _ov2 = document.getElementById('loadingOverlay');
+            _setLoadingMsg('We are generating your booking...', 'Please do not close this window.<br>This may take a few seconds.');
             if (_ov2) _ov2.style.display = 'flex';
             setTimeout(async () => {
                 try {
