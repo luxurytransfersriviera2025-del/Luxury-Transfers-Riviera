@@ -2363,31 +2363,45 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     </div>
 
                     ${tipo === 'REDONDO' ? `
-                    <!-- ROUND TRIP: static layout -->
+                    <!-- ROUND TRIP: sin imagen -->
                     <div style="display:flex; gap:15px; flex-wrap:wrap;">
-                        <div style="background:#fff; border-radius:12px; border:1.5px solid #D4AF37; overflow:hidden; box-shadow:0 2px 8px rgba(212,175,55,0.15); display:flex; flex-direction:column; flex:1 1 200px; min-width:200px;">
-                            <div style="position:relative;"><img src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Quick%2020%20Minute%20Stop.webp" loading="lazy" style="width:100%;height:90px;object-fit:cover;display:block;"><span style="position:absolute;top:8px;left:8px;background:var(--navy-bg);color:#fff;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;padding:3px 7px;border-radius:20px;font-family:var(--font-title);">Trip</span></div>
-                            <div style="padding:10px 12px 12px; text-align:center;"><div style="font-size:13px;font-weight:600;color:#333;font-family:var(--font-body);margin-bottom:8px;">Quick 20-Minute Stop</div><div style="display:flex;align-items:center;justify-content:center;gap:6px;"><span style="font-size:15px;font-weight:800;color:var(--text-dark);font-family:var(--font-title);">${formatExtraPrice(25)}</span><button type="button" onclick="cambiarExtra('${id}','stop',-1)" style="width:28px;height:28px;border-radius:50%;border:1.5px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;">−</button><span id="extra-stop-${id}" style="font-weight:800;color:var(--navy-bg);min-width:20px;text-align:center;font-size:15px;">0</span><button type="button" onclick="cambiarExtra('${id}','stop',+1)" style="width:28px;height:28px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">+</button></div></div>
+                        <div style="background:#fff; border-radius:12px; border:1.5px solid #D4AF37; box-shadow:0 2px 8px rgba(212,175,55,0.15); display:flex; align-items:center; justify-content:space-between; flex:1 1 200px; min-width:200px; padding:14px 16px;">
+                            <div>
+                                <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;background:var(--navy-bg);color:#fff;padding:3px 8px;border-radius:20px;font-family:var(--font-title);">Trip</span>
+                                <div style="font-size:13px;font-weight:600;color:#333;font-family:var(--font-body);margin-top:6px;">Quick 20-Minute Stop</div>
+                                <div style="font-size:15px;font-weight:800;color:var(--text-dark);font-family:var(--font-title);margin-top:4px;">${formatExtraPrice(25)}</div>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <button type="button" onclick="cambiarExtra('${id}','stop',-1)" style="width:28px;height:28px;border-radius:50%;border:1.5px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;">−</button>
+                                <span id="extra-stop-${id}" style="font-weight:800;color:var(--navy-bg);min-width:20px;text-align:center;font-size:15px;">0</span>
+                                <button type="button" onclick="cambiarExtra('${id}','stop',+1)" style="width:28px;height:28px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">+</button>
+                            </div>
                         </div>
-                        <div style="background:#fff; border-radius:12px; border:1.5px solid #D4AF37; overflow:hidden; box-shadow:0 2px 8px rgba(212,175,55,0.15); display:flex; flex-direction:column; flex:1 1 200px; min-width:200px;">
-                            <div style="position:relative;"><img src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Quick%2020%20Minute%20Stop.webp" loading="lazy" style="width:100%;height:90px;object-fit:cover;display:block;"><span style="position:absolute;top:8px;left:8px;background:#555;color:#fff;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;padding:3px 7px;border-radius:20px;font-family:var(--font-title);">Return</span></div>
-                            <div style="padding:10px 12px 12px; text-align:center;"><div style="font-size:13px;font-weight:600;color:#333;font-family:var(--font-body);margin-bottom:8px;">Quick 20-Minute Stop</div><div style="display:flex;align-items:center;justify-content:center;gap:6px;"><span style="font-size:15px;font-weight:800;color:var(--text-dark);font-family:var(--font-title);">${formatExtraPrice(25)}</span><button type="button" onclick="cambiarExtra('${id}','stopR',-1)" style="width:28px;height:28px;border-radius:50%;border:1.5px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;">−</button><span id="extra-stopR-${id}" style="font-weight:800;color:var(--navy-bg);min-width:20px;text-align:center;font-size:15px;">0</span><button type="button" onclick="cambiarExtra('${id}','stopR',+1)" style="width:28px;height:28px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">+</button></div></div>
+                        <div style="background:#fff; border-radius:12px; border:1.5px solid #D4AF37; box-shadow:0 2px 8px rgba(212,175,55,0.15); display:flex; align-items:center; justify-content:space-between; flex:1 1 200px; min-width:200px; padding:14px 16px;">
+                            <div>
+                                <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;background:#555;color:#fff;padding:3px 8px;border-radius:20px;font-family:var(--font-title);">Return</span>
+                                <div style="font-size:13px;font-weight:600;color:#333;font-family:var(--font-body);margin-top:6px;">Quick 20-Minute Stop</div>
+                                <div style="font-size:15px;font-weight:800;color:var(--text-dark);font-family:var(--font-title);margin-top:4px;">${formatExtraPrice(25)}</div>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <button type="button" onclick="cambiarExtra('${id}','stopR',-1)" style="width:28px;height:28px;border-radius:50%;border:1.5px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;">−</button>
+                                <span id="extra-stopR-${id}" style="font-weight:800;color:var(--navy-bg);min-width:20px;text-align:center;font-size:15px;">0</span>
+                                <button type="button" onclick="cambiarExtra('${id}','stopR',+1)" style="width:28px;height:28px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">+</button>
+                            </div>
                         </div>
                     </div>` : `
-                    <!-- ONE WAY: solo parada ida -->
+                    <!-- ONE WAY: sin imagen -->
                     <div style="display:flex; gap:15px; flex-wrap:wrap;">
-                        <div style="background:#fff; border-radius:12px; border:1.5px solid #D4AF37; overflow:hidden; box-shadow:0 2px 8px rgba(212,175,55,0.15); display:flex; flex-direction:column; flex:1 1 200px; min-width:200px;">
-                            <img src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Quick%2020%20Minute%20Stop.webp" loading="lazy" style="width:100%; height:140px; object-fit:cover; display:block;">
-                            <div style="padding:12px 12px 14px; flex:1; display:flex; flex-direction:column; justify-content:space-between;">
-                                <div style="font-size:13px; font-weight:600; color:#333; font-family:var(--font-body); margin-bottom:10px;">Quick 20-Minute Stop</div>
-                                <div style="display:flex; align-items:center; justify-content:space-between;">
-                                    <span style="font-size:16px; font-weight:800; color:var(--text-dark); font-family:var(--font-title);">${formatExtraPrice(25)}</span>
-                                    <div style="display:flex; align-items:center; gap:7px;">
-                                        <button type="button" onclick="cambiarExtra('${id}','stop',-1)" style="width:28px;height:28px;border-radius:50%;border:1.5px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;line-height:1;">−</button>
-                                        <span id="extra-stop-${id}" style="font-weight:800;color:var(--navy-bg);min-width:20px;text-align:center;font-size:15px;">0</span>
-                                        <button type="button" onclick="cambiarExtra('${id}','stop',+1)" style="width:28px;height:28px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;line-height:1;">+</button>
-                                    </div>
-                                </div>
+                        <div style="background:#fff; border-radius:12px; border:1.5px solid #D4AF37; box-shadow:0 2px 8px rgba(212,175,55,0.15); display:flex; align-items:center; justify-content:space-between; flex:1 1 200px; min-width:200px; padding:14px 16px;">
+                            <div>
+                                <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;background:var(--navy-bg);color:#fff;padding:3px 8px;border-radius:20px;font-family:var(--font-title);">Trip</span>
+                                <div style="font-size:13px;font-weight:600;color:#333;font-family:var(--font-body);margin-top:6px;">Quick 20-Minute Stop</div>
+                                <div style="font-size:16px;font-weight:800;color:var(--text-dark);font-family:var(--font-title);margin-top:4px;">${formatExtraPrice(25)}</div>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:7px;">
+                                <button type="button" onclick="cambiarExtra('${id}','stop',-1)" style="width:28px;height:28px;border-radius:50%;border:1.5px solid #ccc;background:#f5f5f5;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:700;line-height:1;">−</button>
+                                <span id="extra-stop-${id}" style="font-weight:800;color:var(--navy-bg);min-width:20px;text-align:center;font-size:15px;">0</span>
+                                <button type="button" onclick="cambiarExtra('${id}','stop',+1)" style="width:28px;height:28px;border-radius:50%;border:none;background:var(--navy-bg);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;line-height:1;">+</button>
                             </div>
                         </div>
                     </div>
@@ -4261,7 +4275,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     
     function initAutocomplete() {
         const bounds = new google.maps.LatLngBounds(new google.maps.LatLng(17.9, -91.5), new google.maps.LatLng(21.8, -86.5));
-        const opts = { bounds: bounds, strictBounds: true, componentRestrictions: { country: "mx" }, fields: ["name", "geometry", "address_components"], types: ["establishment", "geocode"] };
+        const opts = { bounds: bounds, strictBounds: true, componentRestrictions: { country: "mx" }, fields: ["name", "formatted_address", "geometry", "address_components"], types: ["establishment", "geocode"] };
         const autoOrigen  = new google.maps.places.Autocomplete(document.getElementById('origen'), opts);
         const autoDestino = new google.maps.places.Autocomplete(document.getElementById('destino'), opts);
         const autoOrigenRT  = new google.maps.places.Autocomplete(document.getElementById('origenRT'), opts);
@@ -4284,12 +4298,16 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         autoDestino.addListener('place_changed', function() { extraerDatos(autoDestino.getPlace(), "Destino"); });
         autoOrigenRT.addListener('place_changed', function() {
             const p = autoOrigenRT.getPlace();
-            document.getElementById('origen').value = p.name || document.getElementById('origenRT').value;
+            const fullOrigen = p.formatted_address || document.getElementById('origenRT').value;
+            document.getElementById('origenRT').value = fullOrigen;
+            document.getElementById('origen').value = fullOrigen;
             extraerDatos(p, "Origen");
         });
         autoDestinoRT.addListener('place_changed', function() {
             const p = autoDestinoRT.getPlace();
-            document.getElementById('destino').value = p.name || document.getElementById('destinoRT').value;
+            const fullDestino = p.formatted_address || document.getElementById('destinoRT').value;
+            document.getElementById('destinoRT').value = fullDestino;
+            document.getElementById('destino').value = fullDestino;
             extraerDatos(p, "Destino");
         });
     }
