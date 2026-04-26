@@ -3797,6 +3797,18 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
     });
 
+    // Red de seguridad: si hay reserva pendiente en sessionStorage y NO venimos de un pago,
+    // mostrar recuperación automáticamente (cubre el caso de clic accidental durante redirección)
+    window.addEventListener('DOMContentLoaded', function() {
+        const params = new URLSearchParams(window.location.search);
+        if (!params.get('payment')) {
+            const raw = sessionStorage.getItem('ltr_pendingBooking');
+            if (raw) {
+                try { setTimeout(() => mostrarRecuperacion(JSON.parse(raw)), 1500); } catch(_) {}
+            }
+        }
+    });
+
     (function detectarRetornoPago() {
         const params  = new URLSearchParams(window.location.search);
         const payment = params.get('payment');
