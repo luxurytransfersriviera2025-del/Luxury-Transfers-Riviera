@@ -4275,7 +4275,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     
     function initAutocomplete() {
         const bounds = new google.maps.LatLngBounds(new google.maps.LatLng(17.9, -91.5), new google.maps.LatLng(21.8, -86.5));
-        const opts = { bounds: bounds, strictBounds: true, componentRestrictions: { country: "mx" }, fields: ["name", "formatted_address", "geometry", "address_components"], types: ["establishment", "geocode"] };
+        const opts = { bounds: bounds, strictBounds: true, componentRestrictions: { country: "mx" }, fields: ["name", "geometry", "address_components"], types: ["establishment", "geocode"] };
         const autoOrigen  = new google.maps.places.Autocomplete(document.getElementById('origen'), opts);
         const autoDestino = new google.maps.places.Autocomplete(document.getElementById('destino'), opts);
         const autoOrigenRT  = new google.maps.places.Autocomplete(document.getElementById('origenRT'), opts);
@@ -4298,16 +4298,12 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         autoDestino.addListener('place_changed', function() { extraerDatos(autoDestino.getPlace(), "Destino"); });
         autoOrigenRT.addListener('place_changed', function() {
             const p = autoOrigenRT.getPlace();
-            const fullOrigen = p.formatted_address || document.getElementById('origenRT').value;
-            document.getElementById('origenRT').value = fullOrigen;
-            document.getElementById('origen').value = fullOrigen;
+            document.getElementById('origen').value = document.getElementById('origenRT').value;
             extraerDatos(p, "Origen");
         });
         autoDestinoRT.addListener('place_changed', function() {
             const p = autoDestinoRT.getPlace();
-            const fullDestino = p.formatted_address || document.getElementById('destinoRT').value;
-            document.getElementById('destinoRT').value = fullDestino;
-            document.getElementById('destino').value = fullDestino;
+            document.getElementById('destino').value = document.getElementById('destinoRT').value;
             extraerDatos(p, "Destino");
         });
     }
