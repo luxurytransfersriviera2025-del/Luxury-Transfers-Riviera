@@ -3239,7 +3239,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         // ltr_bookingConfirmed is already saved above, so thank-you.html has data regardless.
         try { datosVenta.pdfBase64 = generarVoucherPDF(datosVenta, true); } catch(e) {}
         datosVenta._token = 'LTR-SEC-2025-XK9M7P';
-        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datosVenta) })
+        const _fetchSheet = fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datosVenta) });
+        const _timeout4s  = new Promise(resolve => setTimeout(resolve, 4000));
+        Promise.race([_fetchSheet, _timeout4s])
             .then(function()  { window.location.href = 'thank-you.html'; })
             .catch(function() { window.location.href = 'thank-you.html'; });
     }
@@ -3270,7 +3272,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     function generarVoucherPDF(datos, soloBase64 = false) {  // eslint-disable-line
         if (!datos || !window.jspdf) return null;
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+        const doc = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
 
         // ── Palette ───────────────────────────────────────────────────────
         const black  = [14, 14, 20];
@@ -3325,10 +3327,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         // Vehicle image (or grey placeholder)
         const vehKey = Object.keys(_vehicleImages).find(k => (datos.vehiculo || '').toUpperCase().includes(k));
-        const vehB64 = vehKey ? (_vehicleImgB64[vehKey] || null) : null;
+        const vehB64 = vehKey ? ((soloBase64 ? _vehicleImgB64Email[vehKey] : _vehicleImgB64[vehKey]) || null) : null;
         const imgY = y;
         if (vehB64) {
-            try { doc.addImage(vehB64, 'PNG', padL, imgY, imgW, imgH); } catch(e) {
+            try { doc.addImage(vehB64, 'JPEG', padL, imgY, imgW, imgH); } catch(e) {
                 doc.setFillColor(...lgrey); doc.rect(padL, imgY, imgW, imgH, 'F');
             }
         } else {
@@ -3675,6 +3677,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
     // Vehicle images preloaded as base64 for jsPDF
     const _vehicleImgB64 = {};
+    const _vehicleImgB64Email = {}; // smaller/lower-quality version for email attachments
     (function _preloadVehicleImgs() {
         Object.entries(_vehicleImages).forEach(([key, url]) => {
             const img = new Image();
@@ -3688,6 +3691,14 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     c.height = Math.round(img.naturalHeight * ratio);
                     c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
                     _vehicleImgB64[key] = c.toDataURL('image/jpeg', 0.82);
+                    // Compact version for email PDF (much smaller file)
+                    const MAX_W_E = 200, MAX_H_E = 130;
+                    const ratioE = Math.min(MAX_W_E / img.naturalWidth, MAX_H_E / img.naturalHeight, 1);
+                    const ce = document.createElement('canvas');
+                    ce.width  = Math.round(img.naturalWidth  * ratioE);
+                    ce.height = Math.round(img.naturalHeight * ratioE);
+                    ce.getContext('2d').drawImage(img, 0, 0, ce.width, ce.height);
+                    _vehicleImgB64Email[key] = ce.toDataURL('image/jpeg', 0.40);
                 } catch(e) {}
             };
             img.src = url;
@@ -3844,11 +3855,14 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         extras: datos.extras || '', notas: datos.notas || '',
                     }));
                 } catch(e) { console.error('bookingConfirmed save error:', e); }
-                // Send to Google Sheet and wait for response so the email arrives reliably
+                // Send to Google Sheet — wait at most 4 s then redirect anyway
                 try {
                     try { datos.pdfBase64 = generarVoucherPDF(datos, true); } catch(e) {}
                     datos._token = 'LTR-SEC-2025-XK9M7P';
-                    await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
+                    await Promise.race([
+                        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) }),
+                        new Promise(resolve => setTimeout(resolve, 4000))
+                    ]);
                 } catch(e) {}
                 sessionStorage.removeItem('ltr_pendingBooking');
                 cerrarRecuperacion();
@@ -3970,6 +3984,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     // Detecta regreso por botón "atrás" del browser (bfcache)
     window.addEventListener('pageshow', function(event) {
         if (event.persisted) {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('payment')) return; // venimos de un pago — el handler de pago lo gestiona
             const raw = sessionStorage.getItem('ltr_pendingBooking');
             if (raw) {
                 try { setTimeout(() => mostrarRecuperacion(JSON.parse(raw)), 400); } catch(_) {}
@@ -3980,6 +3996,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     // Red de seguridad: si hay reserva pendiente en sessionStorage y NO venimos de un pago,
     // mostrar recuperación automáticamente (cubre el caso de clic accidental durante redirección)
     window.addEventListener('DOMContentLoaded', function() {
+        if (window._processingPaymentReturn) return; // venimos de un pago exitoso
         const params = new URLSearchParams(window.location.search);
         if (!params.get('payment')) {
             const raw = sessionStorage.getItem('ltr_pendingBooking');
@@ -3989,10 +4006,14 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
     });
 
+    window._processingPaymentReturn = false;
+
     (function detectarRetornoPago() {
         const params  = new URLSearchParams(window.location.search);
         const payment = params.get('payment');
         if (!payment) return;
+
+        window._processingPaymentReturn = true; // bloquea el safety-net de DOMContentLoaded
 
         // Limpiar URL inmediatamente
         window.history.replaceState({}, '', window.location.pathname);
@@ -4003,10 +4024,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             _setLoadingMsg('We are generating your booking...', 'Please do not close this window.<br>This may take a few seconds.');
             if (_ov) _ov.style.display = 'flex';
             const raw = sessionStorage.getItem('ltr_pendingBooking');
+            sessionStorage.removeItem('ltr_pendingBooking'); // siempre limpiar antes de DOMContentLoaded
             if (raw) {
                 try {
                     const datosVenta = JSON.parse(raw);
-                    sessionStorage.removeItem('ltr_pendingBooking');
 
                     // Recuperar last4 y brand de la tarjeta desde el Worker
                     if (datosVenta.stripeSessionId) {
