@@ -4203,49 +4203,51 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             try { data.pdfBase64 = generarVoucherPDF(data, true); } catch(e) { console.warn('PDF gen error:', e); }
         }
 
+        // Save confirmation data BEFORE the fetch so thank-you.html always has it,
+        // even if gtag or the Google Sheet request throws unexpectedly.
+        if (data.esVenta) {
+            const vehKey = Object.keys(_vehicleImages).find(k => (data.vehiculo || '').toUpperCase().includes(k));
+            const imgUrl = vehKey ? _vehicleImages[vehKey] : _vehicleImages['CLASSIC SEDAN'];
+            const _cuponKey = (data.cupon || '').toUpperCase();
+            const _cuponRes = _couponCache[_cuponKey] || { valid: false, discount: 0 };
+            sessionStorage.setItem('ltr_bookingConfirmed', JSON.stringify({
+                esVenta:       true,
+                codigo:        data.codigo,
+                vehiculo:      data.vehiculo,
+                imgUrl:        imgUrl,
+                origen:        data.origen,
+                destino:       data.destino,
+                fecha:         data.fecha,
+                hora:          data.hora,
+                fechaRegreso:  data.fechaRegreso  || '',
+                horaRegreso:   data.horaRegreso   || '',
+                pasajeros:     data.pasajeros,
+                nombre:        data.nombre,
+                email:         data.email,
+                telefono:      data.telefono,
+                tipoViaje:     data.tipoViaje,
+                precio:        data.precio         || '',
+                precioTotal:   data.precioTotal    || data.precio || '',
+                pago:          data.pago            || '',
+                pagoLabel:     data.pagoLabel       || '',
+                vuelo:         data.vuelo           || '',
+                vueloRegreso:  data.vueloRegreso    || '',
+                extraStop:     data.extraStop       || 0,
+                extraStopR:    data.extraStopR      || 0,
+                cupon:         data.cupon           || '',
+                cuponDiscount: _cuponRes.valid ? _cuponRes.discount : 0,
+                extras:        data.extras          || '',
+                notas:         data.notas           || '',
+            }));
+        }
+
         data._token = "LTR-SEC-2025-XK9M7P";
         fetch(SCRIPT_URL, {
             method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
         })
         .then(() => {
-            gtag('event', 'conversion', {
-                'send_to': 'AW-17859609175/8AeACLKZ6N4bENeEkMRC',
-                'transaction_id': data.codigo
-            });
+            try { gtag('event', 'conversion', { 'send_to': 'AW-17859609175/8AeACLKZ6N4bENeEkMRC', 'transaction_id': data.codigo }); } catch(e) {}
             if (data.esVenta) {
-                const vehKey = Object.keys(_vehicleImages).find(k => (data.vehiculo || '').toUpperCase().includes(k));
-                const imgUrl = vehKey ? _vehicleImages[vehKey] : _vehicleImages['CLASSIC SEDAN'];
-                const _cuponKey = (data.cupon || '').toUpperCase();
-                const _cuponRes = _couponCache[_cuponKey] || { valid: false, discount: 0 };
-                sessionStorage.setItem('ltr_bookingConfirmed', JSON.stringify({
-                    esVenta:       true,
-                    codigo:        data.codigo,
-                    vehiculo:      data.vehiculo,
-                    imgUrl:        imgUrl,
-                    origen:        data.origen,
-                    destino:       data.destino,
-                    fecha:         data.fecha,
-                    hora:          data.hora,
-                    fechaRegreso:  data.fechaRegreso  || '',
-                    horaRegreso:   data.horaRegreso   || '',
-                    pasajeros:     data.pasajeros,
-                    nombre:        data.nombre,
-                    email:         data.email,
-                    telefono:      data.telefono,
-                    tipoViaje:     data.tipoViaje,
-                    precio:        data.precio         || '',
-                    precioTotal:   data.precioTotal    || data.precio || '',
-                    pago:          data.pago            || '',
-                    pagoLabel:     data.pagoLabel       || '',
-                    vuelo:         data.vuelo           || '',
-                    vueloRegreso:  data.vueloRegreso    || '',
-                    extraStop:     data.extraStop       || 0,
-                    extraStopR:    data.extraStopR      || 0,
-                    cupon:         data.cupon           || '',
-                    cuponDiscount: _cuponRes.valid ? _cuponRes.discount : 0,
-                    extras:        data.extras          || '',
-                    notas:         data.notas           || '',
-                }));
                 window.location.href = 'thank-you.html';
             } else {
                 document.getElementById('loadingOverlay').style.display = 'none';
@@ -4254,8 +4256,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         })
         .catch(e => {
             console.error(e);
-            alert("Error sending request. Please try via WhatsApp.");
-            document.getElementById('loadingOverlay').style.display = 'none';
+            if (data.esVenta) {
+                // Payment was already confirmed — go to confirmation page even if Google Sheet failed
+                window.location.href = 'thank-you.html';
+            } else {
+                alert("Error sending request. Please try via WhatsApp.");
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
         });
     }
 
