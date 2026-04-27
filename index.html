@@ -3751,19 +3751,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             document.getElementById('recovery-checking').style.display = 'none';
 
             if (result.paid) {
-                // ✅ Payment already completed — show confirmation state
-                document.getElementById('recovery-header-bg').style.background   = '#004d20';
-                document.getElementById('recovery-header-tag').textContent        = 'Payment Confirmed';
-                document.getElementById('recovery-header-title').textContent      = 'Your payment was already processed';
-                document.getElementById('recovery-already-paid').style.display    = 'block';
-                // Update WhatsApp link with booking code context
-                const waMsg = encodeURIComponent(
-                    'Hello! My booking code is *' + (datos.codigo || '') +
-                    '*. I completed my payment but haven\u2019t received the confirmation email. Can you help?'
-                );
-                document.getElementById('recovery-wa-confirmed').href = 'https://wa.me/529842411158?text=' + waMsg;
-                // Clear pending booking — payment is confirmed
+                // ✅ Payment confirmed — close recovery modal and go through normal booking flow
+                // (records in Google Sheets, sends confirmation email, redirects to thank-you.html)
                 sessionStorage.removeItem('ltr_pendingBooking');
+                cerrarRecuperacion();
+                iniciarEnvio(datos);
             } else {
                 // ❌ Payment not completed — show payment buttons normally
                 document.getElementById('recovery-info-msg').style.display        = 'flex';
