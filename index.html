@@ -3129,11 +3129,33 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             // Build complete data BEFORE leaving the page
             const datosVenta = _construirDatosVenta(id, datosCard, 'Stripe Checkout');
             datosVenta.precioTotal = '$' + totalFinal + ' ' + moneda.toUpperCase();
+            datosVenta.pago = 'Stripe Checkout ✅ Paid Online';
 
-            // Save in sessionStorage — recovered when returning from Stripe
+            // Save to localStorage NOW — thank-you.html reads this directly on Stripe return
+            try {
+                const vehKey = Object.keys(_vehicleImages).find(k => (datosVenta.vehiculo || '').toUpperCase().includes(k));
+                const imgUrl = vehKey ? _vehicleImages[vehKey] : _vehicleImages['CLASSIC SEDAN'];
+                const _cuponRes = _couponCache[(datosVenta.cupon || '').toUpperCase()] || { valid: false, discount: 0 };
+                localStorage.setItem('ltr_bookingConfirmed', JSON.stringify({
+                    esVenta: true, codigo: datosVenta.codigo, vehiculo: datosVenta.vehiculo, imgUrl: imgUrl,
+                    origen: datosVenta.origen, destino: datosVenta.destino, fecha: datosVenta.fecha, hora: datosVenta.hora,
+                    fechaRegreso: datosVenta.fechaRegreso || '', horaRegreso: datosVenta.horaRegreso || '',
+                    pasajeros: datosVenta.pasajeros, nombre: datosVenta.nombre, email: datosVenta.email, telefono: datosVenta.telefono,
+                    tipoViaje: datosVenta.tipoViaje, precio: datosVenta.precio || '',
+                    precioTotal: datosVenta.precioTotal || datosVenta.precio || '',
+                    pago: 'Stripe Checkout ✅ Paid Online', pagoLabel: '',
+                    vuelo: datosVenta.vuelo || '', vueloRegreso: datosVenta.vueloRegreso || '',
+                    extraStop: datosVenta.extraStop || 0, extraStopR: datosVenta.extraStopR || 0,
+                    cupon: datosVenta.cupon || '', cuponDiscount: _cuponRes.valid ? _cuponRes.discount : 0,
+                    extras: datosVenta.extras || '', notas: datosVenta.notas || '',
+                }));
+            } catch(e) { console.error('localStorage save error:', e); }
+
+            // Keep sessionStorage for cancelled-payment recovery modal
             sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datosVenta));
 
-            const siteUrl = window.location.origin + window.location.pathname;
+            const thankYouUrl = window.location.origin + '/thank-you.html';
+            const siteUrl     = window.location.origin + window.location.pathname;
             const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -3146,7 +3168,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     vehicle:       datosCard.vehiculo || 'Transfer Privado',
                     customerName:  datosVenta.nombre  || '',
                     customerPhone: datosVenta.telefono || '',
-                    successUrl:    siteUrl + '?payment=success&code=' + datosVenta.codigo,
+                    successUrl:    thankYouUrl + '?session_id={CHECKOUT_SESSION_ID}',
                     cancelUrl:     siteUrl + '?payment=cancelled'
                 })
             });
@@ -3154,13 +3176,18 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             const json = await res.json();
             if (!json.url) throw new Error('No redirect URL from Worker');
 
-            // Guardar sessionId para recuperar last4 al volver de Stripe
+            // Persist stripeSessionId so thank-you.html can fetch last4
             if (json.sessionId) {
                 datosVenta.stripeSessionId = json.sessionId;
+                try {
+                    const saved = JSON.parse(localStorage.getItem('ltr_bookingConfirmed') || '{}');
+                    saved.stripeSessionId = json.sessionId;
+                    localStorage.setItem('ltr_bookingConfirmed', JSON.stringify(saved));
+                } catch(e) {}
                 sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datosVenta));
             }
 
-            // Redirigir a la página oficial de Stripe
+            // Stripe redirects to thank-you.html?session_id=... on success
             window.location.href = json.url;
 
         } catch (e) {
@@ -3899,11 +3926,31 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const currencyCode = moneda === 'MXN' ? 'mxn' : moneda === 'CAD' ? 'cad' : 'usd';
         const siteUrl      = window.location.origin + window.location.pathname;
 
-        // Update pago field and re-save
         datos.pago = 'Stripe Checkout ✅ Paid Online';
+
+        // Save to localStorage — thank-you.html reads this on Stripe return
+        try {
+            const vehKey = Object.keys(_vehicleImages).find(k => (datos.vehiculo || '').toUpperCase().includes(k));
+            const imgUrl = vehKey ? _vehicleImages[vehKey] : _vehicleImages['CLASSIC SEDAN'];
+            const _cuponRes = _couponCache[(datos.cupon || '').toUpperCase()] || { valid: false, discount: 0 };
+            localStorage.setItem('ltr_bookingConfirmed', JSON.stringify({
+                esVenta: true, codigo: datos.codigo, vehiculo: datos.vehiculo, imgUrl: imgUrl,
+                origen: datos.origen, destino: datos.destino, fecha: datos.fecha, hora: datos.hora,
+                fechaRegreso: datos.fechaRegreso || '', horaRegreso: datos.horaRegreso || '',
+                pasajeros: datos.pasajeros, nombre: datos.nombre, email: datos.email, telefono: datos.telefono,
+                tipoViaje: datos.tipoViaje, precio: datos.precio || '',
+                precioTotal: datos.precioTotal || datos.precio || '',
+                pago: 'Stripe Checkout ✅ Paid Online', pagoLabel: '',
+                vuelo: datos.vuelo || '', vueloRegreso: datos.vueloRegreso || '',
+                extraStop: datos.extraStop || 0, extraStopR: datos.extraStopR || 0,
+                cupon: datos.cupon || '', cuponDiscount: _cuponRes.valid ? _cuponRes.discount : 0,
+                extras: datos.extras || '', notas: datos.notas || '',
+            }));
+        } catch(e) {}
         sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datos));
 
         try {
+            const thankYouUrl = window.location.origin + '/thank-you.html';
             const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -3914,7 +3961,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     currency:    currencyCode,
                     bookingCode: datos.codigo,
                     vehicle:     datos.vehiculo || 'Transfer Privado',
-                    successUrl:  siteUrl + '?payment=success&code=' + datos.codigo,
+                    successUrl:  thankYouUrl + '?session_id={CHECKOUT_SESSION_ID}',
                     cancelUrl:   siteUrl + '?payment=cancelled'
                 })
             });
@@ -3923,6 +3970,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             if (!json.url) throw new Error('No redirect URL');
             if (json.sessionId) {
                 datos.stripeSessionId = json.sessionId;
+                try {
+                    const saved = JSON.parse(localStorage.getItem('ltr_bookingConfirmed') || '{}');
+                    saved.stripeSessionId = json.sessionId;
+                    localStorage.setItem('ltr_bookingConfirmed', JSON.stringify(saved));
+                } catch(e) {}
                 sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datos));
             }
             window.location.href = json.url;
@@ -3981,11 +4033,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
     }
 
-    // Detecta regreso por botón "atrás" del browser (bfcache)
+    // Detecta regreso por botón "atrás" del browser (bfcache) — solo muestra recuperación si hay reserva pendiente sin pago
     window.addEventListener('pageshow', function(event) {
         if (event.persisted) {
             const params = new URLSearchParams(window.location.search);
-            if (params.get('payment')) return; // venimos de un pago — el handler de pago lo gestiona
+            if (params.get('payment')) return; // el handler de pago lo gestiona
             const raw = sessionStorage.getItem('ltr_pendingBooking');
             if (raw) {
                 try { setTimeout(() => mostrarRecuperacion(JSON.parse(raw)), 400); } catch(_) {}
@@ -3993,10 +4045,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
     });
 
-    // Red de seguridad: si hay reserva pendiente en sessionStorage y NO venimos de un pago,
-    // mostrar recuperación automáticamente (cubre el caso de clic accidental durante redirección)
+    // Red de seguridad: si hay reserva pendiente y NO venimos de un pago
     window.addEventListener('DOMContentLoaded', function() {
-        if (window._processingPaymentReturn) return; // venimos de un pago exitoso
         const params = new URLSearchParams(window.location.search);
         if (!params.get('payment')) {
             const raw = sessionStorage.getItem('ltr_pendingBooking');
@@ -4006,57 +4056,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
     });
 
-    window._processingPaymentReturn = false;
-
     (function detectarRetornoPago() {
         const params  = new URLSearchParams(window.location.search);
         const payment = params.get('payment');
         if (!payment) return;
 
-        window._processingPaymentReturn = true; // bloquea el safety-net de DOMContentLoaded
-
         // Limpiar URL inmediatamente
         window.history.replaceState({}, '', window.location.pathname);
-
-        // ── Stripe returned successfully ────────────────────────────
-        if (payment === 'success') {
-            const _ov = document.getElementById('loadingOverlay');
-            _setLoadingMsg('We are generating your booking...', 'Please do not close this window.<br>This may take a few seconds.');
-            if (_ov) _ov.style.display = 'flex';
-            const raw = sessionStorage.getItem('ltr_pendingBooking');
-            sessionStorage.removeItem('ltr_pendingBooking'); // siempre limpiar antes de DOMContentLoaded
-            if (raw) {
-                try {
-                    const datosVenta = JSON.parse(raw);
-
-                    // Recuperar last4 y brand de la tarjeta desde el Worker
-                    if (datosVenta.stripeSessionId) {
-                        (async () => {
-                            try {
-                                const cardRes = await fetch(WORKER_PAGOS_URL + '/process-payment', {
-                                    method:  'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ method: 'stripe', action: 'retrieve-session', sessionId: datosVenta.stripeSessionId })
-                                });
-                                if (cardRes.ok) {
-                                    const cardInfo = await cardRes.json();
-                                    if (cardInfo.last4) {
-                                        const brand = cardInfo.brand ? (cardInfo.brand.charAt(0).toUpperCase() + cardInfo.brand.slice(1)) : 'Card';
-                                        datosVenta.pagoLabel = `${brand} **** ${cardInfo.last4}`;
-                                    }
-                                }
-                            } catch(e) { /* no bloquear si falla */ }
-                            setTimeout(() => _finalizarDesdeStripe(datosVenta), 600);
-                        })();
-                    } else {
-                        setTimeout(() => _finalizarDesdeStripe(datosVenta), 600);
-                    }
-                } catch (e) {
-                    console.error('Error procesando regreso de Stripe:', e);
-                }
-            }
-            return;
-        }
 
         // ── PayPal returned successfully ────────────────────────────
         if (payment === 'paypal-success') {
