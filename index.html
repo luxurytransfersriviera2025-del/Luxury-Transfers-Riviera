@@ -1339,10 +1339,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         <div style="background:#fff; width:100%; max-width:480px; border-radius:20px; overflow:hidden; box-shadow:0 40px 80px rgba(0,0,0,0.5); max-height:90vh; display:flex; flex-direction:column;">
 
             <!-- Header -->
-            <div style="background:#002855; padding:20px 24px; display:flex; justify-content:space-between; align-items:center;">
+            <div id="recovery-header-bg" style="background:#002855; padding:20px 24px; display:flex; justify-content:space-between; align-items:center;">
                 <div>
-                    <div style="color:#D4AF37; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:2px; font-family:'Montserrat',sans-serif;">Payment Incomplete</div>
-                    <div style="color:#fff; font-size:18px; font-weight:900; font-family:'Montserrat',sans-serif; margin-top:2px;">Don't worry — your booking is saved</div>
+                    <div id="recovery-header-tag" style="color:#D4AF37; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:2px; font-family:'Montserrat',sans-serif;">Payment Incomplete</div>
+                    <div id="recovery-header-title" style="color:#fff; font-size:18px; font-weight:900; font-family:'Montserrat',sans-serif; margin-top:2px;">Don't worry — your booking is saved</div>
                 </div>
                 <button onclick="cerrarRecuperacion()" style="background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:6px 12px; color:rgba(255,255,255,0.8); cursor:pointer; font-size:13px; font-weight:700;">✕</button>
             </div>
@@ -1369,13 +1369,40 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 </div>
 
                 <!-- Info message -->
-                <div style="background:#fff8e1; border:1px solid #D4AF37; border-radius:10px; padding:12px 14px; margin-bottom:20px; display:flex; gap:10px; align-items:flex-start;">
+                <div id="recovery-info-msg" style="background:#fff8e1; border:1px solid #D4AF37; border-radius:10px; padding:12px 14px; margin-bottom:20px; display:flex; gap:10px; align-items:flex-start;">
                     <span style="font-size:18px; flex-shrink:0;">⚠️</span>
                     <span style="font-size:12px; color:#555; line-height:1.5;">Your booking details are saved. Simply choose a payment method below to complete your reservation — no need to fill out the form again.</span>
                 </div>
 
+                <!-- Checking payment status spinner -->
+                <div id="recovery-checking" style="display:none; text-align:center; padding:24px 0 16px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size:26px; color:#D4AF37; margin-bottom:12px; display:block;"></i>
+                    <div style="font-size:13px; font-weight:600; color:#555; font-family:'Montserrat',sans-serif;">Verifying payment status…</div>
+                    <div style="font-size:12px; color:#aaa; margin-top:4px;">This only takes a moment.</div>
+                </div>
+
+                <!-- Already paid state -->
+                <div id="recovery-already-paid" style="display:none;">
+                    <div style="background:#eaf7ef; border:1.5px solid #00a651; border-radius:12px; padding:16px 18px; margin-bottom:16px; display:flex; gap:14px; align-items:center;">
+                        <div style="width:44px; height:44px; background:#00a651; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                            <i class="fas fa-check" style="color:#fff; font-size:20px;"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:14px; font-weight:800; color:#007a39; font-family:'Montserrat',sans-serif;">Payment already confirmed!</div>
+                            <div style="font-size:12px; color:#555; margin-top:3px; line-height:1.5;">Your reservation is registered. If you haven't received your confirmation email, contact us via WhatsApp and we'll resend it immediately.</div>
+                        </div>
+                    </div>
+                    <a id="recovery-wa-confirmed" href="https://wa.me/529842411158" target="_blank" style="display:flex; align-items:center; justify-content:center; gap:10px; width:100%; background:#25d366; color:#fff; border:none; border-radius:12px; padding:15px; font-size:14px; font-weight:700; cursor:pointer; text-decoration:none; margin-bottom:10px; font-family:'Montserrat',sans-serif;">
+                        <i class="fab fa-whatsapp" style="font-size:18px;"></i>
+                        Contact us on WhatsApp
+                    </a>
+                    <button onclick="cerrarRecuperacion()" style="width:100%; background:transparent; border:1.5px solid #ccc; border-radius:12px; padding:13px; font-size:13px; font-weight:700; color:#666; cursor:pointer; font-family:'Montserrat',sans-serif; text-transform:uppercase; letter-spacing:1px;">
+                        Close
+                    </button>
+                </div>
+
                 <!-- Payment buttons -->
-                <div style="display:flex; flex-direction:column; gap:12px;">
+                <div id="recovery-payment-buttons" style="display:flex; flex-direction:column; gap:12px;">
                     <button id="recovery-btn-stripe" onclick="reintentarStripe()" style="width:100%; background:#0a0a0a; color:#fff; border:none; border-radius:12px; padding:16px 18px; font-size:15px; font-weight:700; cursor:pointer; font-family:'Open Sans',sans-serif; display:flex; align-items:center; justify-content:space-between;">
                         <span style="display:flex; align-items:center; gap:10px;">
                             <span style="display:flex; gap:5px;">
@@ -3685,10 +3712,70 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         img.src = vehKey ? _vehicleImages[vehKey] : _vehicleImages['CLASSIC SEDAN'];
         img.alt = datos.vehiculo || '';
 
+        // Reset modal state (in case it was opened before)
+        document.getElementById('recovery-header-bg').style.background    = '#002855';
+        document.getElementById('recovery-header-tag').textContent         = 'Payment Incomplete';
+        document.getElementById('recovery-header-title').textContent       = "Don't worry \u2014 your booking is saved";
+        document.getElementById('recovery-info-msg').style.display         = 'flex';
+        document.getElementById('recovery-checking').style.display         = 'none';
+        document.getElementById('recovery-already-paid').style.display     = 'none';
+        document.getElementById('recovery-payment-buttons').style.display  = 'flex';
+
         // Show modal
         const overlay = document.getElementById('recoveryOverlay');
         overlay.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+
+        // Verify payment status with Stripe
+        _verificarPagoExistente(datos);
+    }
+
+    async function _verificarPagoExistente(datos) {
+        // Show spinner, hide payment buttons
+        document.getElementById('recovery-checking').style.display        = 'block';
+        document.getElementById('recovery-payment-buttons').style.display = 'none';
+        document.getElementById('recovery-info-msg').style.display        = 'none';
+
+        try {
+            const res = await fetch(WORKER_PAGOS_URL + '/check-payment', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    bookingCode: datos.codigo          || null,
+                    sessionId:   datos.stripeSessionId || null,
+                })
+            });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const result = await res.json();
+
+            document.getElementById('recovery-checking').style.display = 'none';
+
+            if (result.paid) {
+                // ✅ Payment already completed — show confirmation state
+                document.getElementById('recovery-header-bg').style.background   = '#004d20';
+                document.getElementById('recovery-header-tag').textContent        = 'Payment Confirmed';
+                document.getElementById('recovery-header-title').textContent      = 'Your payment was already processed';
+                document.getElementById('recovery-already-paid').style.display    = 'block';
+                // Update WhatsApp link with booking code context
+                const waMsg = encodeURIComponent(
+                    'Hello! My booking code is *' + (datos.codigo || '') +
+                    '*. I completed my payment but haven\u2019t received the confirmation email. Can you help?'
+                );
+                document.getElementById('recovery-wa-confirmed').href = 'https://wa.me/529842411158?text=' + waMsg;
+                // Clear pending booking — payment is confirmed
+                sessionStorage.removeItem('ltr_pendingBooking');
+            } else {
+                // ❌ Payment not completed — show payment buttons normally
+                document.getElementById('recovery-info-msg').style.display        = 'flex';
+                document.getElementById('recovery-payment-buttons').style.display = 'flex';
+            }
+        } catch(e) {
+            // On any error, fail open — show payment buttons so user can retry
+            console.error('Payment verification error:', e);
+            document.getElementById('recovery-checking').style.display        = 'none';
+            document.getElementById('recovery-info-msg').style.display        = 'flex';
+            document.getElementById('recovery-payment-buttons').style.display = 'flex';
+        }
     }
 
     function cerrarRecuperacion() {
@@ -3731,6 +3818,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             if (!res.ok) throw new Error('HTTP ' + res.status);
             const json = await res.json();
             if (!json.url) throw new Error('No redirect URL');
+            if (json.sessionId) {
+                datos.stripeSessionId = json.sessionId;
+                sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datos));
+            }
             window.location.href = json.url;
         } catch (e) {
             console.error('Recovery Stripe error:', e);
@@ -4125,13 +4216,49 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
         })
         .then(() => {
-            // --- CÓDIGO DE GOOGLE ADS ---
-      gtag('event', 'conversion', {
-          'send_to': 'AW-17859609175/8AeACLKZ6N4bENeEkMRC',
-          'transaction_id': data.codigo
-      });
-            document.getElementById('loadingOverlay').style.display = 'none';
-            mostrarModalExito(data);
+            gtag('event', 'conversion', {
+                'send_to': 'AW-17859609175/8AeACLKZ6N4bENeEkMRC',
+                'transaction_id': data.codigo
+            });
+            if (data.esVenta) {
+                const vehKey = Object.keys(_vehicleImages).find(k => (data.vehiculo || '').toUpperCase().includes(k));
+                const imgUrl = vehKey ? _vehicleImages[vehKey] : _vehicleImages['CLASSIC SEDAN'];
+                const _cuponKey = (data.cupon || '').toUpperCase();
+                const _cuponRes = _couponCache[_cuponKey] || { valid: false, discount: 0 };
+                sessionStorage.setItem('ltr_bookingConfirmed', JSON.stringify({
+                    esVenta:       true,
+                    codigo:        data.codigo,
+                    vehiculo:      data.vehiculo,
+                    imgUrl:        imgUrl,
+                    origen:        data.origen,
+                    destino:       data.destino,
+                    fecha:         data.fecha,
+                    hora:          data.hora,
+                    fechaRegreso:  data.fechaRegreso  || '',
+                    horaRegreso:   data.horaRegreso   || '',
+                    pasajeros:     data.pasajeros,
+                    nombre:        data.nombre,
+                    email:         data.email,
+                    telefono:      data.telefono,
+                    tipoViaje:     data.tipoViaje,
+                    precio:        data.precio         || '',
+                    precioTotal:   data.precioTotal    || data.precio || '',
+                    pago:          data.pago            || '',
+                    pagoLabel:     data.pagoLabel       || '',
+                    vuelo:         data.vuelo           || '',
+                    vueloRegreso:  data.vueloRegreso    || '',
+                    extraStop:     data.extraStop       || 0,
+                    extraStopR:    data.extraStopR      || 0,
+                    cupon:         data.cupon           || '',
+                    cuponDiscount: _cuponRes.valid ? _cuponRes.discount : 0,
+                    extras:        data.extras          || '',
+                    notas:         data.notas           || '',
+                }));
+                window.location.href = 'thank-you.html';
+            } else {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                mostrarModalExito(data);
+            }
         })
         .catch(e => {
             console.error(e);
