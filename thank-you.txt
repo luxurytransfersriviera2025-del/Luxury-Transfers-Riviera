@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en" translate="no" class="notranslate">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TGJB3410Q2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-TGJB3410Q2');
+        gtag('config', 'AW-17859609175');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Booking Confirmed | Luxury Transfers Riviera</title>
+    <meta name="facebook-domain-verification" content="nbsn1w3k3g95f02nuqkypfab2frmei" />
+    <!-- Meta Pixel -->
+    <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+    document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init','1206982288231935');fbq('track','PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"/></noscript>
+    <link rel="icon" type="image/webp" href="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Favicon%20200%20x%20200%20px.webp">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-hover: #b5952f;
+            --black: #0a0a0a;
+            --dark-gray: #222;
+            --white: #fff;
+            --navy-bg: #002855;
+            --green: #00a651;
+            --font-title: 'Montserrat', sans-serif;
+            --font-body: 'Open Sans', sans-serif;
+            --header-height: 60px;
+        }
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--font-body); margin: 0; padding: 0; color: var(--dark-gray); background: #f0f2f5; overflow-x: hidden; }
+        * { box-sizing: border-box; }
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        img { max-width: 100%; height: auto; }
+
+        /* ── HEADER ── */
+        header {
+            background-color: rgba(10,10,10,0.95);
+            padding: 10px 0;
+            position: fixed; width: 100%; top: 0; z-index: 1000;
+            border-bottom: 2px solid var(--gold);
+            display: flex; align-items: center;
+        }
+        .nav-container {
+            max-width: 1200px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px; width: 100%;
+        }
+        .logo {
+            font-family: var(--font-title); font-size: 1.4rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1px; color: var(--gold);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .logo-icon { height: 35px; width: auto; }
+        .logo-full  { display: inline; }
+        .logo-short { display: none; }
+        @media (max-width: 600px) {
+            .logo-full  { display: none; }
+            .logo-short { display: inline; }
+        }
+        .btn-back-header {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--gold); color: var(--navy-bg);
+            font-family: var(--font-title); font-size: 0.78rem;
+            font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+            padding: 8px 18px; border-radius: 8px;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .btn-back-header:hover { background: var(--gold-hover); color: var(--navy-bg); }
+        @media (max-width: 768px) {
+            header { padding: 15px 0; }
+            .nav-container { flex-direction: column; gap: 15px; }
+            .logo { font-size: 1.2rem; } .logo-icon { height: 30px; }
+            .btn-back-header { font-size: 0.72rem; padding: 7px 14px; }
+        }
+
+        /* ── MAIN WRAPPER ── */
+        .main-wrapper {
+            padding-top: calc(var(--header-height) + 40px);
+            padding-bottom: 60px;
+            min-height: calc(100vh - 220px);
+            display: flex; align-items: flex-start; justify-content: center;
+            padding-left: 16px; padding-right: 16px;
+        }
+        @media (max-width: 768px) { .main-wrapper { padding-top: calc(var(--header-height) + 75px); } }
+
+        /* ── CARD ── */
+        .card {
+            background: #fff; border-radius: 20px;
+            width: 100%; max-width: 520px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.12); overflow: hidden;
+        }
+        .card-header { background: var(--navy-bg); padding: 36px 24px 32px; text-align: center; }
+        .check-circle {
+            width: 72px; height: 72px; background: var(--green); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            animation: popIn 0.5s cubic-bezier(.34,1.56,.64,1) both;
+        }
+        @keyframes popIn { from { transform:scale(0); opacity:0; } to { transform:scale(1); opacity:1; } }
+        .tag-confirmed { color: var(--gold); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; font-family: var(--font-title); margin-bottom: 8px; }
+        .heading-confirmed { color: #fff; font-size: 21px; font-weight: 900; font-family: var(--font-title); margin-bottom: 18px; }
+        .code-box { display: inline-block; border: 2.5px solid var(--gold); color: #fff; font-size: 22px; font-weight: 900; letter-spacing: 5px; padding: 10px 28px; border-radius: 12px; font-family: var(--font-title); background: rgba(212,175,55,0.08); }
+
+        .card-body { padding: 24px; }
+        .vehicle-strip { display: flex; align-items: center; gap: 14px; background: #f6f8ff; border-radius: 12px; padding: 14px 16px; margin-bottom: 18px; }
+        .vehicle-strip img { width: 80px; height: 56px; object-fit: contain; background: #fff; border-radius: 8px; padding: 4px; flex-shrink: 0; }
+        .vehicle-name { font-size: 15px; font-weight: 900; color: var(--navy-bg); font-family: var(--font-title); text-transform: uppercase; }
+        .vehicle-pax { font-size: 13px; color: #666; margin-top: 3px; }
+        .vehicle-price { margin-left: auto; font-size: 20px; font-weight: 900; color: var(--navy-bg); font-family: var(--font-title); white-space: nowrap; }
+
+        .payment-badge { display: inline-flex; align-items: center; gap: 7px; background: #eaf7ef; color: #007a39; font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 20px; margin-bottom: 18px; font-family: var(--font-title); }
+
+        .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .detail-item { background: #f9f9f9; border-radius: 10px; padding: 12px 14px; }
+        .detail-item.full { grid-column: 1 / -1; }
+        .detail-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #aaa; font-family: var(--font-title); margin-bottom: 4px; }
+        .detail-value { font-size: 13px; font-weight: 600; color: #222; font-family: var(--font-body); line-height: 1.4; word-break: break-word; }
+
+        .confirm-msg { font-size: 13.5px; color: #444; line-height: 1.75; text-align: center; margin-bottom: 18px; }
+        .spam-notice { background: #fff8e1; border: 1px solid var(--gold); border-radius: 10px; padding: 12px 14px; margin-bottom: 18px; display: flex; gap: 10px; align-items: flex-start; font-size: 12px; color: #555; line-height: 1.5; }
+
+        .btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; border-radius: 12px; padding: 15px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; margin-bottom: 10px; font-family: var(--font-title); border: none; transition: opacity 0.2s; }
+        .btn:last-child { margin-bottom: 0; }
+        .btn:hover { opacity: 0.88; }
+        .btn-whatsapp { background: #25d366; color: #fff; }
+        .btn-pdf { background: transparent; border: 2px solid var(--navy-bg); color: var(--navy-bg); }
+        .btn-home { background: var(--gold); color: var(--navy-bg); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .no-data { padding: 60px 32px; text-align: center; color: #999; font-size: 15px; font-family: var(--font-body); }
+
+        /* ── SOCIAL ── */
+        .ltr-social-container { padding: 40px 20px; text-align: center; background-color: #f8f9fa; border-top: 1px solid #e9ecef; }
+        .ltr-social-container h3 { margin-bottom: 20px; color: #333; font-size: 18px; font-family: sans-serif; }
+        .ltr-social-icons { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; }
+        .ltr-social-link { display: inline-flex; justify-content: center; align-items: center; width: 45px; height: 45px; border-radius: 50%; color: white; font-size: 20px; transition: transform 0.2s; }
+        .ltr-social-link:hover { transform: scale(1.1); opacity: 0.9; }
+        .ltr-fb    { background-color: #1877F2; }
+        .ltr-insta { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+        .ltr-tiktok{ background-color: #000000; }
+        .ltr-trip  { background-color: #34E0A1; }
+        .ltr-yt    { background-color: #FF0000; }
+        .ltr-wa    { background-color: #25D366; }
+        .ltr-email { background-color: #555555; }
+        .ltr-phone { background-color: #0d6efd; }
+
+        /* ── FOOTER ── */
+        .site-footer { background: #0a0a0a; color: white; text-align: center; font-size: 12px; padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.1); }
+        .site-footer p { margin: 4px 0; }
+        .footer-links-bar { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin: 12px 0 6px; font-family: var(--font-title); font-size: 11px; }
+        .footer-links-bar a { color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px; transition: color 0.2s; }
+        .footer-links-bar a:hover { color: var(--gold); }
+
+        @media (max-width: 480px) {
+            .details-grid { grid-template-columns: 1fr; }
+            .detail-item.full { grid-column: 1; }
+            .code-box { font-size: 18px; letter-spacing: 3px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header>
+    <div class="nav-container">
+        <a href="index.html" class="logo" translate="no">
+            <img src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Favicon%20200%20x%20200%20px.webp" alt="Luxury Transfers Riviera" class="logo-icon">
+            <span class="logo-full">Luxury Transfers Riviera</span>
+            <span class="logo-short">Luxury Transfers</span>
+        </a>
+        <a href="index.html" class="btn-back-header">
+            <i class="fas fa-home"></i> Back to Home
+        </a>
+    </div>
+</header>
+
+<!-- ══ MAIN ══ -->
+<div class="main-wrapper">
+    <div class="card" id="mainCard">
+
+        <div class="card-header" id="cardHeader" style="display:none">
+            <div class="check-circle">
+                <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
+                    <path d="M6 16L13 23L26 9" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="tag-confirmed">Payment Confirmed</div>
+            <div class="heading-confirmed">Your booking is confirmed!</div>
+            <div class="code-box" id="codeDisplay">LTR-????</div>
+        </div>
+
+        <div class="card-body" id="cardBody" style="display:none">
+
+            <div class="vehicle-strip">
+                <img id="vehImg" src="" alt="" onerror="this.style.display='none'">
+                <div>
+                    <div class="vehicle-name" id="vehName"></div>
+                    <div class="vehicle-pax" id="vehPax"></div>
+                </div>
+                <div class="vehicle-price" id="vehPrice"></div>
+            </div>
+
+            <div id="paymentBadge" class="payment-badge" style="display:none">
+                <i class="fas fa-check-circle"></i>
+                <span id="paymentLabel"></span>
+            </div>
+
+            <div class="details-grid" id="detailsGrid"></div>
+
+            <p class="confirm-msg">
+                Thank you for choosing <strong>Luxury Transfers Riviera</strong>.
+                Your payment has been successfully processed and your reservation is confirmed.
+                One of our agents will contact you as soon as possible with all the details of your service.
+            </p>
+
+            <div class="spam-notice">
+                <span style="font-size:16px;flex-shrink:0;">&#128231;</span>
+                <span>A confirmation email has been sent to you. <strong>If you don't see it in your inbox, please check your spam or junk folder.</strong></span>
+            </div>
+
+            <a id="btnWA" href="https://wa.me/529842411158" target="_blank" rel="noopener" class="btn btn-whatsapp">
+                <i class="fab fa-whatsapp" style="font-size:18px;"></i>
+                Need quick help? Contact us on WhatsApp
+            </a>
+
+            <button id="btnPDF" onclick="downloadVoucher()" class="btn btn-pdf">
+                <i class="fas fa-download"></i> Download Voucher (PDF)
+            </button>
+
+            <a href="index.html" class="btn btn-home">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+
+        </div>
+
+        <div class="no-data" id="noDataMsg" style="display:none">
+            No booking data found. Redirecting to home&hellip;
+        </div>
+
+    </div>
+</div>
+
+<!-- ══ SOCIAL ══ -->
+<div class="ltr-social-container">
+    <h3>Follow us &amp; Contact us</h3>
+    <div class="ltr-social-icons">
+        <a href="https://api.whatsapp.com/send/?phone=529842411158&text&type=phone_number&app_absent=0" target="_blank" class="ltr-social-link ltr-wa" title="WhatsApp" onclick="if(typeof fbq!=='undefined') fbq('track','Contact');"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="https://facebook.com/share/1Yt1WbvDFV" target="_blank" class="ltr-social-link ltr-fb" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="https://instagram.com/luxury_transfers_riviera" target="_blank" class="ltr-social-link ltr-insta" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://tiktok.com/@luxurytransfersriviera?_r=1&_t=ZS-92t33quHLzs" target="_blank" class="ltr-social-link ltr-tiktok" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+        <a href="https://www.youtube.com/@LuxuryTransfersRiviera" target="_blank" class="ltr-social-link ltr-yt" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+        <a href="https://www.tripadvisor.es/Attraction_Review-g150812-d34109769-Reviews-Luxury_Transfers_Riviera-Playa_del_Carmen_Yucatan_Peninsula.html" target="_blank" class="ltr-social-link ltr-trip" title="TripAdvisor">
+            <img src="https://static.tacdn.com/img2/brand_refresh/Tripadvisor_logomark.svg" style="width:24px;height:24px;">
+        </a>
+        <a href="mailto:reservas@luxurytransfersriviera.com.mx" class="ltr-social-link ltr-email" title="Email"><i class="fa-solid fa-envelope"></i></a>
+        <a href="tel:+529842411158" class="ltr-social-link ltr-phone" title="Call"><i class="fa-solid fa-phone"></i></a>
+    </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<div class="site-footer">
+    <div class="footer-links-bar">
+        <a href="index.html">Home</a>
+        <a href="terms.html">Terms &amp; Conditions</a>
+        <a href="privacy.html">Privacy Policy</a>
+    </div>
+    <p style="margin-bottom:5px;">&copy; 2026 Luxury Transfers Riviera. All rights reserved.</p>
+    <p style="margin:0;">Operated by <strong>SILVER'S SHUTTLE'S SERVICES S.A. DE C.V.</strong><br>RFC: SSS210817PQ6</p>
+    <p style="margin-top:10px;"><a href="https://wa.me/529842411158" target="_blank" style="color:#25d366;font-weight:700;text-decoration:none;"><i class="fab fa-whatsapp"></i> WhatsApp: +52 984 241 1158</a></p>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  DATA + UI
+// ══════════════════════════════════════════════════
+var _confirmedData = null;
+
+(function init() {
+    var raw = sessionStorage.getItem('ltr_bookingConfirmed');
+    if (!raw) {
+        document.getElementById('noDataMsg').style.display = 'block';
+        setTimeout(function() { window.location.href = 'index.html'; }, 3000);
+        return;
+    }
+    try { _confirmedData = JSON.parse(raw); } catch(e) {
+        document.getElementById('noDataMsg').style.display = 'block';
+        setTimeout(function() { window.location.href = 'index.html'; }, 3000);
+        return;
+    }
+    sessionStorage.removeItem('ltr_bookingConfirmed');
+
+    var d = _confirmedData;
+
+    document.getElementById('cardHeader').style.display = 'block';
+    document.getElementById('cardBody').style.display   = 'block';
+    document.getElementById('codeDisplay').textContent  = d.codigo || 'LTR-????';
+
+    if (d.imgUrl) document.getElementById('vehImg').src = d.imgUrl;
+    document.getElementById('vehImg').alt  = d.vehiculo || '';
+    document.getElementById('vehName').textContent = d.vehiculo || '';
+    var pax = parseInt(d.pasajeros) || 1;
+    document.getElementById('vehPax').textContent  = pax + ' Passenger' + (pax > 1 ? 's' : '');
+    document.getElementById('vehPrice').textContent = d.precioTotal || '';
+
+    if (d.pagoLabel) {
+        document.getElementById('paymentBadge').style.display = 'inline-flex';
+        document.getElementById('paymentLabel').textContent    = 'Paid \u00b7 ' + d.pagoLabel;
+    }
+
+    function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function addDetail(label, value, full) {
+        if (!value) return;
+        var div = document.createElement('div');
+        div.className = 'detail-item' + (full ? ' full' : '');
+        div.innerHTML = '<div class="detail-label">' + label + '</div><div class="detail-value">' + esc(value) + '</div>';
+        document.getElementById('detailsGrid').appendChild(div);
+    }
+
+    addDetail('Pick-up',     d.origen,  true);
+    addDetail('Destination', d.destino, true);
+    addDetail('Date',        d.fecha);
+    addDetail('Time',        d.hora);
+    addDetail('Passengers',  d.pasajeros);
+    addDetail('Name',        d.nombre);
+    addDetail('Email',       d.email);
+    addDetail('Phone',       d.telefono);
+    if (d.vuelo)        addDetail('Flight',  d.vuelo);
+    if (d.fechaRegreso) addDetail('Return',  d.fechaRegreso + (d.horaRegreso ? ' \u00b7 ' + d.horaRegreso : ''));
+    if (d.extras)       addDetail('Extras',  d.extras,  true);
+    if (d.notas)        addDetail('Notes',   d.notas,   true);
+
+    var waMsg = encodeURIComponent('Hello! I just confirmed my booking *' + (d.codigo || '') + '*. I need assistance.');
+    document.getElementById('btnWA').href = 'https://wa.me/529842411158?text=' + waMsg;
+})();
+
+// ══════════════════════════════════════════════════
+//  PDF — image preloaders
+// ══════════════════════════════════════════════════
+var _vehicleImages = {
+    'CLASSIC SEDAN':  'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/CLASSIC%20SEDAN%201%20Desglose%20de%20Precios.webp',
+    'COMFORT VAN':    'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/COMFORT%20VAN%20Desglose%20de%20Precios.webp',
+    'LUXURY VIP':     'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/LUXURY%20VIP%20Desglose%20de%20Precios.webp',
+    'GRAND SPRINTER': 'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/GRAND%20SPRINTER%20Desglose%20de%20Precios.webp',
+    'FAMILY VAN':     'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/FAMILY%20VAN%20Desglose%20de%20Precios.webp',
+};
+var _vehicleImgB64  = {};
+var _faviconB64     = null;
+var _whatsappQrB64  = null;
+var _socialIconsB64 = {};
+
+(function _preloadAll() {
+    // Favicon
+    var fi = new Image(); fi.crossOrigin = 'anonymous';
+    fi.onload = function() {
+        try { var c=document.createElement('canvas'); c.width=fi.naturalWidth; c.height=fi.naturalHeight; c.getContext('2d').drawImage(fi,0,0); _faviconB64=c.toDataURL('image/png'); } catch(e) {}
+    };
+    fi.src = 'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Favicon%20200%20x%20200%20px.webp';
+
+    // Vehicle images
+    var MAX_W=420, MAX_H=260;
+    Object.entries(_vehicleImages).forEach(function(entry) {
+        var key=entry[0], url=entry[1];
+        var img = new Image(); img.crossOrigin='anonymous';
+        img.onload = function() {
+            try {
+                var ratio=Math.min(MAX_W/img.naturalWidth, MAX_H/img.naturalHeight, 1);
+                var c=document.createElement('canvas');
+                c.width=Math.round(img.naturalWidth*ratio); c.height=Math.round(img.naturalHeight*ratio);
+                c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+                _vehicleImgB64[key]=c.toDataURL('image/png');
+            } catch(e) {}
+        };
+        img.src=url;
+    });
+
+    // WhatsApp QR
+    var qi = new Image(); qi.crossOrigin='anonymous';
+    qi.onload = function() {
+        try { var c=document.createElement('canvas'); c.width=200; c.height=200; c.getContext('2d').drawImage(qi,0,0,200,200); _whatsappQrB64=c.toDataURL('image/png'); } catch(e) {}
+    };
+    qi.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent('https://wa.me/529842411158') + '&margin=5';
+
+    // Social icons
+    var base='https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/';
+    var defs=[['whatsapp',base+'WhatsApp%20Icono.png'],['facebook',base+'Facebook%20icono.png'],['instagram',base+'Instagram%20icono.png'],['tiktok',base+'Tiktok%20Icono.png'],['youtube',base+'Youtube%20icono.png'],['tripadvisor',base+'TripAdvisor.png']];
+    defs.forEach(function(d) {
+        var key=d[0], url=d[1];
+        var img=new Image(); img.crossOrigin='anonymous';
+        img.onload=function() {
+            try { var c=document.createElement('canvas'); c.width=c.height=72; c.getContext('2d').drawImage(img,0,0,72,72); _socialIconsB64[key]=c.toDataURL('image/png'); } catch(e) {}
+        };
+        img.src=url;
+    });
+})();
+
+// ══════════════════════════════════════════════════
+//  PDF GENERATION
+// ══════════════════════════════════════════════════
+function downloadVoucher() {
+    if (!_confirmedData) return;
+    if (!window.jspdf) { alert('PDF library not loaded yet. Please try again in a moment.'); return; }
+    var btn = document.getElementById('btnPDF');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+    try {
+        generarVoucherPDF(_confirmedData);
+    } catch(e) {
+        console.error('PDF error:', e);
+        alert('Could not generate PDF. Please try again.');
+    }
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-download"></i> Download Voucher (PDF)';
+}
+
+function generarVoucherPDF(datos) {
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({ unit: 'mm', format: 'a4' });
+
+    var black  = [14, 14, 20];
+    var gold   = [212, 175, 55];
+    var white  = [255, 255, 255];
+    var dark   = [34, 34, 34];
+    var grey   = [130, 130, 130];
+    var lgrey  = [246, 246, 248];
+    var greyLn = [220, 220, 220];
+    var green  = [39, 174, 96];
+    var navy   = [0, 40, 85];
+
+    var pageW = 210, padL = 20, padR = 20, cW = pageW - padL - padR;
+
+    var fmtDate = function(d) {
+        if (!d) return '';
+        var m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        return m ? (m[3]+'/'+m[2]+'/'+m[1]) : d;
+    };
+
+    // ── HEADER ─────────────────────────────────────
+    doc.setFillColor.apply(doc, black);
+    doc.rect(0, 0, pageW, 25, 'F');
+    var textX = padL;
+    if (_faviconB64) {
+        try { doc.addImage(_faviconB64, 'PNG', padL, 5, 10, 10); textX = padL + 14; } catch(e) {}
+    }
+    doc.setTextColor.apply(doc, gold);
+    doc.setFontSize(10); doc.setFont('helvetica','bold');
+    doc.text('LUXURY TRANSFERS RIVIERA', textX, 11);
+    doc.setTextColor(150,150,165); doc.setFontSize(6.5); doc.setFont('helvetica','normal');
+    doc.text('luxurytransfersriviera.com.mx', textX, 19);
+    doc.setTextColor(150,150,165); doc.setFontSize(6.5);
+    doc.text('Booking confirmation', pageW-padR, 11, { align:'right' });
+    doc.setTextColor.apply(doc, gold); doc.setFontSize(13); doc.setFont('helvetica','bold');
+    doc.text(datos.codigo || 'LTR-????', pageW-padR, 19, { align:'right' });
+
+    // ── VEHICLE + CLIENT ────────────────────────────
+    var y = 32;
+    var imgW = 66, imgH = 38;
+    var hasRegreso = !!(datos.fechaRegreso && String(datos.fechaRegreso).trim());
+
+    doc.setTextColor.apply(doc, dark); doc.setFontSize(8.5); doc.setFont('helvetica','bold');
+    doc.text((datos.vehiculo||'').toUpperCase(), padL+imgW/2, y, { align:'center' });
+    y += 5;
+
+    var vehKey = Object.keys(_vehicleImages).find(function(k){ return (datos.vehiculo||'').toUpperCase().indexOf(k) !== -1; });
+    var vehB64 = vehKey ? (_vehicleImgB64[vehKey]||null) : null;
+    var imgY = y;
+    if (vehB64) {
+        try { doc.addImage(vehB64,'PNG',padL,imgY,imgW,imgH); } catch(e) { doc.setFillColor.apply(doc,lgrey); doc.rect(padL,imgY,imgW,imgH,'F'); }
+    } else {
+        doc.setFillColor.apply(doc,lgrey); doc.rect(padL,imgY,imgW,imgH,'F');
+        doc.setTextColor.apply(doc,grey); doc.setFontSize(8);
+        doc.text(datos.vehiculo||'', padL+imgW/2, imgY+imgH/2, { align:'center' });
+    }
+    doc.setTextColor.apply(doc,grey); doc.setFontSize(5.5); doc.setFont('helvetica','normal');
+    doc.text('* Illustrative image. Color and model may vary.', padL+imgW/2, imgY+imgH+4, { align:'center' });
+
+    var qrSize = 36;
+    var infoX  = padL+imgW+7;
+    var infoW  = cW-imgW-7;
+    var textW  = infoW-qrSize-9;
+    var infoY  = imgY;
+
+    var sideField = function(label, value) {
+        if (!value || String(value).trim()==='') return;
+        doc.setTextColor.apply(doc,grey); doc.setFontSize(7); doc.setFont('helvetica','normal');
+        doc.text(label, infoX, infoY); infoY+=4.5;
+        doc.setTextColor.apply(doc,dark); doc.setFontSize(9); doc.setFont('helvetica','bold');
+        var lines = doc.splitTextToSize(String(value), textW);
+        doc.text(lines, infoX, infoY); infoY += lines.length*5+4;
+    };
+
+    sideField('Client', datos.nombre||'');
+    sideField('Email',  datos.email||'');
+    sideField('Phone',  datos.telefono||'');
+
+    var qrX = infoX+textW+9, qrY = imgY+(imgH-qrSize)/2-2;
+    if (_whatsappQrB64) {
+        try { doc.addImage(_whatsappQrB64,'PNG',qrX,qrY,qrSize,qrSize); } catch(e) {}
+    }
+    doc.setDrawColor.apply(doc,gold); doc.setLineWidth(0.5);
+    doc.rect(qrX-1.2, qrY-1.2, qrSize+2.4, qrSize+2.4, 'S');
+    doc.setTextColor.apply(doc,grey); doc.setFontSize(5.5); doc.setFont('helvetica','normal');
+    doc.text('Scan for WhatsApp', qrX+qrSize/2, qrY+qrSize+4, { align:'center' });
+
+    y = Math.max(imgY+imgH+8, infoY+2);
+
+    // ── GRID DATE / FLIGHT / PAX ────────────────────
+    var hasVuelo = !!(datos.vuelo && String(datos.vuelo).trim());
+    var gap=4, cellH=15;
+    var dateStr = fmtDate(datos.fecha)+(datos.hora?' \u2014 '+datos.hora:'');
+    var retStr  = fmtDate(datos.fechaRegreso)+(datos.horaRegreso?' \u2014 '+datos.horaRegreso:'');
+    var paxStr  = (datos.pasajeros||'')+' pax';
+    var notasVal = datos.notas||'';
+
+    var drawCell = function(cx,cy,w,h,label,value,dotColor) {
+        doc.setFillColor.apply(doc,lgrey); doc.rect(cx,cy,w,h,'F');
+        var hasD = Array.isArray(dotColor);
+        var offX = hasD?9:4, tW = w-offX-4;
+        if (hasD) { doc.setFillColor.apply(doc,dotColor); doc.circle(cx+4,cy+5.2,1.8,'F'); }
+        doc.setTextColor.apply(doc,grey); doc.setFontSize(7); doc.setFont('helvetica','normal');
+        doc.text(label,cx+offX,cy+5.5);
+        doc.setTextColor.apply(doc,dark); doc.setFontSize(8.5); doc.setFont('helvetica','bold');
+        var ls=doc.splitTextToSize(String(value||''),tW);
+        ls.forEach(function(line,i){ doc.text(line,cx+offX,cy+11+i*5.5); });
+    };
+
+    doc.setFontSize(8.5); doc.setFont('helvetica','bold');
+    var notaLines = notasVal ? doc.splitTextToSize(notasVal, cW-8) : [];
+    var notaH = notasVal ? Math.max(cellH, notaLines.length*5.5+12) : 0;
+
+    if (!hasRegreso && hasVuelo) {
+        var w3=(cW-gap*2)/3;
+        drawCell(padL,y,w3,cellH,'Date & time',dateStr); drawCell(padL+w3+gap,y,w3,cellH,'Flight number',datos.vuelo||''); drawCell(padL+(w3+gap)*2,y,w3,cellH,'Passengers',paxStr);
+        y+=cellH+gap; if(notasVal){drawCell(padL,y,cW,notaH,'Notes',notasVal);y+=notaH+gap;}
+    }
+    if (hasRegreso && hasVuelo) {
+        var w3=(cW-gap*2)/3;
+        drawCell(padL,y,w3,cellH,'Date & time',dateStr); drawCell(padL+w3+gap,y,w3,cellH,'Flight number',datos.vuelo||''); drawCell(padL+(w3+gap)*2,y,w3,cellH,'Passengers',paxStr);
+        y+=cellH+gap;
+        var w2=(cW-gap)/2;
+        drawCell(padL,y,w2,cellH,'Return date & time',retStr); drawCell(padL+w2+gap,y,w2,cellH,'Return flight',datos.vueloRegreso||'-');
+        y+=cellH+gap; if(notasVal){drawCell(padL,y,cW,notaH,'Notes',notasVal);y+=notaH+gap;}
+    }
+    if (!hasRegreso && !hasVuelo) {
+        var w2=(cW-gap)/2;
+        drawCell(padL,y,w2,cellH,'Date & time',dateStr); drawCell(padL+w2+gap,y,w2,cellH,'Passengers',paxStr);
+        y+=cellH+gap; if(notasVal){drawCell(padL,y,cW,notaH,'Notes',notasVal);y+=notaH+gap;}
+    }
+    if (hasRegreso && !hasVuelo) {
+        var w3=(cW-gap*2)/3;
+        drawCell(padL,y,w3,cellH,'Date & time',dateStr); drawCell(padL+w3+gap,y,w3,cellH,'Return date & time',retStr); drawCell(padL+(w3+gap)*2,y,w3,cellH,'Passengers',paxStr);
+        y+=cellH+gap; if(notasVal){drawCell(padL,y,cW,notaH,'Notes',notasVal);y+=notaH+gap;}
+    }
+    y+=2;
+
+    // ── ROUTE ───────────────────────────────────────
+    var arrowW=12;
+    doc.setFontSize(8.5); doc.setFont('helvetica','bold');
+    var origLns=doc.splitTextToSize(datos.origen||'',(cW-arrowW-gap*2)/2-12);
+    var destLns=doc.splitTextToSize(datos.destino||'',(cW-arrowW-gap*2)/2-12);
+    var routeH=Math.max(cellH,Math.max(origLns.length,destLns.length)*6+14);
+    var rW=(cW-arrowW-gap*2)/2;
+
+    drawCell(padL,y,rW,routeH,'Pick-up',datos.origen||'',[34,197,94]);
+    drawCell(padL+rW+gap+arrowW+gap,y,rW,routeH,'Drop-off',datos.destino||'',[212,175,55]);
+
+    var arrowX=padL+rW+gap, midArrY=y+routeH/2;
+    doc.setFillColor.apply(doc,lgrey); doc.rect(arrowX,y,arrowW,routeH,'F');
+    doc.setDrawColor.apply(doc,grey); doc.setLineWidth(0.6);
+    if (hasRegreso) {
+        doc.line(arrowX+2,midArrY-2,arrowX+arrowW-2,midArrY-2); doc.line(arrowX+arrowW-2,midArrY-2,arrowX+arrowW-5,midArrY-4.5); doc.line(arrowX+arrowW-2,midArrY-2,arrowX+arrowW-5,midArrY+0.5);
+        doc.line(arrowX+arrowW-2,midArrY+2,arrowX+2,midArrY+2); doc.line(arrowX+2,midArrY+2,arrowX+5,midArrY-0.5); doc.line(arrowX+2,midArrY+2,arrowX+5,midArrY+4.5);
+    } else {
+        doc.line(arrowX+2,midArrY,arrowX+arrowW-2,midArrY); doc.line(arrowX+arrowW-2,midArrY,arrowX+arrowW-5,midArrY-2.5); doc.line(arrowX+arrowW-2,midArrY,arrowX+arrowW-5,midArrY+2.5);
+    }
+    y+=routeH+gap;
+
+    // ── DIVIDER ─────────────────────────────────────
+    doc.setDrawColor.apply(doc,greyLn); doc.setLineWidth(0.3);
+    doc.line(padL,y,pageW-padR,y); y+=7;
+
+    // ── PRICING ─────────────────────────────────────
+    var monedaStr = (datos.precioTotal||datos.precio||'').indexOf('MXN')!==-1?'MXN':(datos.precioTotal||datos.precio||'').indexOf('CAD')!==-1?'CAD':'USD';
+    var baseNum   = parseFloat((datos.precio||'0').replace(/[^0-9.]/g,''))||0;
+    var totalNum  = parseFloat((datos.precioTotal||datos.precio||'0').replace(/[^0-9.]/g,''))||baseNum;
+    var discPct   = ((datos.cuponDiscount||0))/100;
+    var fmt       = function(n){ return '$'+(Math.round(n*100)/100).toFixed(2)+' '+monedaStr; };
+    var rowH=8;
+
+    var priceRow = function(label,amount,txtColor,bold,bgColor) {
+        if (bgColor) { doc.setFillColor.apply(doc,bgColor); doc.rect(padL,y,cW,rowH,'F'); }
+        doc.setTextColor.apply(doc,txtColor); doc.setFontSize(9); doc.setFont('helvetica',bold?'bold':'normal');
+        doc.text(label,padL+4,y+5.5); doc.text(amount,pageW-padR-4,y+5.5,{align:'right'});
+        y+=rowH; doc.setDrawColor.apply(doc,greyLn); doc.setLineWidth(0.2); doc.line(padL,y,pageW-padR,y);
+    };
+
+    if (discPct>0) {
+        var origBase=Math.round(baseNum/(1-discPct)*100)/100;
+        var discAmt=Math.round((origBase-baseNum)*100)/100;
+        priceRow('Service price',fmt(origBase),dark,false,null);
+        priceRow('Discount applied ('+Math.round(discPct*100)+'%)','-'+fmt(discAmt),green,false,null);
+    } else {
+        priceRow('Service price',fmt(baseNum),dark,false,null);
+    }
+
+    var stopPrc = monedaStr==='MXN'?500:monedaStr==='CAD'?40:25;
+    if (parseInt(datos.extraStop) >0) priceRow('Extra stop x'+datos.extraStop,'+'+fmt(datos.extraStop*stopPrc),dark,false,null);
+    if (parseInt(datos.extraStopR)>0) priceRow('Extra stop (return) x'+datos.extraStopR,'+'+fmt(datos.extraStopR*stopPrc),dark,false,null);
+
+    y+=1;
+    priceRow('Total',fmt(totalNum),navy,true,gold);
+
+    if (datos.pago) {
+        var pagoLabel = datos.pagoLabel || (datos.pago||'').replace(' \u2705 Paid Online','').replace('Checkout','').trim();
+        doc.setFillColor.apply(doc,white); doc.rect(padL,y,cW,rowH,'F');
+        doc.setDrawColor.apply(doc,greyLn); doc.setLineWidth(0.3); doc.rect(padL,y,cW,rowH,'S');
+        doc.setTextColor.apply(doc,dark); doc.setFontSize(9); doc.setFont('helvetica','bold');
+        doc.text('Paid online \u2013 '+pagoLabel, padL+4, y+5.5);
+        doc.setTextColor(39,174,96);
+        doc.text(fmt(totalNum),pageW-padR-4,y+5.5,{align:'right'});
+        y+=rowH;
+    }
+    y+=8;
+
+    // ── NOTICE BOX ──────────────────────────────────
+    var footerH=20, footerY=297-footerH;
+    var noticeText='Please save your booking code '+(datos.codigo||'LTR-????')+'. We invite you to download the WhatsApp app and contact us at +52 984 241 1158 for faster communication.';
+    doc.setFontSize(8.5); doc.setFont('helvetica','normal');
+    var noticeLines=doc.splitTextToSize(noticeText,cW-10);
+    var noticeH=noticeLines.length*5.2+8;
+    if (y+noticeH+10>footerY) { doc.addPage(); y=20; }
+    doc.setFillColor(255,252,220); doc.setDrawColor(220,185,60); doc.setLineWidth(0.6);
+    doc.rect(padL,y,cW,noticeH,'FD');
+    doc.setTextColor(100,75,0); doc.text(noticeLines,padL+5,y+7);
+    y+=noticeH+6;
+
+    // ── FOOTER ──────────────────────────────────────
+    doc.setFillColor.apply(doc,black); doc.rect(0,footerY,pageW,footerH,'F');
+    var socialIcons=[
+        {key:'whatsapp',color:[37,211,102],lbl:'WA'},{key:'facebook',color:[24,119,242],lbl:'Fb'},
+        {key:'instagram',color:[193,53,132],lbl:'ig'},{key:'tiktok',color:[30,30,30],lbl:'Tk'},
+        {key:'youtube',color:[255,0,0],lbl:'YT'},{key:'tripadvisor',color:[52,195,143],lbl:'TA'},
+    ];
+    var iconR=3.5, iconGap=14;
+    var iconsStartX=pageW/2-((socialIcons.length-1)*iconGap)/2;
+    var iconCY=footerY+10;
+    socialIcons.forEach(function(ic,i) {
+        var cx=iconsStartX+i*iconGap;
+        if (_socialIconsB64[ic.key]) {
+            try { var d=iconR*2; doc.addImage(_socialIconsB64[ic.key],'PNG',cx-iconR,iconCY-iconR,d,d); } catch(e) {
+                doc.setFillColor.apply(doc,ic.color); doc.circle(cx,iconCY,iconR,'F');
+            }
+        } else {
+            doc.setFillColor.apply(doc,ic.color); doc.circle(cx,iconCY,iconR,'F');
+            doc.setTextColor(255,255,255); doc.setFontSize(ic.lbl.length>1?3.5:5); doc.setFont('helvetica','bold');
+            doc.text(ic.lbl,cx,iconCY+1,{align:'center',baseline:'middle'});
+        }
+    });
+    doc.setTextColor.apply(doc,white); doc.setFontSize(5.5); doc.setFont('helvetica','normal');
+    doc.text('Follow us & Contact us  |  @LuxuryTransfersRiviera  |  reservas@luxurytransfersriviera.com', pageW/2, footerY+17.5, {align:'center'});
+
+    doc.save('Voucher-'+(datos.codigo||'LTR')+'.pdf');
+}
+</script>
+
+</body>
+</html>
