@@ -1,688 +1,517 @@
-<!DOCTYPE html>
-<html lang="en" translate="no" class="notranslate">
-<head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TGJB3410Q2"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-TGJB3410Q2');
-        gtag('config', 'AW-17859609175');
-    </script>
-    <meta charset="UTF-8">
-    <meta name="google" content="notranslate">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
-    <title>Booking Confirmed | Luxury Transfers Riviera</title>
-    <meta name="facebook-domain-verification" content="nbsn1w3k3g95f02nuqkypfab2frmei" />
-    <!-- Meta Pixel -->
-    <script>
-    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-    document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init','1206982288231935');fbq('track','PageView');
-    </script>
-    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"/></noscript>
-    <link rel="icon" type="image/webp" href="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Favicon%20200%20x%20200%20px.webp">
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+/**
+ * ══════════════════════════════════════════════════════════════════
+ *  Cloudflare Worker — Luxury Transfers Riviera
+ *
+ *  RUTAS:
+ *    POST /process-payment  → Crear orden / Capturar pago (Stripe + PayPal)
+ *    POST /webhook          → Notificaciones automáticas de PayPal
+ *    GET  /                 → Health check
+ *
+ *  Variables de entorno (Cloudflare → Settings → Variables y secretos):
+ *    STRIPE_SECRET_KEY    → sk_test_... / sk_live_...
+ *    PAYPAL_CLIENT_ID     → Client ID de tu app PayPal
+ *    PAYPAL_SECRET        → Secret de tu app PayPal
+ *    PAYPAL_WEBHOOK_ID    → Webhook ID de developer.paypal.com → Webhooks
+ *
+ *  Para pasar a producción PayPal cambia PAYPAL_BASE_URL (línea 22).
+ * ══════════════════════════════════════════════════════════════════
+ */
 
-    <style>
-        :root {
-            --gold: #D4AF37;
-            --gold-hover: #b5952f;
-            --black: #0a0a0a;
-            --dark-gray: #222;
-            --white: #fff;
-            --navy-bg: #002855;
-            --green: #00a651;
-            --font-title: 'Montserrat', sans-serif;
-            --font-body: 'Open Sans', sans-serif;
-            --header-height: 60px;
-        }
-        html { scroll-behavior: smooth; }
-        body { font-family: var(--font-body); margin: 0; padding: 0; color: var(--dark-gray); background: #f0f2f5; overflow-x: hidden; }
-        * { box-sizing: border-box; }
-        a { text-decoration: none; color: inherit; transition: 0.3s; }
-        img { max-width: 100%; height: auto; }
+// ── Sandbox → producción: cambia a 'https://api-m.paypal.com' ──────
+const PAYPAL_BASE_URL = 'https://api-m.sandbox.paypal.com';
 
-        /* ── HEADER ── */
-        header {
-            background-color: rgba(10,10,10,0.95);
-            padding: 10px 0;
-            position: fixed; width: 100%; top: 0; z-index: 1000;
-            border-bottom: 2px solid var(--gold);
-            display: flex; align-items: center;
-        }
-        .nav-container {
-            max-width: 1200px; margin: 0 auto;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px; width: 100%;
-        }
-        .logo {
-            font-family: var(--font-title); font-size: 1.4rem; font-weight: 800;
-            text-transform: uppercase; letter-spacing: 1px; color: var(--gold);
-            display: flex; align-items: center; gap: 12px;
-        }
-        .logo-icon { height: 35px; width: auto; }
-        .logo-full  { display: inline; }
-        .logo-short { display: none; }
-        @media (max-width: 600px) {
-            .logo-full  { display: none; }
-            .logo-short { display: inline; }
-        }
-        .btn-back-header {
-            display: flex; align-items: center; gap: 8px;
-            background: var(--gold); color: var(--navy-bg);
-            font-family: var(--font-title); font-size: 0.78rem;
-            font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
-            padding: 8px 18px; border-radius: 8px;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-        .btn-back-header:hover { background: var(--gold-hover); color: var(--navy-bg); }
-        @media (max-width: 768px) {
-            header { padding: 15px 0; }
-            .nav-container { flex-direction: column; gap: 15px; }
-            .logo { font-size: 1.2rem; } .logo-icon { height: 30px; }
-            .btn-back-header { font-size: 0.72rem; padding: 7px 14px; }
-        }
+// ── Tu dominio — el Worker solo acepta CORS desde aquí ──────────────
+const ALLOWED_ORIGIN = 'https://luxurytransfersriviera.com.mx';
 
-        /* ── MAIN WRAPPER ── */
-        .main-wrapper {
-            padding-top: calc(var(--header-height) + 40px);
-            padding-bottom: 60px;
-            min-height: calc(100vh - 220px);
-            display: flex; align-items: flex-start; justify-content: center;
-            padding-left: 16px; padding-right: 16px;
-        }
-        @media (max-width: 768px) { .main-wrapper { padding-top: calc(var(--header-height) + 75px); } }
+export default {
+  async fetch(request, env) {
 
-        /* ── CARD ── */
-        .card {
-            background: #fff; border-radius: 20px;
-            width: 100%; max-width: 520px;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.12); overflow: hidden;
-        }
-        .card-header { background: var(--navy-bg); padding: 36px 24px 32px; text-align: center; }
-        .check-circle {
-            width: 72px; height: 72px; background: var(--green); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 20px;
-            animation: popIn 0.5s cubic-bezier(.34,1.56,.64,1) both;
-        }
-        @keyframes popIn { from { transform:scale(0); opacity:0; } to { transform:scale(1); opacity:1; } }
-        .tag-confirmed { color: var(--gold); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.5px; font-family: var(--font-title); margin-bottom: 8px; }
-        .heading-confirmed { color: #fff; font-size: 21px; font-weight: 900; font-family: var(--font-title); margin-bottom: 18px; }
-        .code-box { display: inline-block; border: 2.5px solid var(--gold); color: #fff; font-size: 22px; font-weight: 900; letter-spacing: 5px; padding: 10px 28px; border-radius: 12px; font-family: var(--font-title); background: rgba(212,175,55,0.08); }
+    const url = new URL(request.url);
 
-        .card-body { padding: 24px; }
-        .vehicle-strip { display: flex; align-items: center; gap: 14px; background: #f6f8ff; border-radius: 12px; padding: 14px 16px; margin-bottom: 18px; }
-        .vehicle-strip img { width: 80px; height: 56px; object-fit: contain; background: #fff; border-radius: 8px; padding: 4px; flex-shrink: 0; }
-        .vehicle-name { font-size: 15px; font-weight: 900; color: var(--navy-bg); font-family: var(--font-title); text-transform: uppercase; }
-        .vehicle-pax { font-size: 13px; color: #666; margin-top: 3px; }
-        .vehicle-price { margin-left: auto; font-size: 20px; font-weight: 900; color: var(--navy-bg); font-family: var(--font-title); white-space: nowrap; }
-
-        .payment-badge { display: inline-flex; align-items: center; gap: 7px; background: #eaf7ef; color: #007a39; font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 20px; margin-bottom: 18px; font-family: var(--font-title); }
-
-        .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .detail-item { background: #f9f9f9; border-radius: 10px; padding: 12px 14px; }
-        .detail-item.full { grid-column: 1 / -1; }
-        .detail-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #aaa; font-family: var(--font-title); margin-bottom: 4px; }
-        .detail-value { font-size: 13px; font-weight: 600; color: #222; font-family: var(--font-body); line-height: 1.4; word-break: break-word; }
-
-        .confirm-msg { font-size: 13.5px; color: #444; line-height: 1.75; text-align: center; margin-bottom: 18px; }
-        .spam-notice { background: #fff8e1; border: 1px solid var(--gold); border-radius: 10px; padding: 12px 14px; margin-bottom: 18px; display: flex; gap: 10px; align-items: flex-start; font-size: 12px; color: #555; line-height: 1.5; }
-
-        .btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; border-radius: 12px; padding: 15px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; margin-bottom: 10px; font-family: var(--font-title); border: none; transition: opacity 0.2s; }
-        .btn:last-child { margin-bottom: 0; }
-        .btn:hover { opacity: 0.88; }
-        .btn-whatsapp { background: #25d366; color: #fff; }
-        .btn-pdf { background: transparent; border: 2px solid var(--navy-bg); color: var(--navy-bg); }
-        .btn-home { background: var(--gold); color: var(--navy-bg); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .no-data { padding: 60px 32px; text-align: center; color: #999; font-size: 15px; font-family: var(--font-body); }
-
-        /* ── SOCIAL ── */
-        .ltr-social-container { padding: 40px 20px; text-align: center; background-color: #f8f9fa; border-top: 1px solid #e9ecef; }
-        .ltr-social-container h3 { margin-bottom: 20px; color: #333; font-size: 18px; font-family: sans-serif; }
-        .ltr-social-icons { display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; }
-        .ltr-social-link { display: inline-flex; justify-content: center; align-items: center; width: 45px; height: 45px; border-radius: 50%; color: white; font-size: 20px; transition: transform 0.2s; }
-        .ltr-social-link:hover { transform: scale(1.1); opacity: 0.9; }
-        .ltr-fb    { background-color: #1877F2; }
-        .ltr-insta { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
-        .ltr-tiktok{ background-color: #000000; }
-        .ltr-trip  { background-color: #34E0A1; }
-        .ltr-yt    { background-color: #FF0000; }
-        .ltr-wa    { background-color: #25D366; }
-        .ltr-email { background-color: #555555; }
-        .ltr-phone { background-color: #0d6efd; }
-
-        /* ── FOOTER ── */
-        .site-footer { background: #0a0a0a; color: white; text-align: center; font-size: 12px; padding: 20px 0; border-top: 1px solid rgba(255,255,255,0.1); }
-        .site-footer p { margin: 4px 0; }
-        .footer-links-bar { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin: 12px 0 6px; font-family: var(--font-title); font-size: 11px; }
-        .footer-links-bar a { color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 1px; transition: color 0.2s; }
-        .footer-links-bar a:hover { color: var(--gold); }
-
-        @media (max-width: 480px) {
-            .details-grid { grid-template-columns: 1fr; }
-            .detail-item.full { grid-column: 1; }
-            .code-box { font-size: 18px; letter-spacing: 3px; }
-        }
-    </style>
-</head>
-<body>
-
-<!-- ══ HEADER ══ -->
-<header>
-    <div class="nav-container">
-        <a href="index.html" class="logo" translate="no">
-            <img src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Favicon%20200%20x%20200%20px.webp" alt="Luxury Transfers Riviera" class="logo-icon">
-            <span class="logo-full">Luxury Transfers Riviera</span>
-            <span class="logo-short">Luxury Transfers</span>
-        </a>
-        <a href="index.html" class="btn-back-header">
-            <i class="fas fa-home"></i> Back to Home
-        </a>
-    </div>
-</header>
-
-<!-- ══ MAIN ══ -->
-<div class="main-wrapper">
-    <div class="card" id="mainCard">
-
-        <div class="card-header" id="cardHeader" style="display:none">
-            <div class="check-circle">
-                <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-                    <path d="M6 16L13 23L26 9" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </div>
-            <div class="tag-confirmed">Payment Confirmed</div>
-            <div class="heading-confirmed">Your booking is confirmed!</div>
-            <div class="code-box" id="codeDisplay">LTR-????</div>
-        </div>
-
-        <div class="card-body" id="cardBody" style="display:none">
-
-            <div class="vehicle-strip">
-                <img id="vehImg" src="" alt="" onerror="this.style.display='none'">
-                <div>
-                    <div class="vehicle-name" id="vehName"></div>
-                    <div class="vehicle-pax" id="vehPax"></div>
-                </div>
-                <div class="vehicle-price" id="vehPrice"></div>
-            </div>
-
-            <div id="paymentBadge" class="payment-badge" style="display:none">
-                <i class="fas fa-check-circle"></i>
-                <span id="paymentLabel"></span>
-            </div>
-
-            <div class="details-grid" id="detailsGrid"></div>
-
-            <p class="confirm-msg">
-                Thank you for choosing <strong>Luxury Transfers Riviera</strong>.
-                Your payment has been successfully processed and your reservation is confirmed.
-                One of our agents will contact you as soon as possible with all the details of your service.
-            </p>
-
-            <div class="spam-notice">
-                <span style="font-size:16px;flex-shrink:0;">&#128231;</span>
-                <span>A confirmation email has been sent to you. <strong>If you don't see it in your inbox, please check your spam or junk folder.</strong></span>
-            </div>
-
-            <a id="btnWA" href="https://wa.me/529842411158" target="_blank" rel="noopener" class="btn btn-whatsapp">
-                <i class="fab fa-whatsapp" style="font-size:18px;"></i>
-                Need quick help? Contact us on WhatsApp
-            </a>
-
-            <button id="btnPDF" onclick="downloadVoucher()" class="btn btn-pdf">
-                <i class="fas fa-download"></i> Download Voucher (PDF)
-            </button>
-
-            <a href="index.html" class="btn btn-home">
-                <i class="fas fa-home"></i> Back to Home
-            </a>
-
-        </div>
-
-        <div class="no-data" id="noDataMsg" style="display:none">
-            No booking data found. Redirecting to home&hellip;
-        </div>
-
-    </div>
-</div>
-
-<!-- ══ SOCIAL ══ -->
-<div class="ltr-social-container">
-    <h3>Follow us &amp; Contact us</h3>
-    <div class="ltr-social-icons">
-        <a href="https://api.whatsapp.com/send/?phone=529842411158&text&type=phone_number&app_absent=0" target="_blank" class="ltr-social-link ltr-wa" title="WhatsApp" onclick="if(typeof fbq!=='undefined') fbq('track','Contact');"><i class="fa-brands fa-whatsapp"></i></a>
-        <a href="https://facebook.com/share/1Yt1WbvDFV" target="_blank" class="ltr-social-link ltr-fb" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-        <a href="https://instagram.com/luxury_transfers_riviera" target="_blank" class="ltr-social-link ltr-insta" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-        <a href="https://tiktok.com/@luxurytransfersriviera?_r=1&_t=ZS-92t33quHLzs" target="_blank" class="ltr-social-link ltr-tiktok" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-        <a href="https://www.youtube.com/@LuxuryTransfersRiviera" target="_blank" class="ltr-social-link ltr-yt" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
-        <a href="https://www.tripadvisor.es/Attraction_Review-g150812-d34109769-Reviews-Luxury_Transfers_Riviera-Playa_del_Carmen_Yucatan_Peninsula.html" target="_blank" class="ltr-social-link ltr-trip" title="TripAdvisor">
-            <img src="https://static.tacdn.com/img2/brand_refresh/Tripadvisor_logomark.svg" style="width:24px;height:24px;">
-        </a>
-        <a href="mailto:reservas@luxurytransfersriviera.com.mx" class="ltr-social-link ltr-email" title="Email"><i class="fa-solid fa-envelope"></i></a>
-        <a href="tel:+529842411158" class="ltr-social-link ltr-phone" title="Call"><i class="fa-solid fa-phone"></i></a>
-    </div>
-</div>
-
-<!-- ══ FOOTER ══ -->
-<div class="site-footer">
-    <div class="footer-links-bar">
-        <a href="index.html">Home</a>
-        <a href="terms.html">Terms &amp; Conditions</a>
-        <a href="privacy.html">Privacy Policy</a>
-    </div>
-    <p style="margin-bottom:5px;">&copy; 2026 Luxury Transfers Riviera. All rights reserved.</p>
-    <p style="margin:0;">Operated by <strong>SILVER'S SHUTTLE'S SERVICES S.A. DE C.V.</strong><br>RFC: SSS210817PQ6</p>
-    <p style="margin-top:10px;"><a href="https://wa.me/529842411158" target="_blank" style="color:#25d366;font-weight:700;text-decoration:none;"><i class="fab fa-whatsapp"></i> WhatsApp: +52 984 241 1158</a></p>
-</div>
-
-<script>
-// ══════════════════════════════════════════════════
-//  DATA + UI
-// ══════════════════════════════════════════════════
-var _confirmedData = null;
-
-(function init() {
-    var raw = localStorage.getItem('ltr_bookingConfirmed');
-    if (!raw) {
-        document.getElementById('noDataMsg').style.display = 'block';
-        setTimeout(function() { window.location.href = 'index.html'; }, 3000);
-        return;
-    }
-    try { _confirmedData = JSON.parse(raw); } catch(e) {
-        document.getElementById('noDataMsg').style.display = 'block';
-        setTimeout(function() { window.location.href = 'index.html'; }, 3000);
-        return;
-    }
-    localStorage.removeItem('ltr_bookingConfirmed');
-
-    var d = _confirmedData;
-
-    document.getElementById('cardHeader').style.display = 'block';
-    document.getElementById('cardBody').style.display   = 'block';
-    document.getElementById('codeDisplay').textContent  = d.codigo || 'LTR-????';
-
-    if (d.imgUrl) document.getElementById('vehImg').src = d.imgUrl;
-    document.getElementById('vehImg').alt  = d.vehiculo || '';
-    document.getElementById('vehName').textContent = d.vehiculo || '';
-    var pax = parseInt(d.pasajeros) || 1;
-    document.getElementById('vehPax').textContent  = pax + ' Passenger' + (pax > 1 ? 's' : '');
-    document.getElementById('vehPrice').textContent = d.precioTotal || '';
-
-    if (d.pagoLabel) {
-        document.getElementById('paymentBadge').style.display = 'inline-flex';
-        document.getElementById('paymentLabel').textContent    = 'Paid \u00b7 ' + d.pagoLabel;
-    }
-
-    function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-    function addDetail(label, value, full) {
-        if (!value) return;
-        var div = document.createElement('div');
-        div.className = 'detail-item' + (full ? ' full' : '');
-        div.innerHTML = '<div class="detail-label">' + label + '</div><div class="detail-value">' + esc(value) + '</div>';
-        document.getElementById('detailsGrid').appendChild(div);
-    }
-
-    addDetail('Pick-up',     d.origen,  true);
-    addDetail('Destination', d.destino, true);
-    addDetail('Date',        d.fecha);
-    addDetail('Time',        d.hora);
-    addDetail('Passengers',  d.pasajeros);
-    addDetail('Name',        d.nombre);
-    addDetail('Email',       d.email);
-    addDetail('Phone',       d.telefono);
-    if (d.vuelo)        addDetail('Flight',  d.vuelo);
-    if (d.fechaRegreso) addDetail('Return',  d.fechaRegreso + (d.horaRegreso ? ' \u00b7 ' + d.horaRegreso : ''));
-    if (d.extras)       addDetail('Extras',  d.extras,  true);
-    if (d.notas)        addDetail('Notes',   d.notas,   true);
-
-    var waMsg = encodeURIComponent('Hello! I just confirmed my booking *' + (d.codigo || '') + '*. I need assistance.');
-    document.getElementById('btnWA').href = 'https://wa.me/529842411158?text=' + waMsg;
-})();
-
-// ══════════════════════════════════════════════════
-//  PDF — image preloaders
-// ══════════════════════════════════════════════════
-var _vehicleImages = {
-    'CLASSIC SEDAN':  'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/CLASSIC%20SEDAN%201%20Desglose%20de%20Precios.webp',
-    'COMFORT VAN':    'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/COMFORT%20VAN%20Desglose%20de%20Precios.webp',
-    'LUXURY VIP':     'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/LUXURY%20VIP%20Desglose%20de%20Precios.webp',
-    'GRAND SPRINTER': 'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/GRAND%20SPRINTER%20Desglose%20de%20Precios.webp',
-    'FAMILY VAN':     'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/FAMILY%20VAN%20Desglose%20de%20Precios.webp',
-};
-var _vehicleImgB64  = {};
-var _faviconB64     = null;
-var _whatsappQrB64  = null;
-var _socialIconsB64 = {};
-
-(function _preloadAll() {
-    // Favicon
-    var fi = new Image(); fi.crossOrigin = 'anonymous';
-    fi.onload = function() {
-        try { var c=document.createElement('canvas'); c.width=fi.naturalWidth; c.height=fi.naturalHeight; c.getContext('2d').drawImage(fi,0,0); _faviconB64=c.toDataURL('image/png'); } catch(e) {}
-    };
-    fi.src = 'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Favicon%20200%20x%20200%20px.webp';
-
-    // Vehicle images
-    var MAX_W=420, MAX_H=260;
-    Object.entries(_vehicleImages).forEach(function(entry) {
-        var key=entry[0], url=entry[1];
-        var img = new Image(); img.crossOrigin='anonymous';
-        img.onload = function() {
-            try {
-                var ratio=Math.min(MAX_W/img.naturalWidth, MAX_H/img.naturalHeight, 1);
-                var c=document.createElement('canvas');
-                c.width=Math.round(img.naturalWidth*ratio); c.height=Math.round(img.naturalHeight*ratio);
-                c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-                _vehicleImgB64[key]=c.toDataURL('image/png');
-            } catch(e) {}
-        };
-        img.src=url;
-    });
-
-    // WhatsApp QR
-    var qi = new Image(); qi.crossOrigin='anonymous';
-    qi.onload = function() {
-        try { var c=document.createElement('canvas'); c.width=200; c.height=200; c.getContext('2d').drawImage(qi,0,0,200,200); _whatsappQrB64=c.toDataURL('image/png'); } catch(e) {}
-    };
-    qi.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent('https://wa.me/529842411158') + '&margin=5';
-
-    // Social icons
-    var base='https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/';
-    var defs=[['whatsapp',base+'WhatsApp%20Icono.png'],['facebook',base+'Facebook%20icono.png'],['instagram',base+'Instagram%20icono.png'],['tiktok',base+'Tiktok%20Icono.png'],['youtube',base+'Youtube%20icono.png'],['tripadvisor',base+'TripAdvisor.png']];
-    defs.forEach(function(d) {
-        var key=d[0], url=d[1];
-        var img=new Image(); img.crossOrigin='anonymous';
-        img.onload=function() {
-            try { var c=document.createElement('canvas'); c.width=c.height=72; c.getContext('2d').drawImage(img,0,0,72,72); _socialIconsB64[key]=c.toDataURL('image/png'); } catch(e) {}
-        };
-        img.src=url;
-    });
-})();
-
-// ══════════════════════════════════════════════════
-//  PDF GENERATION
-// ══════════════════════════════════════════════════
-function downloadVoucher() {
-    if (!_confirmedData) return;
-    if (!window.jspdf) { alert('PDF library not loaded yet. Please try again in a moment.'); return; }
-    var btn = document.getElementById('btnPDF');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
-    try {
-        generarVoucherPDF(_confirmedData);
-    } catch(e) {
-        console.error('PDF error:', e);
-        alert('Could not generate PDF. Please try again.');
-    }
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-download"></i> Download Voucher (PDF)';
-}
-
-function generarVoucherPDF(datos) {
-    var jsPDF = window.jspdf.jsPDF;
-    var doc = new jsPDF({ unit: 'mm', format: 'a4' });
-
-    var black  = [14, 14, 20];
-    var gold   = [212, 175, 55];
-    var white  = [255, 255, 255];
-    var dark   = [34, 34, 34];
-    var grey   = [130, 130, 130];
-    var lgrey  = [246, 246, 248];
-    var greyLn = [220, 220, 220];
-    var green  = [39, 174, 96];
-    var navy   = [0, 40, 85];
-
-    var pageW = 210, padL = 20, padR = 20, cW = pageW - padL - padR;
-
-    var fmtDate = function(d) {
-        if (!d) return '';
-        var m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})$/);
-        return m ? (m[3]+'/'+m[2]+'/'+m[1]) : d;
+    // ── CORS (solo aplica a rutas que llama el navegador) ────────────
+    const origin = request.headers.get('Origin') || '';
+    const isAllowed = origin === ALLOWED_ORIGIN
+                   || origin === 'http://localhost'
+                   || origin.startsWith('http://localhost:')
+                   || origin === 'http://127.0.0.1'
+                   || origin.startsWith('http://127.0.0.1:');
+    const corsHeaders = {
+      'Access-Control-Allow-Origin':  isAllowed ? origin : ALLOWED_ORIGIN,
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
     };
 
-    // ── HEADER ─────────────────────────────────────
-    doc.setFillColor.apply(doc, black);
-    doc.rect(0, 0, pageW, 25, 'F');
-    var textX = padL;
-    if (_faviconB64) {
-        try { doc.addImage(_faviconB64, 'PNG', padL, 5, 10, 10); textX = padL + 14; } catch(e) {}
-    }
-    doc.setTextColor.apply(doc, gold);
-    doc.setFontSize(10); doc.setFont('helvetica','bold');
-    doc.text('LUXURY TRANSFERS RIVIERA', textX, 11);
-    doc.setTextColor(150,150,165); doc.setFontSize(6.5); doc.setFont('helvetica','normal');
-    doc.text('luxurytransfersriviera.com.mx', textX, 19);
-    doc.setTextColor(150,150,165); doc.setFontSize(6.5);
-    doc.text('Booking confirmation', pageW-padR, 11, { align:'right' });
-    doc.setTextColor.apply(doc, gold); doc.setFontSize(13); doc.setFont('helvetica','bold');
-    doc.text(datos.codigo || 'LTR-????', pageW-padR, 19, { align:'right' });
-
-    // ── VEHICLE + CLIENT ────────────────────────────
-    var y = 32;
-    var imgW = 66, imgH = 38;
-    var hasRegreso = !!(datos.fechaRegreso && String(datos.fechaRegreso).trim());
-
-    doc.setTextColor.apply(doc, dark); doc.setFontSize(8.5); doc.setFont('helvetica','bold');
-    doc.text((datos.vehiculo||'').toUpperCase(), padL+imgW/2, y, { align:'center' });
-    y += 5;
-
-    var vehKey = Object.keys(_vehicleImages).find(function(k){ return (datos.vehiculo||'').toUpperCase().indexOf(k) !== -1; });
-    var vehB64 = vehKey ? (_vehicleImgB64[vehKey]||null) : null;
-    var imgY = y;
-    if (vehB64) {
-        try { doc.addImage(vehB64,'PNG',padL,imgY,imgW,imgH); } catch(e) { doc.setFillColor.apply(doc,lgrey); doc.rect(padL,imgY,imgW,imgH,'F'); }
-    } else {
-        doc.setFillColor.apply(doc,lgrey); doc.rect(padL,imgY,imgW,imgH,'F');
-        doc.setTextColor.apply(doc,grey); doc.setFontSize(8);
-        doc.text(datos.vehiculo||'', padL+imgW/2, imgY+imgH/2, { align:'center' });
-    }
-    doc.setTextColor.apply(doc,grey); doc.setFontSize(5.5); doc.setFont('helvetica','normal');
-    doc.text('* Illustrative image. Color and model may vary.', padL+imgW/2, imgY+imgH+4, { align:'center' });
-
-    var qrSize = 36;
-    var infoX  = padL+imgW+7;
-    var infoW  = cW-imgW-7;
-    var textW  = infoW-qrSize-9;
-    var infoY  = imgY;
-
-    var sideField = function(label, value) {
-        if (!value || String(value).trim()==='') return;
-        doc.setTextColor.apply(doc,grey); doc.setFontSize(7); doc.setFont('helvetica','normal');
-        doc.text(label, infoX, infoY); infoY+=4.5;
-        doc.setTextColor.apply(doc,dark); doc.setFontSize(9); doc.setFont('helvetica','bold');
-        var lines = doc.splitTextToSize(String(value), textW);
-        doc.text(lines, infoX, infoY); infoY += lines.length*5+4;
-    };
-
-    sideField('Client', datos.nombre||'');
-    sideField('Email',  datos.email||'');
-    sideField('Phone',  datos.telefono||'');
-
-    var qrX = infoX+textW+9, qrY = imgY+(imgH-qrSize)/2-2;
-    if (_whatsappQrB64) {
-        try { doc.addImage(_whatsappQrB64,'PNG',qrX,qrY,qrSize,qrSize); } catch(e) {}
-    }
-    doc.setDrawColor.apply(doc,gold); doc.setLineWidth(0.5);
-    doc.rect(qrX-1.2, qrY-1.2, qrSize+2.4, qrSize+2.4, 'S');
-    doc.setTextColor.apply(doc,grey); doc.setFontSize(5.5); doc.setFont('helvetica','normal');
-    doc.text('Scan for WhatsApp', qrX+qrSize/2, qrY+qrSize+4, { align:'center' });
-
-    y = Math.max(imgY+imgH+8, infoY+2);
-
-    // ── GRID DATE / FLIGHT / PAX ────────────────────
-    var hasVuelo = !!(datos.vuelo && String(datos.vuelo).trim());
-    var gap=4, cellH=15;
-    var dateStr = fmtDate(datos.fecha)+(datos.hora?' \u2014 '+datos.hora:'');
-    var retStr  = fmtDate(datos.fechaRegreso)+(datos.horaRegreso?' \u2014 '+datos.horaRegreso:'');
-    var paxStr  = (datos.pasajeros||'')+' pax';
-    var notasVal = datos.notas||'';
-
-    var drawCell = function(cx,cy,w,h,label,value,dotColor) {
-        doc.setFillColor.apply(doc,lgrey); doc.rect(cx,cy,w,h,'F');
-        var hasD = Array.isArray(dotColor);
-        var offX = hasD?9:4, tW = w-offX-4;
-        if (hasD) { doc.setFillColor.apply(doc,dotColor); doc.circle(cx+4,cy+5.2,1.8,'F'); }
-        doc.setTextColor.apply(doc,grey); doc.setFontSize(7); doc.setFont('helvetica','normal');
-        doc.text(label,cx+offX,cy+5.5);
-        doc.setTextColor.apply(doc,dark); doc.setFontSize(8.5); doc.setFont('helvetica','bold');
-        var ls=doc.splitTextToSize(String(value||''),tW);
-        ls.forEach(function(line,i){ doc.text(line,cx+offX,cy+11+i*5.5); });
-    };
-
-    doc.setFontSize(8.5); doc.setFont('helvetica','bold');
-    var notaLines = notasVal ? doc.splitTextToSize(notasVal, cW-8) : [];
-    var notaH = notasVal ? Math.max(cellH, notaLines.length*5.5+12) : 0;
-
-    if (!hasRegreso && hasVuelo) {
-        var w3=(cW-gap*2)/3;
-        drawCell(padL,y,w3,cellH,'Date & time',dateStr); drawCell(padL+w3+gap,y,w3,cellH,'Flight number',datos.vuelo||''); drawCell(padL+(w3+gap)*2,y,w3,cellH,'Passengers',paxStr);
-        y+=cellH+gap; if(notasVal){drawCell(padL,y,cW,notaH,'Notes',notasVal);y+=notaH+gap;}
-    }
-    if (hasRegreso && hasVuelo) {
-        var w3=(cW-gap*2)/3;
-        drawCell(padL,y,w3,cellH,'Date & time',dateStr); drawCell(padL+w3+gap,y,w3,cellH,'Flight number',datos.vuelo||''); drawCell(padL+(w3+gap)*2,y,w3,cellH,'Passengers',paxStr);
-        y+=cellH+gap;
-        var w2=(cW-gap)/2;
-        drawCell(padL,y,w2,cellH,'Return date & time',retStr); drawCell(padL+w2+gap,y,w2,cellH,'Return flight',datos.vueloRegreso||'-');
-        y+=cellH+gap; if(notasVal){drawCell(padL,y,cW,notaH,'Notes',notasVal);y+=notaH+gap;}
-    }
-    if (!hasRegreso && !hasVuelo) {
-        var w2=(cW-gap)/2;
-        drawCell(padL,y,w2,cellH,'Date & time',dateStr); drawCell(padL+w2+gap,y,w2,cellH,'Passengers',paxStr);
-        y+=cellH+gap; if(notasVal){drawCell(padL,y,cW,notaH,'Notes',notasVal);y+=notaH+gap;}
-    }
-    if (hasRegreso && !hasVuelo) {
-        var w3=(cW-gap*2)/3;
-        drawCell(padL,y,w3,cellH,'Date & time',dateStr); drawCell(padL+w3+gap,y,w3,cellH,'Return date & time',retStr); drawCell(padL+(w3+gap)*2,y,w3,cellH,'Passengers',paxStr);
-        y+=cellH+gap; if(notasVal){drawCell(padL,y,cW,notaH,'Notes',notasVal);y+=notaH+gap;}
-    }
-    y+=2;
-
-    // ── ROUTE ───────────────────────────────────────
-    var arrowW=12;
-    doc.setFontSize(8.5); doc.setFont('helvetica','bold');
-    var origLns=doc.splitTextToSize(datos.origen||'',(cW-arrowW-gap*2)/2-12);
-    var destLns=doc.splitTextToSize(datos.destino||'',(cW-arrowW-gap*2)/2-12);
-    var routeH=Math.max(cellH,Math.max(origLns.length,destLns.length)*6+14);
-    var rW=(cW-arrowW-gap*2)/2;
-
-    drawCell(padL,y,rW,routeH,'Pick-up',datos.origen||'',[34,197,94]);
-    drawCell(padL+rW+gap+arrowW+gap,y,rW,routeH,'Drop-off',datos.destino||'',[212,175,55]);
-
-    var arrowX=padL+rW+gap, midArrY=y+routeH/2;
-    doc.setFillColor.apply(doc,lgrey); doc.rect(arrowX,y,arrowW,routeH,'F');
-    doc.setDrawColor.apply(doc,grey); doc.setLineWidth(0.6);
-    if (hasRegreso) {
-        doc.line(arrowX+2,midArrY-2,arrowX+arrowW-2,midArrY-2); doc.line(arrowX+arrowW-2,midArrY-2,arrowX+arrowW-5,midArrY-4.5); doc.line(arrowX+arrowW-2,midArrY-2,arrowX+arrowW-5,midArrY+0.5);
-        doc.line(arrowX+arrowW-2,midArrY+2,arrowX+2,midArrY+2); doc.line(arrowX+2,midArrY+2,arrowX+5,midArrY-0.5); doc.line(arrowX+2,midArrY+2,arrowX+5,midArrY+4.5);
-    } else {
-        doc.line(arrowX+2,midArrY,arrowX+arrowW-2,midArrY); doc.line(arrowX+arrowW-2,midArrY,arrowX+arrowW-5,midArrY-2.5); doc.line(arrowX+arrowW-2,midArrY,arrowX+arrowW-5,midArrY+2.5);
-    }
-    y+=routeH+gap;
-
-    // ── DIVIDER ─────────────────────────────────────
-    doc.setDrawColor.apply(doc,greyLn); doc.setLineWidth(0.3);
-    doc.line(padL,y,pageW-padR,y); y+=7;
-
-    // ── PRICING ─────────────────────────────────────
-    var monedaStr = (datos.precioTotal||datos.precio||'').indexOf('MXN')!==-1?'MXN':(datos.precioTotal||datos.precio||'').indexOf('CAD')!==-1?'CAD':'USD';
-    var baseNum   = parseFloat((datos.precio||'0').replace(/[^0-9.]/g,''))||0;
-    var totalNum  = parseFloat((datos.precioTotal||datos.precio||'0').replace(/[^0-9.]/g,''))||baseNum;
-    var discPct   = ((datos.cuponDiscount||0))/100;
-    var fmt       = function(n){ return '$'+(Math.round(n*100)/100).toFixed(2)+' '+monedaStr; };
-    var rowH=8;
-
-    var priceRow = function(label,amount,txtColor,bold,bgColor) {
-        if (bgColor) { doc.setFillColor.apply(doc,bgColor); doc.rect(padL,y,cW,rowH,'F'); }
-        doc.setTextColor.apply(doc,txtColor); doc.setFontSize(9); doc.setFont('helvetica',bold?'bold':'normal');
-        doc.text(label,padL+4,y+5.5); doc.text(amount,pageW-padR-4,y+5.5,{align:'right'});
-        y+=rowH; doc.setDrawColor.apply(doc,greyLn); doc.setLineWidth(0.2); doc.line(padL,y,pageW-padR,y);
-    };
-
-    if (discPct>0) {
-        var origBase=Math.round(baseNum/(1-discPct)*100)/100;
-        var discAmt=Math.round((origBase-baseNum)*100)/100;
-        priceRow('Service price',fmt(origBase),dark,false,null);
-        priceRow('Discount applied ('+Math.round(discPct*100)+'%)','-'+fmt(discAmt),green,false,null);
-    } else {
-        priceRow('Service price',fmt(baseNum),dark,false,null);
+    // Preflight CORS
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { status: 204, headers: corsHeaders });
     }
 
-    var stopPrc = monedaStr==='MXN'?500:monedaStr==='CAD'?40:25;
-    if (parseInt(datos.extraStop) >0) priceRow('Extra stop x'+datos.extraStop,'+'+fmt(datos.extraStop*stopPrc),dark,false,null);
-    if (parseInt(datos.extraStopR)>0) priceRow('Extra stop (return) x'+datos.extraStopR,'+'+fmt(datos.extraStopR*stopPrc),dark,false,null);
-
-    y+=1;
-    priceRow('Total',fmt(totalNum),navy,true,gold);
-
-    if (datos.pago) {
-        var pagoLabel = datos.pagoLabel || (datos.pago||'').replace(' \u2705 Paid Online','').replace('Checkout','').trim();
-        doc.setFillColor.apply(doc,white); doc.rect(padL,y,cW,rowH,'F');
-        doc.setDrawColor.apply(doc,greyLn); doc.setLineWidth(0.3); doc.rect(padL,y,cW,rowH,'S');
-        doc.setTextColor.apply(doc,dark); doc.setFontSize(9); doc.setFont('helvetica','bold');
-        doc.text('Paid online \u2013 '+pagoLabel, padL+4, y+5.5);
-        doc.setTextColor(39,174,96);
-        doc.text(fmt(totalNum),pageW-padR-4,y+5.5,{align:'right'});
-        y+=rowH;
+    // Health check
+    if (request.method === 'GET') {
+      return new Response(
+        JSON.stringify({ status: 'ok', service: 'Luxury Transfers Payments Worker' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
-    y+=8;
 
-    // ── NOTICE BOX ──────────────────────────────────
-    var footerH=20, footerY=297-footerH;
-    var noticeText='Please save your booking code '+(datos.codigo||'LTR-????')+'. We invite you to download the WhatsApp app and contact us at +52 984 241 1158 for faster communication.';
-    doc.setFontSize(8.5); doc.setFont('helvetica','normal');
-    var noticeLines=doc.splitTextToSize(noticeText,cW-10);
-    var noticeH=noticeLines.length*5.2+8;
-    if (y+noticeH+10>footerY) { doc.addPage(); y=20; }
-    doc.setFillColor(255,252,220); doc.setDrawColor(220,185,60); doc.setLineWidth(0.6);
-    doc.rect(padL,y,cW,noticeH,'FD');
-    doc.setTextColor(100,75,0); doc.text(noticeLines,padL+5,y+7);
-    y+=noticeH+6;
+    // ════════════════════════════════════════════════════════════════
+    //  RUTA: /webhook
+    //  PayPal llama aquí directamente desde sus servidores.
+    //  NO pasa por el navegador del cliente — sin CORS, sin JSON parse
+    //  previo (necesitamos el rawBody para verificar la firma).
+    // ════════════════════════════════════════════════════════════════
+    if (url.pathname === '/webhook') {
 
-    // ── FOOTER ──────────────────────────────────────
-    doc.setFillColor.apply(doc,black); doc.rect(0,footerY,pageW,footerH,'F');
-    var socialIcons=[
-        {key:'whatsapp',color:[37,211,102],lbl:'WA'},{key:'facebook',color:[24,119,242],lbl:'Fb'},
-        {key:'instagram',color:[193,53,132],lbl:'ig'},{key:'tiktok',color:[30,30,30],lbl:'Tk'},
-        {key:'youtube',color:[255,0,0],lbl:'YT'},{key:'tripadvisor',color:[52,195,143],lbl:'TA'},
-    ];
-    var iconR=3.5, iconGap=14;
-    var iconsStartX=pageW/2-((socialIcons.length-1)*iconGap)/2;
-    var iconCY=footerY+10;
-    socialIcons.forEach(function(ic,i) {
-        var cx=iconsStartX+i*iconGap;
-        if (_socialIconsB64[ic.key]) {
-            try { var d=iconR*2; doc.addImage(_socialIconsB64[ic.key],'PNG',cx-iconR,iconCY-iconR,d,d); } catch(e) {
-                doc.setFillColor.apply(doc,ic.color); doc.circle(cx,iconCY,iconR,'F');
+      if (request.method !== 'POST') {
+        return new Response('Method Not Allowed', { status: 405 });
+      }
+
+      // 1. Leer body como texto crudo (obligatorio para verificar firma)
+      let rawBody;
+      try {
+        rawBody = await request.text();
+      } catch {
+        return new Response('Bad Request: cannot read body', { status: 400 });
+      }
+
+      // 2. Headers de firma que PayPal incluye en cada webhook
+      const transmissionId   = request.headers.get('paypal-transmission-id')   || '';
+      const transmissionTime = request.headers.get('paypal-transmission-time')  || '';
+      const certUrl          = request.headers.get('paypal-cert-url')           || '';
+      const authAlgo         = request.headers.get('paypal-auth-algo')          || '';
+      const transmissionSig  = request.headers.get('paypal-transmission-sig')   || '';
+
+      // 3. Verificar que el webhook viene realmente de PayPal
+      let isVerified = false;
+      try {
+        const accessToken = await _getPayPalToken(env);
+        const verifyRes = await fetch(
+          `${PAYPAL_BASE_URL}/v1/notifications/verify-webhook-signature`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type':  'application/json',
+            },
+            body: JSON.stringify({
+              transmission_id:   transmissionId,
+              transmission_time: transmissionTime,
+              cert_url:          certUrl,
+              auth_algo:         authAlgo,
+              transmission_sig:  transmissionSig,
+              webhook_id:        env.PAYPAL_WEBHOOK_ID,
+              webhook_event:     JSON.parse(rawBody),
+            }),
+          }
+        );
+        const verifyData = await verifyRes.json();
+        isVerified = verifyData.verification_status === 'SUCCESS';
+      } catch (e) {
+        console.error('Webhook verification error:', e);
+        return new Response('Verification error', { status: 500 });
+      }
+
+      if (!isVerified) {
+        console.warn('Webhook RECHAZADO — firma inválida o PAYPAL_WEBHOOK_ID incorrecto');
+        return new Response('Forbidden: invalid signature', { status: 403 });
+      }
+
+      // 4. Firma OK — parsear y manejar el evento
+      let event;
+      try {
+        event = JSON.parse(rawBody);
+      } catch {
+        return new Response('Bad Request: invalid JSON', { status: 400 });
+      }
+
+      const eventType = event.event_type || '';
+      const resource  = event.resource    || {};
+
+      // Extraer datos útiles del evento (estructura varía por tipo)
+      const orderID   = resource.id
+                     || resource.supplementary_data?.related_ids?.order_id
+                     || '';
+      const customId  = resource.purchase_units?.[0]?.custom_id  // bookingCode
+                     || resource.custom_id
+                     || '';
+      const amount    = resource.amount?.value
+                     || resource.purchase_units?.[0]?.amount?.value
+                     || '';
+      const currency  = resource.amount?.currency_code
+                     || resource.purchase_units?.[0]?.amount?.currency_code
+                     || '';
+
+      console.log(`[WEBHOOK] ${eventType} | Booking: ${customId} | ${amount} ${currency} | Order: ${orderID}`);
+
+      // 5. Router de eventos
+      switch (eventType) {
+
+        // ── Pago capturado y completado ──────────────────────────────
+        case 'PAYMENT.CAPTURE.COMPLETED':
+          console.log(`✅ PAGO COMPLETADO — Booking: ${customId} | ${amount} ${currency}`);
+          // El front ya registró la reserva en Google Sheet al recibir el capture.
+          // Este evento sirve como respaldo de auditoría.
+          // Si quieres agregar lógica adicional (KV store, email, etc.) hazlo aquí.
+          break;
+
+        // ── Pago denegado ────────────────────────────────────────────
+        case 'PAYMENT.CAPTURE.DENIED':
+          console.warn(`❌ PAGO DENEGADO — Booking: ${customId} | ${amount} ${currency}`);
+          // El cliente ya recibe el error en el front vía onError de PayPal SDK.
+          // Este evento permite auditar cuántos pagos fallan.
+          break;
+
+        // ── Pago revertido / chargeback / disputa ────────────────────
+        case 'PAYMENT.CAPTURE.REVERSED':
+          console.warn(`⚠️ PAGO REVERTIDO — Booking: ${customId} | ${amount} ${currency}`);
+          // ⚠️ IMPORTANTE: un reverso puede indicar fraude o disputa abierta.
+          // Recomendado: enviar alerta manual a tu WhatsApp de operaciones.
+          // Puedes llamar a la API de WhatsApp aquí con los datos del booking.
+          break;
+
+        default:
+          console.log(`[WEBHOOK] Evento no manejado: ${eventType}`);
+          break;
+      }
+
+      // PayPal requiere un 200 rápido (< 5s) o reintentará el webhook
+      return new Response('OK', { status: 200 });
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    //  RUTA: /process-payment
+    //  Llamada desde el navegador del cliente.
+    // ════════════════════════════════════════════════════════════════
+    if (url.pathname === '/process-payment') {
+
+      if (request.method !== 'POST') {
+        return _error(corsHeaders, 405, 'Method Not Allowed');
+      }
+
+      let body;
+      try {
+        body = await request.json();
+      } catch {
+        return _error(corsHeaders, 400, 'Invalid JSON body');
+      }
+
+      const {
+        method, action, amount,
+        currency = 'USD', bookingCode,
+        orderID, vehicle = '',
+        customerName = '', customerPhone = '',
+        successUrl = '', cancelUrl = '',
+        returnUrl = '', cancelPayPalUrl = ''
+      } = body;
+
+      if (!method)                            return _error(corsHeaders, 400, 'Missing: method');
+      if (method === 'paypal' && !action)     return _error(corsHeaders, 400, 'Missing: action');
+      if (method === 'stripe' && !amount && action !== 'retrieve-session') return _error(corsHeaders, 400, 'Missing: amount');
+
+      // ── STRIPE ──────────────────────────────────────────────────────
+      if (method === 'stripe') {
+
+        // retrieve-session: recupera last4 y brand de una sesión completada
+        if (action === 'retrieve-session') {
+          try {
+            const { sessionId } = body;
+            if (!sessionId) return _error(corsHeaders, 400, 'Missing: sessionId');
+            const res = await fetch(
+              `https://api.stripe.com/v1/checkout/sessions/${sessionId}?expand[]=payment_intent.payment_method`,
+              { headers: { 'Authorization': `Bearer ${env.STRIPE_SECRET_KEY}` } }
+            );
+            const sess = await res.json();
+            const card = sess?.payment_intent?.payment_method?.card;
+            const paypalEmail = sess?.payment_intent?.payment_method?.paypal?.payer_email
+                             || sess?.customer_details?.email || null;
+            return _json(corsHeaders, {
+              last4:      card?.last4  || null,
+              brand:      card?.brand  || null,
+              payerEmail: card ? null : paypalEmail,
+              status:     sess?.payment_status || null,
+            });
+          } catch (e) {
+            console.error('retrieve-session error:', e);
+            return _error(corsHeaders, 500, 'Could not retrieve session');
+          }
+        }
+
+        // create-checkout-session: crea la sesión y redirige a stripe.com
+        try {
+          const amountCents = Math.round(parseFloat(amount) * 100);
+          if (!isFinite(amountCents) || isNaN(amountCents) || amountCents < 50) return _error(corsHeaders, 400, 'Invalid amount (min $0.50)');
+          if (amountCents > 10_000_00) return _error(corsHeaders, 400, 'Amount exceeds maximum allowed');
+
+          const VALID_CURRENCIES = ['USD', 'MXN', 'CAD'];
+          if (!VALID_CURRENCIES.includes((currency || '').toUpperCase())) return _error(corsHeaders, 400, 'Invalid currency');
+
+          if (!successUrl || !cancelUrl) {
+            return _error(corsHeaders, 400, 'Missing: successUrl or cancelUrl');
+          }
+          const ALLOWED_DOMAIN = 'https://luxurytransfersriviera.com.mx';
+          if (!successUrl.startsWith(ALLOWED_DOMAIN) || !cancelUrl.startsWith(ALLOWED_DOMAIN)) {
+            return _error(corsHeaders, 400, 'Invalid redirect URL');
+          }
+          if (bookingCode && bookingCode.length > 50)  return _error(corsHeaders, 400, 'Invalid bookingCode');
+          if (vehicle     && vehicle.length     > 100) return _error(corsHeaders, 400, 'Invalid vehicle');
+
+          const stripeRes = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${env.STRIPE_SECRET_KEY}`,
+              'Content-Type':  'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+              'mode':                                          'payment',
+              'payment_method_types[]':                        'card',
+              'line_items[0][price_data][currency]':           currency.toLowerCase(),
+              'line_items[0][price_data][unit_amount]':        String(amountCents),
+              'line_items[0][price_data][product_data][name]': `Luxury Transfers Riviera`,
+              'line_items[0][price_data][product_data][description]': vehicle || 'Transfer Privado',
+              'line_items[0][quantity]':                       '1',
+              'success_url':                                   successUrl,
+              'cancel_url':                                    cancelUrl,
+              'metadata[bookingCode]':                                  bookingCode || '',
+              'metadata[vehicle]':                                      vehicle || '',
+              'metadata[customerName]':                                 customerName.slice(0, 100),
+              'metadata[customerPhone]':                                customerPhone.slice(0, 50),
+              'payment_intent_data[metadata][bookingCode]':             bookingCode || '',
+              'payment_intent_data[metadata][vehicle]':                 vehicle || '',
+              'payment_intent_data[metadata][customerName]':            customerName.slice(0, 100),
+              'payment_intent_data[metadata][customerPhone]':           customerPhone.slice(0, 50),
+              'locale':                                        'auto',
+            }),
+          });
+
+          const session = await stripeRes.json();
+          if (session.error || !session.url) {
+            console.error('Stripe session error:', session.error);
+            return _error(corsHeaders, 502, 'Payment session could not be created. Please try again.');
+          }
+          // Devolver URL + sessionId (frontend lo guarda para recuperar last4 al volver)
+          return _json(corsHeaders, { url: session.url, sessionId: session.id });
+
+        } catch (e) {
+          console.error('Stripe error:', e);
+          return _error(corsHeaders, 500, 'Internal Stripe error');
+        }
+      }
+
+      // ── PAYPAL: create-order → devuelve orderID ──────────────────────
+      if (method === 'paypal' && action === 'create-order') {
+        try {
+          if (!amount) return _error(corsHeaders, 400, 'Missing: amount');
+          const amountNum = parseFloat(amount);
+          if (!isFinite(amountNum) || isNaN(amountNum) || amountNum <= 0) return _error(corsHeaders, 400, 'Invalid amount');
+          if (amountNum > 100000) return _error(corsHeaders, 400, 'Amount exceeds maximum allowed');
+          const VALID_CURRENCIES_PP = ['USD', 'MXN', 'CAD'];
+          if (!VALID_CURRENCIES_PP.includes((currency || '').toUpperCase())) return _error(corsHeaders, 400, 'Invalid currency');
+          if (bookingCode && bookingCode.length > 50)  return _error(corsHeaders, 400, 'Invalid bookingCode');
+          if (vehicle     && vehicle.length     > 100) return _error(corsHeaders, 400, 'Invalid vehicle');
+
+          const accessToken = await _getPayPalToken(env);
+          const orderRes = await fetch(`${PAYPAL_BASE_URL}/v2/checkout/orders`, {
+            method: 'POST',
+            headers: {
+              'Authorization':     `Bearer ${accessToken}`,
+              'Content-Type':      'application/json',
+              'PayPal-Request-Id': `LTR-${bookingCode || Date.now()}`,
+            },
+            body: JSON.stringify({
+              intent: 'CAPTURE',
+              purchase_units: [{
+                amount: {
+                  currency_code: currency.toUpperCase(),
+                  value:         parseFloat(amount).toFixed(2),
+                },
+                custom_id:   bookingCode || '',
+                description: `Luxury Transfers Riviera — ${vehicle || 'Transfer Privado'}`,
+              }],
+              application_context: {
+                brand_name:          'Luxury Transfers Riviera',
+                shipping_preference: 'NO_SHIPPING',
+                user_action:         'PAY_NOW',
+                return_url:          returnUrl  || 'https://luxurytransfersriviera.com.mx/?payment=paypal-success',
+                cancel_url:          cancelPayPalUrl || 'https://luxurytransfersriviera.com.mx/?payment=cancelled',
+              },
+            }),
+          });
+
+          const order = await orderRes.json();
+          if (order.error || !order.id) {
+            console.error('PayPal create-order error:', order);
+            return _error(corsHeaders, 502, order.message || 'PayPal create-order failed');
+          }
+          return _json(corsHeaders, { orderID: order.id, status: order.status });
+
+        } catch (e) {
+          console.error('PayPal create-order error:', e);
+          return _error(corsHeaders, 500, 'Internal PayPal error');
+        }
+      }
+
+      // ── PAYPAL: capture-order → devuelve status COMPLETED ────────────
+      if (method === 'paypal' && action === 'capture-order') {
+        try {
+          if (!orderID) return _error(corsHeaders, 400, 'Missing: orderID');
+          if (!/^[A-Z0-9]{5,30}$/i.test(orderID)) return _error(corsHeaders, 400, 'Invalid orderID format');
+
+          const accessToken = await _getPayPalToken(env);
+          const captureRes = await fetch(
+            `${PAYPAL_BASE_URL}/v2/checkout/orders/${orderID}/capture`,
+            {
+              method: 'POST',
+              headers: {
+                'Authorization':     `Bearer ${accessToken}`,
+                'Content-Type':      'application/json',
+                'PayPal-Request-Id': `CAP-${orderID}`,
+              },
+              body: '{}',
             }
-        } else {
-            doc.setFillColor.apply(doc,ic.color); doc.circle(cx,iconCY,iconR,'F');
-            doc.setTextColor(255,255,255); doc.setFontSize(ic.lbl.length>1?3.5:5); doc.setFont('helvetica','bold');
-            doc.text(ic.lbl,cx,iconCY+1,{align:'center',baseline:'middle'});
+          );
+
+          const capture = await captureRes.json();
+          if (capture.error || !capture.status) {
+            console.error('PayPal capture error:', capture);
+            return _error(corsHeaders, 502, capture.message || 'PayPal capture failed');
+          }
+          return _json(corsHeaders, {
+            status:     capture.status,
+            orderID:    capture.id,
+            payerID:    capture.payer?.payer_id    || '',
+            payerEmail: capture.payer?.email_address || '',
+            captures:   capture.purchase_units?.[0]?.payments?.captures || [],
+          });
+
+        } catch (e) {
+          console.error('PayPal capture error:', e);
+          return _error(corsHeaders, 500, 'Internal PayPal capture error');
         }
-    });
-    doc.setTextColor.apply(doc,white); doc.setFontSize(5.5); doc.setFont('helvetica','normal');
-    doc.text('Follow us & Contact us  |  @LuxuryTransfersRiviera  |  reservas@luxurytransfersriviera.com', pageW/2, footerY+17.5, {align:'center'});
+      }
 
-    doc.save('Voucher-'+(datos.codigo||'LTR')+'.pdf');
+      return _error(corsHeaders, 400, `Unknown method/action: ${method}/${action}`);
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    //  RUTA: /validate-coupon
+    //  Valida un código de cupón contra VALID_COUPONS (JSON en env var).
+    //  Formato VALID_COUPONS: {"LTR-10":10,"LTR10":10,"LUX-20":20,"LUX20":20}
+    // ════════════════════════════════════════════════════════════════
+    if (url.pathname === '/validate-coupon') {
+
+      if (request.method !== 'POST') return _error(corsHeaders, 405, 'Method Not Allowed');
+
+      let body;
+      try { body = await request.json(); } catch { return _error(corsHeaders, 400, 'Invalid JSON body'); }
+
+      const code = (body.code || '').toString().trim().toUpperCase();
+      if (!code) return _error(corsHeaders, 400, 'Missing: code');
+
+      let coupons = {};
+      try { coupons = JSON.parse(env.VALID_COUPONS || '{}'); } catch {
+        return _error(corsHeaders, 500, 'Coupon config error');
+      }
+
+      const discount = coupons[code];
+      if (!discount) return _json(corsHeaders, { valid: false, discount: 0 });
+      const discountNum = Number(discount);
+      if (!Number.isFinite(discountNum) || discountNum <= 0 || discountNum > 100) {
+        return _json(corsHeaders, { valid: false, discount: 0 });
+      }
+      return _json(corsHeaders, { valid: true, discount: discountNum, code });
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    //  RUTA: /check-payment
+    //  Verifica si un pago ya fue completado en Stripe para un bookingCode.
+    //  Evita que el recovery modal ofrezca pagar dos veces.
+    // ════════════════════════════════════════════════════════════════
+    if (url.pathname === '/check-payment') {
+
+      if (request.method !== 'POST') return _error(corsHeaders, 405, 'Method Not Allowed');
+
+      let body;
+      try { body = await request.json(); } catch { return _error(corsHeaders, 400, 'Invalid JSON body'); }
+
+      const { bookingCode, sessionId } = body;
+      if (!bookingCode && !sessionId) return _error(corsHeaders, 400, 'Missing: bookingCode or sessionId');
+      if (bookingCode && (bookingCode.length > 50 || !/^[A-Z0-9\-]{3,50}$/i.test(bookingCode))) {
+        return _error(corsHeaders, 400, 'Invalid bookingCode');
+      }
+
+      try {
+        // 1. Verificar por Stripe Session ID (el más rápido y confiable)
+        if (sessionId && /^cs_[a-zA-Z0-9_]+$/.test(sessionId)) {
+          const sessRes = await fetch(
+            `https://api.stripe.com/v1/checkout/sessions/${sessionId}`,
+            { headers: { 'Authorization': `Bearer ${env.STRIPE_SECRET_KEY}` } }
+          );
+          const sess = await sessRes.json();
+          if (sess.payment_status === 'paid') {
+            return _json(corsHeaders, { paid: true, via: 'stripe-session' });
+          }
+        }
+
+        // 2. Buscar PaymentIntents por bookingCode en metadata
+        if (bookingCode) {
+          const query = `metadata['bookingCode']:'${bookingCode}' AND status:'succeeded'`;
+          const searchRes = await fetch(
+            `https://api.stripe.com/v1/payment_intents/search?` + new URLSearchParams({ query, limit: '1' }),
+            { headers: { 'Authorization': `Bearer ${env.STRIPE_SECRET_KEY}` } }
+          );
+          const searchData = await searchRes.json();
+          if (searchData.data && searchData.data.length > 0) {
+            return _json(corsHeaders, { paid: true, via: 'stripe-search' });
+          }
+        }
+
+        return _json(corsHeaders, { paid: false });
+
+      } catch(e) {
+        console.error('check-payment error:', e);
+        return _json(corsHeaders, { paid: false }); // fail open — muestra botones de pago
+      }
+    }
+
+    // ── Ruta desconocida ─────────────────────────────────────────────
+    return new Response(
+      JSON.stringify({ error: 'Route not found', routes: ['GET /', 'POST /process-payment', 'POST /webhook', 'POST /validate-coupon', 'POST /check-payment'] }),
+      { status: 404, headers: { 'Content-Type': 'application/json' } }
+    );
+  },
+};
+
+// ════════════════════════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════════════════════════
+
+async function _getPayPalToken(env) {
+  const auth = btoa(`${env.PAYPAL_CLIENT_ID}:${env.PAYPAL_SECRET}`);
+  const res  = await fetch(`${PAYPAL_BASE_URL}/v1/oauth2/token`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${auth}`,
+      'Content-Type':  'application/x-www-form-urlencoded',
+    },
+    body: 'grant_type=client_credentials',
+  });
+  const data = await res.json();
+  if (!data.access_token) {
+    throw new Error('PayPal token error: ' + JSON.stringify(data));
+  }
+  return data.access_token;
 }
-</script>
 
-</body>
-</html>
+function _json(corsHeaders, data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
+
+function _error(corsHeaders, status, message) {
+  return new Response(JSON.stringify({ error: message }), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
