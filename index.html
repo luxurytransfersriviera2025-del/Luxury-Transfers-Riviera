@@ -3186,21 +3186,77 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     }
 
     function _finalizarDesdeStripe(datosVenta) {
-        document.getElementById('codigoDisplay').innerText = datosVenta.codigo;
-        _dispararPurchaseYEnviar(datosVenta);
+        // 1. Save confirmation data synchronously — thank-you.html reads this
+        try {
+            const vehKey = Object.keys(_vehicleImages).find(k => (datosVenta.vehiculo || '').toUpperCase().includes(k));
+            const imgUrl = vehKey ? _vehicleImages[vehKey] : _vehicleImages['CLASSIC SEDAN'];
+            const _cuponKey = (datosVenta.cupon || '').toUpperCase();
+            const _cuponRes = _couponCache[_cuponKey] || { valid: false, discount: 0 };
+            sessionStorage.setItem('ltr_bookingConfirmed', JSON.stringify({
+                esVenta:       true,
+                codigo:        datosVenta.codigo,
+                vehiculo:      datosVenta.vehiculo,
+                imgUrl:        imgUrl,
+                origen:        datosVenta.origen,
+                destino:       datosVenta.destino,
+                fecha:         datosVenta.fecha,
+                hora:          datosVenta.hora,
+                fechaRegreso:  datosVenta.fechaRegreso  || '',
+                horaRegreso:   datosVenta.horaRegreso   || '',
+                pasajeros:     datosVenta.pasajeros,
+                nombre:        datosVenta.nombre,
+                email:         datosVenta.email,
+                telefono:      datosVenta.telefono,
+                tipoViaje:     datosVenta.tipoViaje,
+                precio:        datosVenta.precio        || '',
+                precioTotal:   datosVenta.precioTotal   || datosVenta.precio || '',
+                pago:          datosVenta.pago           || '',
+                pagoLabel:     datosVenta.pagoLabel      || '',
+                vuelo:         datosVenta.vuelo          || '',
+                vueloRegreso:  datosVenta.vueloRegreso   || '',
+                extraStop:     datosVenta.extraStop      || 0,
+                extraStopR:    datosVenta.extraStopR     || 0,
+                cupon:         datosVenta.cupon          || '',
+                cuponDiscount: _cuponRes.valid ? _cuponRes.discount : 0,
+                extras:        datosVenta.extras         || '',
+                notas:         datosVenta.notas          || '',
+            }));
+        } catch(e) { console.error('bookingConfirmed save error:', e); }
+
+        // 2. Fire pixels & Google Sheet in background (non-blocking)
+        try {
+            gtag('event', 'conversion', { 'send_to': 'AW-17859609175/8AeACLKZ6N4bENeEkMRC', 'transaction_id': datosVenta.codigo });
+        } catch(e) {}
+        try {
+            if (typeof fbq !== 'undefined' && datosVenta.precioTotal) {
+                const priceNum   = parseFloat(datosVenta.precioTotal.replace(/[^0-9.]/g, '')) || 0;
+                const currencyFb = datosVenta.precioTotal.includes('MXN') ? 'MXN' : datosVenta.precioTotal.includes('CAD') ? 'CAD' : 'USD';
+                fbq('track', 'Purchase', { value: priceNum, currency: currencyFb, content_name: datosVenta.vehiculo }, { eventID: datosVenta.codigo });
+            }
+        } catch(e) {}
+        try { enviarConversionsAPI(datosVenta, 'Purchase'); } catch(e) {}
+        try {
+            datosVenta._token = 'LTR-SEC-2025-XK9M7P';
+            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', keepalive: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datosVenta) });
+        } catch(e) {}
+
+        // 3. Redirect immediately — ltr_bookingConfirmed is already set above
+        window.location.href = 'thank-you.html';
     }
 
     function _dispararPurchaseYEnviar(datosVenta) {
-        if (typeof fbq !== 'undefined' && datosVenta.precioTotal) {
-            const priceNum   = parseFloat(datosVenta.precioTotal.replace(/[^0-9.]/g, '')) || 0;
-            const currencyFb = datosVenta.precioTotal.includes('MXN') ? 'MXN'
-                             : datosVenta.precioTotal.includes('CAD') ? 'CAD' : 'USD';
-            fbq('track', 'Purchase',
-                { value: priceNum, currency: currencyFb, content_name: datosVenta.vehiculo },
-                { eventID: datosVenta.codigo }
-            );
-        }
-        enviarConversionsAPI(datosVenta, 'Purchase');
+        try {
+            if (typeof fbq !== 'undefined' && datosVenta.precioTotal) {
+                const priceNum   = parseFloat(datosVenta.precioTotal.replace(/[^0-9.]/g, '')) || 0;
+                const currencyFb = datosVenta.precioTotal.includes('MXN') ? 'MXN'
+                                 : datosVenta.precioTotal.includes('CAD') ? 'CAD' : 'USD';
+                fbq('track', 'Purchase',
+                    { value: priceNum, currency: currencyFb, content_name: datosVenta.vehiculo },
+                    { eventID: datosVenta.codigo }
+                );
+            }
+        } catch(e) {}
+        try { enviarConversionsAPI(datosVenta, 'Purchase'); } catch(e) {}
         iniciarEnvio(datosVenta);
     }
 
