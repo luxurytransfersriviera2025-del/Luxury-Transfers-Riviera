@@ -3223,10 +3223,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             }));
         } catch(e) { console.error('bookingConfirmed save error:', e); }
 
-        // 2. Fire pixels & Google Sheet in background (non-blocking)
-        try {
-            gtag('event', 'conversion', { 'send_to': 'AW-17859609175/8AeACLKZ6N4bENeEkMRC', 'transaction_id': datosVenta.codigo });
-        } catch(e) {}
+        // 2. Pixels (fire and forget)
+        try { gtag('event', 'conversion', { 'send_to': 'AW-17859609175/8AeACLKZ6N4bENeEkMRC', 'transaction_id': datosVenta.codigo }); } catch(e) {}
         try {
             if (typeof fbq !== 'undefined' && datosVenta.precioTotal) {
                 const priceNum   = parseFloat(datosVenta.precioTotal.replace(/[^0-9.]/g, '')) || 0;
@@ -3235,13 +3233,15 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             }
         } catch(e) {}
         try { enviarConversionsAPI(datosVenta, 'Purchase'); } catch(e) {}
-        try {
-            datosVenta._token = 'LTR-SEC-2025-XK9M7P';
-            fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', keepalive: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datosVenta) });
-        } catch(e) {}
 
-        // 3. Redirect immediately — ltr_bookingConfirmed is already set above
-        window.location.href = 'thank-you.html';
+        // 3. Generate PDF for email attachment, then send to Google Sheet
+        // Wait for the fetch response before redirecting so the email arrives reliably.
+        // ltr_bookingConfirmed is already saved above, so thank-you.html has data regardless.
+        try { datosVenta.pdfBase64 = generarVoucherPDF(datosVenta, true); } catch(e) {}
+        datosVenta._token = 'LTR-SEC-2025-XK9M7P';
+        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datosVenta) })
+            .then(function()  { window.location.href = 'thank-you.html'; })
+            .catch(function() { window.location.href = 'thank-you.html'; });
     }
 
     function _dispararPurchaseYEnviar(datosVenta) {
@@ -3807,7 +3807,25 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             document.getElementById('recovery-checking').style.display = 'none';
 
             if (result.paid) {
-                // ✅ Payment confirmed — save confirmation data and redirect immediately
+                // ✅ Payment confirmed — fetch card/PayPal details, save, then redirect
+                // Try to get last4/brand (Stripe) or payer email (PayPal) for the voucher
+                if (!datos.pagoLabel && datos.stripeSessionId) {
+                    try {
+                        const cardRes = await fetch(WORKER_PAGOS_URL + '/process-payment', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ method: 'stripe', action: 'retrieve-session', sessionId: datos.stripeSessionId })
+                        });
+                        if (cardRes.ok) {
+                            const cardInfo = await cardRes.json();
+                            if (cardInfo.last4) {
+                                const brand = cardInfo.brand ? (cardInfo.brand.charAt(0).toUpperCase() + cardInfo.brand.slice(1)) : 'Card';
+                                datos.pagoLabel = brand + ' **** ' + cardInfo.last4;
+                            } else if (cardInfo.payerEmail) {
+                                datos.pagoLabel = 'PayPal (' + cardInfo.payerEmail + ')';
+                            }
+                        }
+                    } catch(e) {}
+                }
                 try {
                     const vehKey = Object.keys(_vehicleImages).find(k => (datos.vehiculo || '').toUpperCase().includes(k));
                     const imgUrl = vehKey ? _vehicleImages[vehKey] : _vehicleImages['CLASSIC SEDAN'];
@@ -3826,10 +3844,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         extras: datos.extras || '', notas: datos.notas || '',
                     }));
                 } catch(e) { console.error('bookingConfirmed save error:', e); }
-                // Fire Google Sheets recording in background (keepalive survives navigation)
+                // Send to Google Sheet and wait for response so the email arrives reliably
                 try {
+                    try { datos.pdfBase64 = generarVoucherPDF(datos, true); } catch(e) {}
                     datos._token = 'LTR-SEC-2025-XK9M7P';
-                    fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', keepalive: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
+                    await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
                 } catch(e) {}
                 sessionStorage.removeItem('ltr_pendingBooking');
                 cerrarRecuperacion();
