@@ -3192,7 +3192,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             const imgUrl = vehKey ? _vehicleImages[vehKey] : _vehicleImages['CLASSIC SEDAN'];
             const _cuponKey = (datosVenta.cupon || '').toUpperCase();
             const _cuponRes = _couponCache[_cuponKey] || { valid: false, discount: 0 };
-            sessionStorage.setItem('ltr_bookingConfirmed', JSON.stringify({
+            localStorage.setItem('ltr_bookingConfirmed', JSON.stringify({
                 esVenta:       true,
                 codigo:        datosVenta.codigo,
                 vehiculo:      datosVenta.vehiculo,
@@ -3807,11 +3807,33 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             document.getElementById('recovery-checking').style.display = 'none';
 
             if (result.paid) {
-                // ✅ Payment confirmed — close recovery modal and go through normal booking flow
-                // (records in Google Sheets, sends confirmation email, redirects to thank-you.html)
+                // ✅ Payment confirmed — save confirmation data and redirect immediately
+                try {
+                    const vehKey = Object.keys(_vehicleImages).find(k => (datos.vehiculo || '').toUpperCase().includes(k));
+                    const imgUrl = vehKey ? _vehicleImages[vehKey] : _vehicleImages['CLASSIC SEDAN'];
+                    const _cuponRes = _couponCache[(datos.cupon || '').toUpperCase()] || { valid: false, discount: 0 };
+                    localStorage.setItem('ltr_bookingConfirmed', JSON.stringify({
+                        esVenta: true, codigo: datos.codigo, vehiculo: datos.vehiculo, imgUrl: imgUrl,
+                        origen: datos.origen, destino: datos.destino, fecha: datos.fecha, hora: datos.hora,
+                        fechaRegreso: datos.fechaRegreso || '', horaRegreso: datos.horaRegreso || '',
+                        pasajeros: datos.pasajeros, nombre: datos.nombre, email: datos.email, telefono: datos.telefono,
+                        tipoViaje: datos.tipoViaje, precio: datos.precio || '',
+                        precioTotal: datos.precioTotal || datos.precio || '',
+                        pago: datos.pago || '', pagoLabel: datos.pagoLabel || '',
+                        vuelo: datos.vuelo || '', vueloRegreso: datos.vueloRegreso || '',
+                        extraStop: datos.extraStop || 0, extraStopR: datos.extraStopR || 0,
+                        cupon: datos.cupon || '', cuponDiscount: _cuponRes.valid ? _cuponRes.discount : 0,
+                        extras: datos.extras || '', notas: datos.notas || '',
+                    }));
+                } catch(e) { console.error('bookingConfirmed save error:', e); }
+                // Fire Google Sheets recording in background (keepalive survives navigation)
+                try {
+                    datos._token = 'LTR-SEC-2025-XK9M7P';
+                    fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', keepalive: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) });
+                } catch(e) {}
                 sessionStorage.removeItem('ltr_pendingBooking');
                 cerrarRecuperacion();
-                iniciarEnvio(datos);
+                window.location.href = 'thank-you.html';
             } else {
                 // ❌ Payment not completed — show payment buttons normally
                 document.getElementById('recovery-info-msg').style.display        = 'flex';
@@ -4266,7 +4288,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             const imgUrl = vehKey ? _vehicleImages[vehKey] : _vehicleImages['CLASSIC SEDAN'];
             const _cuponKey = (data.cupon || '').toUpperCase();
             const _cuponRes = _couponCache[_cuponKey] || { valid: false, discount: 0 };
-            sessionStorage.setItem('ltr_bookingConfirmed', JSON.stringify({
+            localStorage.setItem('ltr_bookingConfirmed', JSON.stringify({
                 esVenta:       true,
                 codigo:        data.codigo,
                 vehiculo:      data.vehiculo,
