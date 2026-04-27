@@ -298,7 +298,7 @@
 var _confirmedData = null;
 
 (function init() {
-    var raw = sessionStorage.getItem('ltr_bookingConfirmed');
+    var raw = localStorage.getItem('ltr_bookingConfirmed');
     if (!raw) {
         document.getElementById('noDataMsg').style.display = 'block';
         setTimeout(function() { window.location.href = 'index.html'; }, 3000);
@@ -309,7 +309,7 @@ var _confirmedData = null;
         setTimeout(function() { window.location.href = 'index.html'; }, 3000);
         return;
     }
-    sessionStorage.removeItem('ltr_bookingConfirmed');
+    localStorage.removeItem('ltr_bookingConfirmed');
 
     var d = _confirmedData;
 
