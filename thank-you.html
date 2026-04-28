@@ -33,7 +33,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
 
     <style>
         :root {
@@ -410,14 +410,22 @@ function _enablePdfBtn() {
         img.src=url;
     });
 
-    // WhatsApp QR — generated client-side to avoid CORS issues with third-party APIs
+    // WhatsApp QR — generated client-side (qrcodejs library, canvas-based, no CORS issues)
     _pdfTaskStart();
     (function _waitAndGenQR() {
-        if (typeof QRCode !== 'undefined' && QRCode.toDataURL) {
-            QRCode.toDataURL('https://wa.me/529842411158', { width: 200, margin: 2 }, function(err, url) {
-                if (!err) _whatsappQrB64 = url;
-                _pdfTaskDone();
-            });
+        if (typeof QRCode !== 'undefined') {
+            try {
+                var hiddenDiv = document.createElement('div');
+                hiddenDiv.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+                document.body.appendChild(hiddenDiv);
+                new QRCode(hiddenDiv, { text: 'https://wa.me/529842411158', width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M });
+                setTimeout(function() {
+                    var qrCanvas = hiddenDiv.querySelector('canvas');
+                    if (qrCanvas) { try { _whatsappQrB64 = qrCanvas.toDataURL('image/png'); } catch(e) {} }
+                    document.body.removeChild(hiddenDiv);
+                    _pdfTaskDone();
+                }, 300);
+            } catch(e) { _pdfTaskDone(); }
         } else {
             setTimeout(_waitAndGenQR, 200);
         }
