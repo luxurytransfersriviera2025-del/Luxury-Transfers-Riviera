@@ -373,12 +373,16 @@ var _socialIconsB64 = {};
 
 // Tracks pending async tasks before the PDF button is enabled
 var _pdfPendingTasks = 0;
-var _pdfStripeTaskDone = false; // set to true when retrieve-session is not needed or completes
+var _pdfStripeTaskDone = false;
+var _deferredSheetSend = null; // holds _sendToSheetAndPixels when images aren't ready yet
 
 function _pdfTaskStart() { _pdfPendingTasks++; }
 function _pdfTaskDone() {
     _pdfPendingTasks--;
-    if (_pdfPendingTasks <= 0 && _pdfStripeTaskDone) _enablePdfBtn();
+    if (_pdfPendingTasks <= 0 && _pdfStripeTaskDone) {
+        _enablePdfBtn();
+        if (_deferredSheetSend) { var fn = _deferredSheetSend; _deferredSheetSend = null; fn(); }
+    }
 }
 function _enablePdfBtn() {
     var btn = document.getElementById('btnPDF');
@@ -451,6 +455,7 @@ function _enablePdfBtn() {
         _pdfStripeTaskDone = true;
         _pdfPendingTasks = 0;
         _enablePdfBtn();
+        if (_deferredSheetSend) { var fn = _deferredSheetSend; _deferredSheetSend = null; fn(); }
     }, 8000);
 })();
 
@@ -527,10 +532,15 @@ function _enablePdfBtn() {
     })
     .catch(function() {})
     .then(function() {
-        _sendToSheetAndPixels();
-        // Mark Stripe task done and try to enable PDF button
         _pdfStripeTaskDone = true;
-        if (_pdfPendingTasks <= 0) _enablePdfBtn();
+        if (_pdfPendingTasks <= 0) {
+            // All images already loaded — send immediately
+            _enablePdfBtn();
+            _sendToSheetAndPixels();
+        } else {
+            // Images still loading — defer until _pdfTaskDone() fires for the last one
+            _deferredSheetSend = _sendToSheetAndPixels;
+        }
     });
 })();
 
