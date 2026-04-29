@@ -481,7 +481,6 @@ function _enablePdfBtn() {
     sessionStorage.removeItem('ltr_pendingBooking');
 
     var WORKER_PAGOS_URL = 'https://checkout.luxurytransfersriviera.com.mx';
-    var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz7Fc9DMmnbwoc2Xt8xoRdem8jOoRNlnrofAx0JjFUNzlBLvVzpX5zi8Hj5OaojlGw/exec';
 
     function _sendToSheetAndPixels() {
         if (!_confirmedData) return;
@@ -497,9 +496,8 @@ function _enablePdfBtn() {
         // Google Sheets + email (fire & forget, max 6s)
         try {
             var data = JSON.parse(JSON.stringify(_confirmedData));
-            data._token = 'LTR-SEC-2025-XK9M7P';
             if (window.jspdf) { try { data.pdfBase64 = generarVoucherPDF(data, true); } catch(e) {} }
-            var fetchSheet = fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            var fetchSheet = fetch(WORKER_PAGOS_URL + '/send-to-sheet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
             Promise.race([fetchSheet, new Promise(function(r){ setTimeout(r, 6000); })]).catch(function(){});
         } catch(e) {}
     }
