@@ -512,7 +512,6 @@ function _enablePdfBtn() {
     })
     .then(function(r) { return r.ok ? r.json() : null; })
     .then(function(cardInfo) {
-        console.log('[LTR] retrieve-session response:', JSON.stringify(cardInfo));
         if (cardInfo && _confirmedData) {
             var label = '';
             if (cardInfo.last4) {
