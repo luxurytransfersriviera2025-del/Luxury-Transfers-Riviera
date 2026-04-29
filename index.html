@@ -1559,7 +1559,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     </div>
 
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7Fc9DMmnbwoc2Xt8xoRdem8jOoRNlnrofAx0JjFUNzlBLvVzpX5zi8Hj5OaojlGw/exec";
+    const SCRIPT_URL = "";
     const CAPI_WORKER_URL = "https://meta-conversiones-api.luxurytransfersriviera2025.workers.dev";
 
     function escapeHTML(str) {
@@ -4370,9 +4370,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             }));
         }
 
-        data._token = "LTR-SEC-2025-XK9M7P";
-        fetch(SCRIPT_URL, {
-            method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
+        fetch(WORKER_PAGOS_URL + '/send-to-sheet', {
+            method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
         })
         .then(() => {
             try { gtag('event', 'conversion', { 'send_to': 'AW-17859609175/8AeACLKZ6N4bENeEkMRC', 'transaction_id': data.codigo }); } catch(e) {}
