@@ -1812,9 +1812,16 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     window.onload = function() {
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('fechaIda').setAttribute('min', today);
+        document.getElementById('fechaIdaRT').setAttribute('min', today);
         document.getElementById('fechaVuelta').setAttribute('min', today);
         document.getElementById('fechaIda').addEventListener('change', function() {
             document.getElementById('fechaVuelta').setAttribute('min', this.value);
+        });
+        document.getElementById('fechaIdaRT').addEventListener('change', function() {
+            document.getElementById('fechaVuelta').setAttribute('min', this.value);
+            if (document.getElementById('fechaVuelta').value < this.value) {
+                document.getElementById('fechaVuelta').value = '';
+            }
         });
 
         // Clear fields before airport pre-fill
@@ -3265,8 +3272,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         // Wait for the fetch response before redirecting so the email arrives reliably.
         // ltr_bookingConfirmed is already saved above, so thank-you.html has data regardless.
         try { datosVenta.pdfBase64 = generarVoucherPDF(datosVenta, true); } catch(e) {}
-        datosVenta._token = 'LTR-SEC-2025-XK9M7P';
-        const _fetchSheet = fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datosVenta) });
+        const _fetchSheet = fetch(WORKER_PAGOS_URL + '/send-to-sheet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datosVenta) });
         const _timeout4s  = new Promise(resolve => setTimeout(resolve, 4000));
         Promise.race([_fetchSheet, _timeout4s])
             .then(function()  { window.location.href = 'thank-you.html'; })
@@ -3885,9 +3891,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 // Send to Google Sheet — wait at most 4 s then redirect anyway
                 try {
                     try { datos.pdfBase64 = generarVoucherPDF(datos, true); } catch(e) {}
-                    datos._token = 'LTR-SEC-2025-XK9M7P';
                     await Promise.race([
-                        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) }),
+                        fetch(WORKER_PAGOS_URL + '/send-to-sheet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datos) }),
                         new Promise(resolve => setTimeout(resolve, 4000))
                     ]);
                 } catch(e) {}
