@@ -2215,6 +2215,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         </a>
                     </div>`;
             } else {
+                // Store route context so payment functions can call /calculate-price
+                window._ltrZonaDestino    = zonaDestino;
+                window._ltrTipo           = tipo;
+                window._ltrCuponActivo    = promoCode;
                 if (pax <= 3)  divRes.innerHTML += crearCard("CLASSIC SEDAN",   "1-3 Pax",  cp(p.sedan),    moneda, zonaOrigen, imgUrlsErtiga,     rutaLabel);
                 if (pax <= 7)  divRes.innerHTML += crearCard("COMFORT VAN",     "1-7 Pax",  cp(p.van),      moneda, zonaOrigen, imgUrlTransporter, rutaLabel);
                 if (pax <= 10) divRes.innerHTML += crearCard("FAMILY VAN",      "8-10 Pax", cp(p.familyVan), moneda, zonaOrigen, imgUrlToyotaGL,    rutaLabel);
@@ -2267,7 +2271,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const descuentoPct = tieneDescuento ? (1 - _cardCoupon.discount / 100) : 1;
         const precioOriginal = tieneDescuento ? Math.round(precio / descuentoPct) : precio;
 
-        _cardDataStore[id] = { esVenta: true, vehiculo: veh, precio: "$" + precio + " " + moneda, zona: zona, origen: document.getElementById('origen').value, destino: document.getElementById('destino').value };
+        _cardDataStore[id] = { esVenta: true, vehiculo: veh, precio: "$" + precio + " " + moneda, zona: zona, zonaDestino: window._ltrZonaDestino || '', tipo: window._ltrTipo || 'SENCILLO', cupon: window._ltrCuponActivo || '', origen: document.getElementById('origen').value, destino: document.getElementById('destino').value };
         const precioDisplay = '<span style="font-size:26px;font-weight:900;color:var(--navy-bg);font-family:var(--font-title);">$' + precio + ' <small style="font-size:14px;font-weight:600;" translate="no">' + moneda + '</small></span>';
         let tipoTexto = (tipo === 'SENCILLO') ? t.oneWay : t.roundTrip;
         let iconoTipo = (tipo === 'SENCILLO') ? "fa-arrow-right" : "fa-exchange-alt";
@@ -3044,10 +3048,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     async function pagarConPayPal(id) {
         const datosCard = _cardDataStore[id] || {};
         const moneda       = document.getElementById('moneda') ? document.getElementById('moneda').value : 'USD';
-        const basePrice    = parseFloat((datosCard.precio || '0').replace(/[^0-9.]/g, '')) || 0;
-        const extras       = getExtrasTotal(id);
-        const totalFinal   = Math.round((basePrice + extras) * 100) / 100;
         const currencyCode = moneda === 'MXN' ? 'MXN' : moneda === 'CAD' ? 'CAD' : 'USD';
+        const extraStopCount  = parseInt(document.getElementById('extra-stop-'  + id)?.innerText) || 0;
+        const extraStopRCount = parseInt(document.getElementById('extra-stopR-' + id)?.innerText) || 0;
 
         _setLoadingMsg('Redirecting to Stripe...', 'Please do not close this window.<br>You will be redirected to complete your payment.');
         document.getElementById('loadingOverlay').style.display = 'flex';
@@ -3055,6 +3058,26 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const siteUrl = window.location.origin + window.location.pathname;
 
         try {
+            // Step 1: Get server-verified price token
+            const priceRes = await fetch(WORKER_PAGOS_URL + '/calculate-price', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    zonaOrigen:  datosCard.zona        || '',
+                    zonaDestino: datosCard.zonaDestino || '',
+                    vehiculo:    datosCard.vehiculo    || '',
+                    tipo:        datosCard.tipo        || 'SENCILLO',
+                    stops:       extraStopCount,
+                    stopsR:      extraStopRCount,
+                    currency:    moneda,
+                    cupon:       datosCard.cupon       || '',
+                })
+            });
+            if (!priceRes.ok) throw new Error('Price calculation failed: ' + priceRes.status);
+            const priceData  = await priceRes.json();
+            const priceToken = priceData.priceToken;
+            const totalFinal = priceData.amount;
+
             // Build complete data BEFORE leaving the page
             const datosVenta = _construirDatosVenta(id, datosCard, 'PayPal Checkout');
             datosVenta.precioTotal = '$' + totalFinal + ' ' + moneda.toUpperCase();
@@ -3066,7 +3089,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 body: JSON.stringify({
                     method:           'paypal',
                     action:           'create-order',
-                    amount:           totalFinal.toFixed(2),
+                    priceToken:       priceToken,
                     currency:         currencyCode,
                     bookingCode:      datosVenta.codigo,
                     vehicle:          datosCard.vehiculo || '',
@@ -3127,12 +3150,31 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting to Stripe...';
 
         const moneda       = document.getElementById('moneda') ? document.getElementById('moneda').value : 'USD';
-        const basePrice    = parseFloat((datosCard.precio || '0').replace(/[^0-9.]/g, '')) || 0;
-        const extras       = getExtrasTotal(id);
-        const totalFinal   = Math.round((basePrice + extras) * 100) / 100;
         const currencyCode = moneda === 'MXN' ? 'mxn' : moneda === 'CAD' ? 'cad' : 'usd';
+        const extraStopCount  = parseInt(document.getElementById('extra-stop-'  + id)?.innerText) || 0;
+        const extraStopRCount = parseInt(document.getElementById('extra-stopR-' + id)?.innerText) || 0;
 
         try {
+            // Step 1: Get server-verified price token
+            const priceRes = await fetch(WORKER_PAGOS_URL + '/calculate-price', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    zonaOrigen:  datosCard.zona        || '',
+                    zonaDestino: datosCard.zonaDestino || '',
+                    vehiculo:    datosCard.vehiculo    || '',
+                    tipo:        datosCard.tipo        || 'SENCILLO',
+                    stops:       extraStopCount,
+                    stopsR:      extraStopRCount,
+                    currency:    moneda,
+                    cupon:       datosCard.cupon       || '',
+                })
+            });
+            if (!priceRes.ok) throw new Error('Price calculation failed: ' + priceRes.status);
+            const priceData  = await priceRes.json();
+            const priceToken = priceData.priceToken;
+            const totalFinal = priceData.amount;
+
             // Build complete data BEFORE leaving the page
             const datosVenta = _construirDatosVenta(id, datosCard, 'Stripe Checkout');
             datosVenta.precioTotal = '$' + totalFinal + ' ' + moneda.toUpperCase();
@@ -3169,7 +3211,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 body: JSON.stringify({
                     method:        'stripe',
                     action:        'create-checkout-session',
-                    amount:        totalFinal,
+                    priceToken:    priceToken,
                     currency:      currencyCode,
                     bookingCode:   datosVenta.codigo,
                     vehicle:       datosCard.vehiculo || 'Transfer Privado',
