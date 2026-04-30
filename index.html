@@ -2261,7 +2261,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     function crearCard(veh, cap, precio, moneda, zona, img, rutaLabel, precioSinDescuento) {
         const t = { monitor: "Flight Monitoring", ac: "Air Conditioning", insurance: "Travel Insurance", private: "100% Private", noHidden: "No Hidden Fees", oneWay: "One Way", roundTrip: "Round Trip", bookBtn: "BOOK NOW" };
         const tipo = document.getElementById('tipoServicio').value;
-        const pAlto = Math.round(precio * 1.30);
+        const pAlto = Math.round((precioSinDescuento || precio) * 1.30);
         const id = 'c' + (++_cid);
 
         // Detectar si hay descuento activo (solo del campo visible)
