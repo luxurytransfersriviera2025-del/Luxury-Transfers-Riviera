@@ -3081,8 +3081,29 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             // Build complete data BEFORE leaving the page
             const datosVenta = _construirDatosVenta(id, datosCard, 'PayPal Checkout');
             datosVenta.precioTotal = '$' + totalFinal + ' ' + moneda.toUpperCase();
+            datosVenta.pago = 'PayPal ✅ Paid Online';
             sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datosVenta));
 
+            // Save to localStorage so thank-you.html can access the data after PayPal redirect
+            try {
+                const vehKey = Object.keys(_vehicleImages).find(k => (datosVenta.vehiculo || '').toUpperCase().includes(k));
+                const imgUrl = vehKey ? _vehicleImages[vehKey] : _vehicleImages['CLASSIC SEDAN'];
+                localStorage.setItem('ltr_bookingConfirmed', JSON.stringify({
+                    esVenta: true, codigo: datosVenta.codigo, vehiculo: datosVenta.vehiculo, imgUrl: imgUrl,
+                    origen: datosVenta.origen, destino: datosVenta.destino, fecha: datosVenta.fecha, hora: datosVenta.hora,
+                    fechaRegreso: datosVenta.fechaRegreso || '', horaRegreso: datosVenta.horaRegreso || '',
+                    pasajeros: datosVenta.pasajeros, nombre: datosVenta.nombre, email: datosVenta.email, telefono: datosVenta.telefono,
+                    tipoViaje: datosVenta.tipoViaje, precio: datosVenta.precio || '',
+                    precioTotal: datosVenta.precioTotal || datosVenta.precio || '',
+                    pago: 'PayPal ✅ Paid Online', pagoLabel: '',
+                    vuelo: datosVenta.vuelo || '', vueloRegreso: datosVenta.vueloRegreso || '',
+                    extraStop: datosVenta.extraStop || 0, extraStopR: datosVenta.extraStopR || 0,
+                    cupon: datosVenta.cupon || '', cuponDiscount: 0,
+                    extras: datosVenta.extras || '', notas: datosVenta.notas || '',
+                }));
+            } catch(e) { console.error('localStorage PayPal save error:', e); }
+
+            const thankYouUrl = window.location.origin + '/thank-you.html';
             const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -3095,8 +3116,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     vehicle:          datosCard.vehiculo || '',
                     customerName:     datosVenta.nombre  || '',
                     customerPhone:    datosVenta.telefono || '',
-                    // Return URLs — PayPal will redirect here after payment
-                    returnUrl:        siteUrl + '?payment=paypal-success',
+                    // Redirect directly to thank-you.html after PayPal payment
+                    returnUrl:        thankYouUrl + '?payment=paypal-success',
                     cancelPayPalUrl:  siteUrl + '?payment=cancelled'
                 })
             });
