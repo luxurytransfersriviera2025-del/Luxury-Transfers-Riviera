@@ -2912,7 +2912,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 const tot  = base + extrasTotal;
                 return "$" + tot + " " + moneda;
             })(),
-            zona: datosCard.zona, idioma: 'en',
+            zona: datosCard.zona, zonaDestino: datosCard.zonaDestino || '', tipo: datosCard.tipo || 'SENCILLO', idioma: 'en',
             pago: metodoPago + ' ✅ Paid Online',
             extraAgua, extraCerveza, extraAguaR, extraCervezaR, extraStop, extraStopR,
             totalExtras: totalExtrasStr,
@@ -2967,13 +2967,35 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     createOrder: async () => {
                         _setPayPalError(id, '');
                         try {
+                            const _sdkStopCount  = parseInt(document.getElementById('extra-stop-'  + id)?.innerText) || 0;
+                            const _sdkStopRCount = parseInt(document.getElementById('extra-stopR-' + id)?.innerText) || 0;
+                            // Step 1: Get server-verified price token
+                            const _priceRes = await fetch(WORKER_PAGOS_URL + '/calculate-price', {
+                                method:  'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    zonaOrigen:  datosCard.zona        || '',
+                                    zonaDestino: datosCard.zonaDestino || '',
+                                    vehiculo:    datosCard.vehiculo    || '',
+                                    tipo:        datosCard.tipo        || 'SENCILLO',
+                                    stops:       _sdkStopCount,
+                                    stopsR:      _sdkStopRCount,
+                                    currency:    currencyCode,
+                                    cupon:       datosCard.cupon       || '',
+                                })
+                            });
+                            if (!_priceRes.ok) throw new Error('Price calc HTTP ' + _priceRes.status);
+                            const _priceData  = await _priceRes.json();
+                            const _priceToken = _priceData.priceToken;
+                            if (!_priceToken) throw new Error('No priceToken from server');
+                            // Step 2: Create PayPal order with verified token
                             const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
                                 method:  'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
                                     method:      'paypal',
                                     action:      'create-order',
-                                    amount:      totalFinal.toFixed(2),
+                                    priceToken:  _priceToken,
                                     currency:    currencyCode,
                                     bookingCode: id,
                                     vehicle:     datosCard.vehiculo || ''
@@ -4018,6 +4040,25 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datos));
 
         try {
+            // Step 1: Get server-verified price token
+            const _rsPriceRes = await fetch(WORKER_PAGOS_URL + '/calculate-price', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    zonaOrigen:  datos.zona        || '',
+                    zonaDestino: datos.zonaDestino || '',
+                    vehiculo:    datos.vehiculo    || '',
+                    tipo:        datos.tipo        || 'SENCILLO',
+                    stops:       datos.extraStop   || 0,
+                    stopsR:      datos.extraStopR  || 0,
+                    currency:    moneda,
+                    cupon:       datos.cupon       || '',
+                })
+            });
+            if (!_rsPriceRes.ok) throw new Error('Price calc HTTP ' + _rsPriceRes.status);
+            const _rsPriceData  = await _rsPriceRes.json();
+            const _rsPriceToken = _rsPriceData.priceToken;
+            if (!_rsPriceToken) throw new Error('No priceToken from server');
             const thankYouUrl = window.location.origin + '/thank-you.html';
             const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
                 method:  'POST',
@@ -4025,7 +4066,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 body: JSON.stringify({
                     method:      'stripe',
                     action:      'create-checkout-session',
-                    amount:      totalFinal,
+                    priceToken:  _rsPriceToken,
                     currency:    currencyCode,
                     bookingCode: datos.codigo,
                     vehicle:     datos.vehiculo || 'Transfer Privado',
@@ -4056,30 +4097,70 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
     async function reintentarPayPal() {
         if (!_recoveryDatos) return;
-        const datos       = _recoveryDatos;
-        const totalFinal  = parseFloat((datos.precioTotal || datos.precio || '0').replace(/[^0-9.]/g, '')) || 0;
-        const moneda      = (datos.precioTotal || '').includes('MXN') ? 'MXN' : (datos.precioTotal || '').includes('CAD') ? 'CAD' : 'USD';
-        const currencyCode = moneda === 'MXN' ? 'MXN' : moneda === 'CAD' ? 'CAD' : 'USD';
+        const datos        = _recoveryDatos;
+        const moneda       = (datos.precioTotal || '').includes('MXN') ? 'MXN' : (datos.precioTotal || '').includes('CAD') ? 'CAD' : 'USD';
+        const currencyCode = moneda;
         const siteUrl      = window.location.origin + window.location.pathname;
+        const thankYouUrl  = window.location.origin + '/thank-you.html';
 
-        datos.pago = 'PayPal Checkout ✅ Paid Online';
+        datos.pago = 'PayPal ✅ Paid Online';
         sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datos));
 
         document.getElementById('loadingOverlay').style.display = 'flex';
         cerrarRecuperacion();
 
         try {
+            // Step 1: Get server-verified price token
+            const _rpPriceRes = await fetch(WORKER_PAGOS_URL + '/calculate-price', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    zonaOrigen:  datos.zona        || '',
+                    zonaDestino: datos.zonaDestino || '',
+                    vehiculo:    datos.vehiculo    || '',
+                    tipo:        datos.tipo        || 'SENCILLO',
+                    stops:       datos.extraStop   || 0,
+                    stopsR:      datos.extraStopR  || 0,
+                    currency:    currencyCode,
+                    cupon:       datos.cupon       || '',
+                })
+            });
+            if (!_rpPriceRes.ok) throw new Error('Price calc HTTP ' + _rpPriceRes.status);
+            const _rpPriceData  = await _rpPriceRes.json();
+            const _rpPriceToken = _rpPriceData.priceToken;
+            if (!_rpPriceToken) throw new Error('No priceToken from server');
+
+            // Save to localStorage before redirecting — thank-you.html reads this on return
+            try {
+                const _rpVehKey = Object.keys(_vehicleImages).find(k => (datos.vehiculo || '').toUpperCase().includes(k));
+                const _rpImgUrl = _rpVehKey ? _vehicleImages[_rpVehKey] : _vehicleImages['CLASSIC SEDAN'];
+                localStorage.setItem('ltr_bookingConfirmed', JSON.stringify({
+                    esVenta: true, codigo: datos.codigo, vehiculo: datos.vehiculo, imgUrl: _rpImgUrl,
+                    origen: datos.origen, destino: datos.destino, fecha: datos.fecha, hora: datos.hora,
+                    fechaRegreso: datos.fechaRegreso || '', horaRegreso: datos.horaRegreso || '',
+                    pasajeros: datos.pasajeros, nombre: datos.nombre, email: datos.email, telefono: datos.telefono,
+                    tipoViaje: datos.tipoViaje, precio: datos.precio || '',
+                    precioTotal: datos.precioTotal || datos.precio || '',
+                    pago: 'PayPal ✅ Paid Online', pagoLabel: '',
+                    vuelo: datos.vuelo || '', vueloRegreso: datos.vueloRegreso || '',
+                    extraStop: datos.extraStop || 0, extraStopR: datos.extraStopR || 0,
+                    cupon: datos.cupon || '', cuponDiscount: 0,
+                    extras: datos.extras || '', notas: datos.notas || '',
+                }));
+            } catch(_e) {}
+
+            // Step 2: Create PayPal order with verified token, redirect to thank-you.html
             const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     method:          'paypal',
                     action:          'create-order',
-                    amount:          totalFinal.toFixed(2),
+                    priceToken:      _rpPriceToken,
                     currency:        currencyCode,
                     bookingCode:     datos.codigo,
                     vehicle:         datos.vehiculo || '',
-                    returnUrl:       siteUrl + '?payment=paypal-success',
+                    returnUrl:       thankYouUrl + '?payment=paypal-success',
                     cancelPayPalUrl: siteUrl + '?payment=cancelled'
                 })
             });
@@ -4131,68 +4212,6 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         // Limpiar URL inmediatamente
         window.history.replaceState({}, '', window.location.pathname);
-
-        // ── PayPal returned successfully ────────────────────────────
-        if (payment === 'paypal-success') {
-            const token   = params.get('token');    // orderID de PayPal
-            const payerID = params.get('PayerID');  // ID del comprador
-
-            if (!token) {
-                console.error('PayPal return sin token');
-                return;
-            }
-
-            const raw = sessionStorage.getItem('ltr_pendingBooking');
-            if (!raw) {
-                console.error('No hay datos de reserva en sessionStorage');
-                return;
-            }
-
-            let datosVenta;
-            try {
-                datosVenta = JSON.parse(raw);
-                sessionStorage.removeItem('ltr_pendingBooking');
-            } catch (e) {
-                console.error('Error parseando datos de reserva:', e);
-                return;
-            }
-
-            // Capturar el pago en el Worker
-            const _ov2 = document.getElementById('loadingOverlay');
-            _setLoadingMsg('We are generating your booking...', 'Please do not close this window.<br>This may take a few seconds.');
-            if (_ov2) _ov2.style.display = 'flex';
-            setTimeout(async () => {
-                try {
-                    const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
-                        method:  'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            method:      'paypal',
-                            action:      'capture-order',
-                            orderID:     token,
-                            bookingCode: datosVenta.codigo
-                        })
-                    });
-                    if (!res.ok) throw new Error('Capture HTTP ' + res.status);
-                    const capture       = await res.json();
-                    const captureStatus = capture.status ||
-                        capture.purchase_units?.[0]?.payments?.captures?.[0]?.status;
-
-                    if (captureStatus === 'COMPLETED') {
-                        // ✅ Pago capturado — adjuntar email de PayPal al label
-                        if (capture.payerEmail) datosVenta.pagoLabel = 'PayPal (' + capture.payerEmail + ')';
-                        _finalizarDesdeStripe(datosVenta);
-                    } else {
-                        throw new Error('Capture status: ' + captureStatus);
-                    }
-                } catch (e) {
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                    console.error('PayPal capture al regresar:', e);
-                    alert('⚠️ Payment could not be confirmed. Please contact us via WhatsApp with your booking code: ' + datosVenta.codigo);
-                }
-            }, 500);
-            return;
-        }
 
         // ── Pago cancelado — mostrar modal de recuperación ──────────
         if (payment === 'cancelled') {
