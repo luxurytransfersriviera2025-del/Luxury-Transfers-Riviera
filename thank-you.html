@@ -140,6 +140,7 @@
         .detail-value { font-size: 13px; font-weight: 600; color: #222; font-family: var(--font-body); line-height: 1.4; word-break: break-word; }
 
         .confirm-msg-header { font-size: 13px; color: rgba(255,255,255,0.88); line-height: 1.7; text-align: center; margin: 18px 0 0; padding: 0 4px; }
+        .spam-notice-header { background: rgba(255,255,255,0.10); border: 1px solid rgba(212,175,55,0.5); border-radius: 10px; padding: 11px 14px; margin: 14px 4px 0; display: flex; gap: 10px; align-items: flex-start; font-size: 12px; color: rgba(255,255,255,0.80); line-height: 1.5; text-align: left; }
         .spam-notice { background: #fff8e1; border: 1px solid var(--gold); border-radius: 10px; padding: 12px 14px; margin-bottom: 18px; display: flex; gap: 10px; align-items: flex-start; font-size: 12px; color: #555; line-height: 1.5; }
 
         .btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; border-radius: 12px; padding: 15px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; margin-bottom: 10px; font-family: var(--font-title); border: none; transition: opacity 0.2s; }
@@ -211,6 +212,10 @@
             <div class="heading-confirmed">Your booking is confirmed!</div>
             <div class="code-box" id="codeDisplay">LTR-????</div>
             <p class="confirm-msg-header">Thank you for choosing <strong>Luxury Transfers Riviera</strong>. Your payment has been successfully processed and your reservation is confirmed. One of our agents will contact you shortly to coordinate the details of your service.</p>
+            <div class="spam-notice-header">
+                <span style="font-size:15px;flex-shrink:0;">&#128231;</span>
+                <span>A confirmation email has been sent to you. <strong>If you don't see it in your inbox, please check your spam or junk folder.</strong></span>
+            </div>
         </div>
 
         <div class="card-body" id="cardBody" style="display:none">
@@ -230,11 +235,6 @@
             </div>
 
             <div class="details-grid" id="detailsGrid"></div>
-
-            <div class="spam-notice">
-                <span style="font-size:16px;flex-shrink:0;">&#128231;</span>
-                <span>A confirmation email has been sent to you. <strong>If you don't see it in your inbox, please check your spam or junk folder.</strong></span>
-            </div>
 
             <a id="btnWA" href="https://wa.me/529842411158" target="_blank" rel="noopener" class="btn btn-whatsapp">
                 <i class="fab fa-whatsapp" style="font-size:18px;"></i>
