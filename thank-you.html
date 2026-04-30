@@ -542,6 +542,108 @@ function _enablePdfBtn() {
 })();
 
 // ══════════════════════════════════════════════════
+//  PAYPAL RETURN — capture order, send to sheet
+// ══════════════════════════════════════════════════
+(function _processPayPalReturn() {
+    var params  = new URLSearchParams(window.location.search);
+    var payment = params.get('payment');
+    if (payment !== 'paypal-success') return;
+
+    var token   = params.get('token');   // PayPal orderID
+    var payerID = params.get('PayerID');
+
+    // Clean URL
+    window.history.replaceState({}, '', window.location.pathname);
+    sessionStorage.removeItem('ltr_pendingBooking');
+
+    if (!token) {
+        console.error('PayPal return sin token');
+        return;
+    }
+
+    var WORKER_PAGOS_URL = 'https://checkout.luxurytransfersriviera.com.mx';
+
+    // Disable PDF while we capture
+    var pdfBtn = document.getElementById('btnPDF');
+    if (pdfBtn) { pdfBtn.disabled = true; pdfBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Confirming payment...'; }
+
+    // Capture the PayPal order
+    fetch(WORKER_PAGOS_URL + '/process-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            method:   'paypal',
+            action:   'capture-order',
+            orderID:  token,
+            bookingCode: _confirmedData ? _confirmedData.codigo : ''
+        })
+    })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(capture) {
+        if (!capture || capture.status !== 'COMPLETED') {
+            console.error('PayPal capture failed:', capture);
+            _pdfStripeTaskDone = true;
+            _enablePdfBtn();
+            return;
+        }
+
+        // Update payment label with PayPal email
+        if (_confirmedData) {
+            var payerEmail = capture.payerEmail || '';
+            _confirmedData.pagoLabel = payerEmail ? 'PayPal (' + payerEmail + ')' : 'PayPal';
+            _confirmedData.pago      = 'PayPal ✅ Paid Online';
+
+            // Update localStorage with confirmed payment info
+            try {
+                var saved = JSON.parse(localStorage.getItem('ltr_bookingConfirmed') || '{}');
+                saved.pagoLabel = _confirmedData.pagoLabel;
+                saved.pago      = _confirmedData.pago;
+                localStorage.setItem('ltr_bookingConfirmed', JSON.stringify(saved));
+            } catch(e) {}
+
+            // Update badge on screen
+            var badge = document.getElementById('paymentBadge');
+            var lbl   = document.getElementById('paymentLabel');
+            if (badge) badge.style.display = 'inline-flex';
+            if (lbl)   lbl.textContent = 'Paid · ' + _confirmedData.pagoLabel;
+        }
+
+        // Send to Google Sheets + fire pixels
+        _pdfStripeTaskDone = true;
+        if (_pdfPendingTasks <= 0) {
+            _enablePdfBtn();
+            _sendPayPalToSheet();
+        } else {
+            _deferredSheetSend = _sendPayPalToSheet;
+        }
+    })
+    .catch(function(e) {
+        console.error('PayPal capture error:', e);
+        _pdfStripeTaskDone = true;
+        _enablePdfBtn();
+    });
+
+    function _sendPayPalToSheet() {
+        if (!_confirmedData) return;
+        // Pixels
+        try { gtag('event', 'conversion', { 'send_to': 'AW-17859609175/8AeACLKZ6N4bENeEkMRC', 'transaction_id': _confirmedData.codigo }); } catch(e) {}
+        try {
+            if (typeof fbq !== 'undefined' && _confirmedData.precioTotal) {
+                var priceNum   = parseFloat(_confirmedData.precioTotal.replace(/[^0-9.]/g, '')) || 0;
+                var currencyFb = _confirmedData.precioTotal.indexOf('MXN') >= 0 ? 'MXN' : _confirmedData.precioTotal.indexOf('CAD') >= 0 ? 'CAD' : 'USD';
+                fbq('track', 'Purchase', { value: priceNum, currency: currencyFb, content_name: _confirmedData.vehiculo }, { eventID: _confirmedData.codigo });
+            }
+        } catch(e) {}
+        // Google Sheets + email
+        try {
+            var data = JSON.parse(JSON.stringify(_confirmedData));
+            if (window.jspdf) { try { data.pdfBase64 = generarVoucherPDF(data, true); } catch(e) {} }
+            fetch(WORKER_PAGOS_URL + '/send-to-sheet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).catch(function(){});
+        } catch(e) {}
+    }
+})();
+
+// ══════════════════════════════════════════════════
 //  PDF GENERATION
 // ══════════════════════════════════════════════════
 function downloadVoucher() {
