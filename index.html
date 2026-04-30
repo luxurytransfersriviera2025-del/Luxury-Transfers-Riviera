@@ -3052,7 +3052,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const extraStopCount  = parseInt(document.getElementById('extra-stop-'  + id)?.innerText) || 0;
         const extraStopRCount = parseInt(document.getElementById('extra-stopR-' + id)?.innerText) || 0;
 
-        _setLoadingMsg('Redirecting to Stripe...', 'Please do not close this window.<br>You will be redirected to complete your payment.');
+        _setLoadingMsg('Redirecting to PayPal...', 'Please do not close this window.<br>You will be redirected to complete your payment.');
         document.getElementById('loadingOverlay').style.display = 'flex';
 
         const siteUrl = window.location.origin + window.location.pathname;
