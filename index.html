@@ -18,6 +18,11 @@
     <meta name="description" content="Private transfers in the Riviera Maya — Cancun &amp; Tulum airports and hotel to hotel. Own vehicles, no agencies. VIP, punctual and safe service." />
     <meta name="keywords" content="transfer cancun, transfer tulum, transfer riviera maya, transporte privado cancun, hotel a hotel riviera maya, airport transfer cancun, private transfer tulum, luxury transfer cancun playa del carmen, cancun airport transfer, tulum airport transfer, cancun airport transportation, tulum airport transportation" />
     <meta name="facebook-domain-verification" content="nbsn1w3k3g95f02nuqkypfab2frmei" />
+    <!-- hreflang -->
+    <link rel="alternate" hreflang="en" href="https://luxurytransfersriviera.com.mx/" />
+    <link rel="alternate" hreflang="es" href="https://luxurytransfersriviera.com.mx/es/" />
+    <link rel="alternate" hreflang="x-default" href="https://luxurytransfersriviera.com.mx/" />
+    <link rel="canonical" href="https://luxurytransfersriviera.com.mx/" />
     <!-- Meta Pixel Code -->
 <script>
 !function(f,b,e,v,n,t,s)
@@ -49,7 +54,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
          Replace TU_PAYPAL_CLIENT_ID with your Client ID (Sandbox for testing, Live for production).
          Find it at developer.paypal.com → My Apps & Credentials
     ══ -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AWKiNea9VitTyjMVRwn533L3B2ukDZ7ooMiAnFCl3BkTAjuEqI2tmwSYp6hwh4aRQaUNq79EsU8Nrozg&currency=USD&intent=capture&components=buttons&enable-funding=paypal" data-namespace="paypalSDK"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AWKiNea9VitTyjMVRwn533L3B2ukDZ7ooMiAnFCl3BkTAjuEqI2tmwSYp6hwh4aRQaUNq79EsU8Nrozg&currency=USD&intent=capture&components=buttons&enable-funding=paypal&disable-funding=card,credit,paylater&locale=en_US" data-namespace="paypalSDK"></script>
 
     <style>
         /* ==========================================================================
@@ -2530,7 +2535,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     </div>
 
                     <!-- PAYPAL SDK (cuando el dominio este registrado carga aqui) -->
-                    <div id="paypal-button-container-${id}" style="min-height:55px; border-radius:8px; overflow:hidden;"></div>
+                    <div style="margin-left:-8px; margin-right:-8px; overflow:hidden;">
+                        <div id="paypal-button-container-${id}" style="min-height:55px; border-radius:8px; overflow:hidden;"></div>
+                    </div>
 
                     <!-- PAYPAL FALLBACK con logo SVG oficial -->
                     <div id="paypal-fallback-${id}" style="display:none;">
@@ -2962,7 +2969,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
             if (sdkRef) {
                 sdkRef.Buttons({
-                    style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 50 },
+                    style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 50, tagline: false },
 
                     createOrder: async () => {
                         _setPayPalError(id, '');
@@ -3149,16 +3156,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             if (!orderID) throw new Error('No orderID from Worker');
 
             // Redirect to official PayPal checkout (sandbox or production)
-            const isSandbox = WORKER_PAGOS_URL.includes('sandbox') ||
-                              window.location.hostname.includes('localhost') ||
-                              document.querySelector('script[src*="sandbox.paypal"]') !== null;
-            // Detectar sandbox por el Client ID en el SDK
-            const sdkScript = document.querySelector('script[src*="paypal.com/sdk"]');
-            const clientId  = sdkScript ? new URL(sdkScript.src).searchParams.get('client-id') : '';
-            // Sandbox client IDs start with 'A'; we use the worker base URL
-            const useSandbox = WORKER_PAGOS_URL.includes('sandbox') ||
-                               (typeof AcRsDfJPus !== 'undefined') ||
-                               clientId.startsWith('A'); // sandbox client IDs
+            const useSandbox = WORKER_PAGOS_URL.includes('sandbox');
             const paypalBase = useSandbox
                 ? 'https://www.sandbox.paypal.com'
                 : 'https://www.paypal.com';
@@ -4169,9 +4167,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             const orderID = json.orderID || json.id;
             if (!orderID) throw new Error('No orderID');
 
-            const sdkScript = document.querySelector('script[src*="paypal.com/sdk"]');
-            const clientId  = sdkScript ? new URL(sdkScript.src).searchParams.get('client-id') : '';
-            const useSandbox = clientId.startsWith('A');
+            const useSandbox = WORKER_PAGOS_URL.includes('sandbox');
             const paypalBase = useSandbox ? 'https://www.sandbox.paypal.com' : 'https://www.paypal.com';
             window.location.href = paypalBase + '/checkoutnow?token=' + orderID;
         } catch (e) {
