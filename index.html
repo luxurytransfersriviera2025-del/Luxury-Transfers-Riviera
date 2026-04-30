@@ -2536,7 +2536,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
                     <!-- PAYPAL SDK (cuando el dominio este registrado carga aqui) -->
                     <div style="margin-left:-8px; margin-right:-8px; overflow:hidden;">
-                        <div id="paypal-button-container-${id}" style="min-height:55px; border-radius:8px; overflow:hidden;"></div>
+                        <div id="paypal-button-container-${id}" style="min-height:55px; height:55px; border-radius:8px; overflow:hidden;"></div>
                     </div>
 
                     <!-- PAYPAL FALLBACK con logo SVG oficial -->
@@ -2969,7 +2969,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
             if (sdkRef) {
                 sdkRef.Buttons({
-                    style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 50, tagline: false },
+                    style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay', height: 55, tagline: false },
 
                     createOrder: async () => {
                         _setPayPalError(id, '');
