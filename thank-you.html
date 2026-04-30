@@ -342,8 +342,9 @@ var _confirmedData = null;
     addDetail('Name',        d.nombre);
     addDetail('Email',       d.email);
     addDetail('Phone',       d.telefono);
-    if (d.vuelo)        addDetail('Flight',  d.vuelo);
-    if (d.fechaRegreso) addDetail('Return',  d.fechaRegreso + (d.horaRegreso ? ' \u00b7 ' + d.horaRegreso : ''));
+    if (d.vuelo)        addDetail('Flight',         d.vuelo);
+    if (d.fechaRegreso) addDetail('Return',         d.fechaRegreso + (d.horaRegreso ? ' \u00b7 ' + d.horaRegreso : ''));
+    if (d.vueloRegreso) addDetail('Return Flight',  d.vueloRegreso);
     if (d.extras)       addDetail('Extras',  d.extras,  true);
     if (d.notas)        addDetail('Notes',   d.notas,   true);
 
