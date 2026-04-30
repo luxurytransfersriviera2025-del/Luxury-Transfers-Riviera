@@ -2497,7 +2497,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
                     <!-- BOTON TARJETA: fondo BLANCO, borde sutil, logos reales -->
                     <button id="btn-stripe-${id}" onclick="pagarConStripe('${id}')"
-                        style="width:100%; background:#0a0a0a; color:#fff; border:none; border-radius:10px; padding:14px 18px; font-size:14px; font-weight:700; cursor:pointer; font-family:var(--font-body); display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;"
+                        style="width:calc(100% - 20px); margin:0 auto 10px; display:flex; background:#0a0a0a; color:#fff; border:none; border-radius:10px; padding:14px 18px; font-size:14px; font-weight:700; cursor:pointer; font-family:var(--font-body); align-items:center; justify-content:space-between;"
                         >
                         <span style="display:flex; align-items:center; gap:12px;">
                             <!-- Logos reales de tarjetas -->
@@ -2535,9 +2535,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     </div>
 
                     <!-- PAYPAL SDK (cuando el dominio este registrado carga aqui) -->
-                    <div style="margin-left:-16px; margin-right:-16px; overflow:hidden;">
-                        <div id="paypal-button-container-${id}" style="min-height:55px; height:55px; border-radius:8px; overflow:hidden;"></div>
-                    </div>
+                    <div id="paypal-button-container-${id}" style="min-height:55px; height:55px; border-radius:8px; overflow:hidden;"></div>
 
                     <!-- PAYPAL FALLBACK con logo SVG oficial -->
                     <div id="paypal-fallback-${id}" style="display:none;">
