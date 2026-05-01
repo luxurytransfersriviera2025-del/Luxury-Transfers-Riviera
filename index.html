@@ -1580,8 +1580,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
     // Currency conversion utility
     function convertirPrecio(usd, moneda) {
-        if (moneda === 'MXN') return usd === 2 ? 35 : usd === 4 ? 70 : Math.round(usd * 18.5);
-        if (moneda === 'CAD') return Math.round(usd * 18.5 / 11.5);
+        const tcMXN = window._ltrTasas.tcMXN;
+        const tcCAD = window._ltrTasas.tcCAD;
+        if (moneda === 'MXN') return usd === 2 ? 35 : usd === 4 ? 70 : Math.round(usd * tcMXN);
+        if (moneda === 'CAD') return Math.round(usd * tcCAD);
         return usd;
     }
 
@@ -2626,11 +2628,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const pCAD = (_precios && _precios.extrasPreciosCAD) || { 25: 40 };
         const pMXN = (_precios && _precios.extrasPreciosMXN) || { 25: 500 };
         if (moneda === 'CAD') {
-            const fixedCAD = pCAD[usdPrice] || Math.round(usdPrice * 18.5 / 11.5);
+            const fixedCAD = pCAD[usdPrice] || Math.round(usdPrice * window._ltrTasas.tcCAD);
             return `${symbol}${fixedCAD} ${moneda}`;
         }
         if (moneda === 'MXN') {
-            const fixedMXN = pMXN[usdPrice] || Math.round(usdPrice * 18.5);
+            const fixedMXN = pMXN[usdPrice] || Math.round(usdPrice * window._ltrTasas.tcMXN);
             return `${symbol}${fixedMXN} ${moneda}`;
         }
         return `${symbol}${usdPrice} ${moneda}`;
@@ -2655,9 +2657,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 const usdUnit = ((_precios&&_precios.extras&&_precios.extras[t]&&_precios.extras[t].usd)) || 25;
                 var localUnit;
                 if (monedaActual === 'CAD') {
-                    localUnit = ((_precios&&_precios.extrasPreciosCAD)||{})[usdUnit] || Math.round(usdUnit * 18.5 / 11.5);
+                    localUnit = ((_precios&&_precios.extrasPreciosCAD)||{})[usdUnit] || Math.round(usdUnit * window._ltrTasas.tcCAD);
                 } else if (monedaActual === 'MXN') {
-                    localUnit = ((_precios&&_precios.extrasPreciosMXN)||{})[usdUnit] || Math.round(usdUnit * 18.5);
+                    localUnit = ((_precios&&_precios.extrasPreciosMXN)||{})[usdUnit] || Math.round(usdUnit * window._ltrTasas.tcMXN);
                 } else {
                     localUnit = usdUnit;
                 }
@@ -2704,9 +2706,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 const usdUnit = ((_precios&&_precios.extras&&_precios.extras[t]&&_precios.extras[t].usd)) || 25;
                 var localUnit;
                 if (monedaActual === 'CAD') {
-                    localUnit = ((_precios&&_precios.extrasPreciosCAD)||{})[usdUnit] || Math.round(usdUnit * 18.5 / 11.5);
+                    localUnit = ((_precios&&_precios.extrasPreciosCAD)||{})[usdUnit] || Math.round(usdUnit * window._ltrTasas.tcCAD);
                 } else if (monedaActual === 'MXN') {
-                    localUnit = ((_precios&&_precios.extrasPreciosMXN)||{})[usdUnit] || Math.round(usdUnit * 18.5);
+                    localUnit = ((_precios&&_precios.extrasPreciosMXN)||{})[usdUnit] || Math.round(usdUnit * window._ltrTasas.tcMXN);
                 } else {
                     localUnit = usdUnit;
                 }
@@ -2727,9 +2729,9 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 const usdUnit = ((_precios&&_precios.extras&&_precios.extras[t]&&_precios.extras[t].usd)) || 25;
                 var unit;
                 if (monedaActual === 'CAD') {
-                    unit = ((_precios&&_precios.extrasPreciosCAD)||{})[usdUnit] || Math.round(usdUnit * 18.5 / 11.5);
+                    unit = ((_precios&&_precios.extrasPreciosCAD)||{})[usdUnit] || Math.round(usdUnit * window._ltrTasas.tcCAD);
                 } else if (monedaActual === 'MXN') {
-                    unit = ((_precios&&_precios.extrasPreciosMXN)||{})[usdUnit] || Math.round(usdUnit * 18.5);
+                    unit = ((_precios&&_precios.extrasPreciosMXN)||{})[usdUnit] || Math.round(usdUnit * window._ltrTasas.tcMXN);
                 } else {
                     unit = usdUnit;
                 }
@@ -2913,6 +2915,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     // ════════════════════════════════════════════════════════════
     // Tu Cloudflare Worker de pagos
     const WORKER_PAGOS_URL = 'https://checkout.luxurytransfersriviera.com.mx';
+
+    // Exchange rates — defaults; overwritten with live values from worker /config
+    window._ltrTasas = { tcMXN: 18.5, tcCAD: 1.38 };
+    fetch(WORKER_PAGOS_URL + '/config')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d && d.tcMXN && d.tcCAD) window._ltrTasas = d; })
+      .catch(() => {});
 
     // Store of pending sale data awaiting payment
     const _datosPendientes = {};
