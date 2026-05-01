@@ -4165,6 +4165,14 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
     });
 
+    // Bfcache: forzar recarga limpia si el navegador restaura la página desde caché
+    // (evita que los campos del formulario queden con valores intercambiados tras volver con el botón atrás)
+    window.addEventListener('pageshow', function(e) {
+        if (e.persisted) {
+            window.location.reload();
+        }
+    });
+
     // Red de seguridad: si hay reserva pendiente y NO venimos de un pago
     window.addEventListener('DOMContentLoaded', function() {
         const params = new URLSearchParams(window.location.search);
