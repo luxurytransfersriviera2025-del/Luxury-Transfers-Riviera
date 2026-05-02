@@ -3112,6 +3112,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     extraStop: datosVenta.extraStop || 0, extraStopR: datosVenta.extraStopR || 0,
                     cupon: datosVenta.cupon || '', cuponDiscount: 0,
                     extras: datosVenta.extras || '', notas: datosVenta.notas || '',
+                    idioma: datosVenta.idioma || 'es',
                 }));
             } catch(e) { console.error('localStorage PayPal save error:', e); }
 
@@ -3221,6 +3222,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     extraStop: datosVenta.extraStop || 0, extraStopR: datosVenta.extraStopR || 0,
                     cupon: datosVenta.cupon || '', cuponDiscount: _cuponRes.valid ? _cuponRes.discount : 0,
                     extras: datosVenta.extras || '', notas: datosVenta.notas || '',
+                    idioma: datosVenta.idioma || 'es',
                 }));
             } catch(e) { console.error('localStorage save error:', e); }
 
@@ -3320,6 +3322,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 cuponDiscount: _cuponRes.valid ? _cuponRes.discount : 0,
                 extras:        datosVenta.extras         || '',
                 notas:         datosVenta.notas          || '',
+                idioma:        datosVenta.idioma         || 'es',
             }));
         } catch(e) { console.error('bookingConfirmed save error:', e); }
 
@@ -3952,6 +3955,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         extraStop: datos.extraStop || 0, extraStopR: datos.extraStopR || 0,
                         cupon: datos.cupon || '', cuponDiscount: _cuponRes.valid ? _cuponRes.discount : 0,
                         extras: datos.extras || '', notas: datos.notas || '',
+                        idioma: datos.idioma || 'es',
                     }));
                 } catch(e) { console.error('bookingConfirmed save error:', e); }
                 // Send to Google Sheet — wait at most 4 s then redirect anyway
@@ -4016,6 +4020,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 extraStop: datos.extraStop || 0, extraStopR: datos.extraStopR || 0,
                 cupon: datos.cupon || '', cuponDiscount: _cuponRes.valid ? _cuponRes.discount : 0,
                 extras: datos.extras || '', notas: datos.notas || '',
+                idioma: datos.idioma || 'es',
             }));
         } catch(e) {}
         sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datos));
@@ -4127,6 +4132,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     extraStop: datos.extraStop || 0, extraStopR: datos.extraStopR || 0,
                     cupon: datos.cupon || '', cuponDiscount: 0,
                     extras: datos.extras || '', notas: datos.notas || '',
+                    idioma: datos.idioma || 'es',
                 }));
             } catch(_e) {}
 
@@ -4436,6 +4442,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 cuponDiscount: _cuponRes.valid ? _cuponRes.discount : 0,
                 extras:        data.extras          || '',
                 notas:         data.notas           || '',
+                idioma:        data.idioma          || 'es',
             }));
         }
 
