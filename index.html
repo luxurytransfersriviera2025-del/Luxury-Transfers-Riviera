@@ -13,7 +13,7 @@
 </script>
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=overlays-content">
     <title>Luxury Transfers Riviera | Private Transfer Cancun, Tulum &amp; Riviera Maya — Airport &amp; Hotel to Hotel</title>
     <meta name="description" content="Private transfers in the Riviera Maya — Cancun &amp; Tulum airports and hotel to hotel. Own vehicles, no agencies. VIP, punctual and safe service." />
     <meta name="keywords" content="transfer cancun, transfer tulum, transfer riviera maya, transporte privado cancun, hotel a hotel riviera maya, airport transfer cancun, private transfer tulum, luxury transfer cancun playa del carmen, cancun airport transfer, tulum airport transfer, cancun airport transportation, tulum airport transportation" />
@@ -2776,11 +2776,12 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             });
             const bandera = document.getElementById('bandera-' + id);
             if (bandera) bandera.addEventListener('change', () => guardarDatosForm(id));
+            const nFocus = document.getElementById('nombre-' + id);
+            if (nFocus) nFocus.focus();
             setTimeout(() => {
                 const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 60;
                 const top = form.getBoundingClientRect().top + window.scrollY - headerH - 10;
                 window.scrollTo({ top, behavior: 'smooth' });
-                setTimeout(() => { const n = document.getElementById('nombre-' + id); if (n) n.focus(); }, 600);
             }, 400);
         }
     }
