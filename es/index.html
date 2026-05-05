@@ -13,7 +13,7 @@
 </script>
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=overlays-content">
     <title>Traslado Privado Aeropuerto Cancún y Tulum | Luxury Transfers Riviera</title>
     <meta name="description" content="Traslados privados en Cancún, Tulum y la Riviera Maya. Aeropuerto a hotel, hotel a hotel. Vehículos propios, sin agencias. Servicio VIP, puntual y seguro." />
     <meta name="keywords" content="traslado aeropuerto cancun, traslado privado cancun, transfer tulum, transporte privado riviera maya, traslado hotel a hotel playa del carmen, traslado aeropuerto tulum, transfer privado cancun, traslado cancun playa del carmen, transporte privado aeropuerto cancun, traslado privado playa del carmen, traslado riviera maya, transporte privado tulum" />
@@ -2777,11 +2777,12 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             });
             const bandera = document.getElementById('bandera-' + id);
             if (bandera) bandera.addEventListener('change', () => guardarDatosForm(id));
+            const nFocus = document.getElementById('nombre-' + id);
+            if (nFocus) nFocus.focus();
             setTimeout(() => {
                 const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 60;
                 const top = form.getBoundingClientRect().top + window.scrollY - headerH - 10;
                 window.scrollTo({ top, behavior: 'smooth' });
-                setTimeout(() => { const n = document.getElementById('nombre-' + id); if (n) n.focus(); }, 600);
             }, 400);
         }
     }
