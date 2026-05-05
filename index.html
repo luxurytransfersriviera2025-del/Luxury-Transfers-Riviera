@@ -186,7 +186,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
         .nav-links a:hover { color: var(--gold); }
 
-        #seccion-quote, #servicios, #flota, #servicio-personalizado {
+        #quote, #services, #fleet, #custom {
             scroll-margin-top: calc(var(--header-height) - 25px);
         }
 
@@ -297,7 +297,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         }
 
         /* CALCULADORA */
-        #seccion-quote { 
+        #quote { 
             position: relative;
             background-image: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.15)),
                 url('https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Imagen%20cotizador.webp');
@@ -634,7 +634,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
         /* Custom section mobile */
         @media (max-width: 768px) {
-            #servicio-personalizado { padding: 40px 15px; }
+            #custom { padding: 40px 15px; }
             .custom-form-grid { grid-template-columns: 1fr !important; }
         }
         @media (max-width: 480px) {
@@ -837,16 +837,16 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
 
     <header>
         <div class="nav-container">
-            <a href="#inicio" class="logo" translate="no">
+            <a href="/" class="logo" translate="no">
                 <img src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Favicon%20200%20x%20200%20px.webp" alt="Icono Luxury" class="logo-icon">
                 <span class="logo-full">Luxury Transfers Riviera</span>
                 <span class="logo-short">Luxury Transfers</span>
             </a>
             <nav class="nav-links">
-                <a href="#seccion-quote" class="nav-link">Quote</a>
-                <a href="#servicios" class="nav-link">Services</a>
-                <a href="#flota" class="nav-link">Fleet</a>
-                <a href="#servicio-personalizado" class="nav-link" id="nav-custom">Custom</a>
+                <a href="#quote" class="nav-link">Quote</a>
+                <a href="#services" class="nav-link">Services</a>
+                <a href="#fleet" class="nav-link">Fleet</a>
+                <a href="#custom" class="nav-link" id="nav-custom">Custom</a>
                 <a href="/es/" class="nav-link"><i class="fas fa-globe"></i> Español</a>
             </nav>
         </div>
@@ -856,11 +856,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         <div class="hero-content">
             <h1>YOUR EXCLUSIVE TRIP IN CANCUN, RIVIERA MAYA AND TULUM</h1>
             <p>A safe and private trip is the true luxury you can give your family and friends. Quote now and see for yourself.</p>
-            <a href="#seccion-quote" class="btn-cta">QUOTE NOW</a>
+            <a href="#quote" class="btn-cta">QUOTE NOW</a>
         </div>
     </section>
 
-    <section id="seccion-quote">
+    <section id="quote">
         <div class="overlay" style="display:none;"></div> 
         <div class="main-container-calc">
             <h2 class="title-calc">
@@ -1068,13 +1068,13 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         </div>
     </section>
 
-    <section id="servicios" class="section-wrapper">
+    <section id="services" class="section-wrapper">
         <div class="section-header">
-            <h2 id="servicios-title">Our Services</h2>
-            <p id="servicios-subtitle">Exclusive transport solutions designed to exceed your expectations.</p>
+            <h2 id="services-title">Our Services</h2>
+            <p id="services-subtitle">Exclusive transport solutions designed to exceed your expectations.</p>
         </div>
         <div class="services-grid">
-            <a href="#seccion-quote" class="service-card" style="text-decoration:none;">
+            <a href="#quote" class="service-card" style="text-decoration:none;">
                 <img loading="lazy" src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&h=400&fit=crop" class="service-img" alt="Airport">
                 <div class="service-info">
                     <div class="service-icon"><i class="fas fa-plane-departure"></i></div>
@@ -1082,7 +1082,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     <div class="service-desc" id="serv-desc-1">Private transfer to and from Cancun Airport and Tulum Airport. Flight monitoring included, own vehicles, no agencies.</div>
                 </div>
             </a>
-            <a href="#seccion-quote" class="service-card" style="text-decoration:none;">
+            <a href="#quote" class="service-card" style="text-decoration:none;">
                 <img loading="lazy" src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&h=400&fit=crop" class="service-img" alt="Hotel">
                 <div class="service-info">
                     <div class="service-icon"><i class="fas fa-building"></i></div>
@@ -1090,7 +1090,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     <div class="service-desc" id="serv-desc-2">Direct and exclusive transfers between any hotel, resort or Airbnb across the Riviera Maya — Playa del Carmen, Tulum, Cancun and beyond.</div>
                 </div>
             </a>
-            <a href="#servicio-personalizado" class="service-card" style="text-decoration:none;" onclick="document.getElementById('custom-tipo').value=document.getElementById('custom-tipo').options[4]?document.getElementById('custom-tipo').options[4].value:'';document.getElementById('servicio-personalizado').scrollIntoView({behavior:'smooth'});return false;">
+            <a href="#custom" class="service-card" style="text-decoration:none;" onclick="document.getElementById('custom-tipo').value=document.getElementById('custom-tipo').options[4]?document.getElementById('custom-tipo').options[4].value:'';document.getElementById('custom').scrollIntoView({behavior:'smooth'});return false;">
                 <img loading="lazy" src="https://images.unsplash.com/photo-1518638150340-f706e86654de?w=600&h=400&fit=crop" class="service-img" alt="Tours">
                 <div class="service-info">
                     <div class="service-icon"><i class="fas fa-globe-americas"></i></div>
@@ -1098,7 +1098,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                     <div class="service-desc" id="serv-desc-3">Want to visit Chichen Itza or Xcaret? We take you with private, flexible service in our own vehicles.</div>
                 </div>
             </a>
-            <a href="#servicio-personalizado" class="service-card" style="text-decoration:none;" onclick="document.getElementById('custom-tipo').value=document.getElementById('custom-tipo').options[2]?document.getElementById('custom-tipo').options[2].value:'';document.getElementById('servicio-personalizado').scrollIntoView({behavior:'smooth'});return false;">
+            <a href="#custom" class="service-card" style="text-decoration:none;" onclick="document.getElementById('custom-tipo').value=document.getElementById('custom-tipo').options[2]?document.getElementById('custom-tipo').options[2].value:'';document.getElementById('custom').scrollIntoView({behavior:'smooth'});return false;">
                 <img loading="lazy" src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=600&h=400&fit=crop" class="service-img" alt="Hourly">
                 <div class="service-info">
                     <div class="service-icon"><i class="fas fa-clock"></i></div>
@@ -1109,10 +1109,10 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         </div>
     </section>
 
-    <section id="flota" class="fleet-section">
+    <section id="fleet" class="fleet-section">
         <div class="section-header">
-            <h2 id="flota-title">Our Premium Fleet</h2>
-            <p id="flota-subtitle">Select the ideal vehicle for your trip</p>
+            <h2 id="fleet-title">Our Premium Fleet</h2>
+            <p id="fleet-subtitle">Select the ideal vehicle for your trip</p>
         </div>
         <div class="slider-container">
             <div class="slider-track">
@@ -1123,7 +1123,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                             <h3 class="vehicle-name-clean" id="veh-title-1">Classic Sedan</h3>
                             <p class="vehicle-desc-clean" id="fleet-desc-1">Travel light and in total comfort. Ideal for couples or business travelers seeking a private and efficient transfer.</p>
                             <div><span class="vehicle-capacity-clean"><i class="fas fa-user"></i> 1-3 Pax</span></div>
-                            <a href="#seccion-quote" class="btn-reservar-clean" id="btn-quote-1">Quote Now</a>
+                            <a href="#quote" class="btn-reservar-clean" id="btn-quote-1">Quote Now</a>
                         </div>
                     </div>
                 </div>
@@ -1134,7 +1134,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                             <h3 class="vehicle-name-clean" id="veh-title-2">Luxury VIP</h3>
                             <p class="vehicle-desc-clean" id="fleet-desc-2">Exclusivity and power upon arrival. The perfect airport welcome for executives and VIP families.</p>
                             <div><span class="vehicle-capacity-clean"><i class="fas fa-star"></i> 1-5 Pax</span></div>
-                            <a href="#seccion-quote" class="btn-reservar-clean" id="btn-quote-2">Quote Now</a>
+                            <a href="#quote" class="btn-reservar-clean" id="btn-quote-2">Quote Now</a>
                         </div>
                     </div>
                 </div>
@@ -1145,7 +1145,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                             <h3 class="vehicle-name-clean" id="veh-title-3">Comfort Van</h3>
                             <p class="vehicle-desc-clean" id="fleet-desc-3">Smart space and total comfort. The ideal option for families or groups of friends looking to travel together safely.</p>
                             <div><span class="vehicle-capacity-clean"><i class="fas fa-users"></i> 1-7 Pax</span></div>
-                            <a href="#seccion-quote" class="btn-reservar-clean" id="btn-quote-3">Quote Now</a>
+                            <a href="#quote" class="btn-reservar-clean" id="btn-quote-3">Quote Now</a>
                         </div>
                     </div>
                 </div>
@@ -1156,7 +1156,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                             <h3 class="vehicle-name-clean" id="veh-title-5">Family Van</h3>
                             <p class="vehicle-desc-clean" id="fleet-desc-5">Comfort and space for medium-sized groups. The perfect option for families traveling with luggage who need extra room.</p>
                             <div><span class="vehicle-capacity-clean"><i class="fas fa-users"></i> 1-10 Pax</span></div>
-                            <a href="#seccion-quote" class="btn-reservar-clean" id="btn-quote-5">Quote Now</a>
+                            <a href="#quote" class="btn-reservar-clean" id="btn-quote-5">Quote Now</a>
                         </div>
                     </div>
                 </div>
@@ -1167,7 +1167,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                             <h3 class="vehicle-name-clean" id="veh-title-4">Grand Sprinter</h3>
                             <p class="vehicle-desc-clean" id="fleet-desc-4">Ideal for weddings, events, or large families. Travel all together, safely, and with top-notch air conditioning.</p>
                             <div><span class="vehicle-capacity-clean"><i class="fas fa-bus"></i> 1-15 Pax</span></div>
-                            <a href="#seccion-quote" class="btn-reservar-clean" id="btn-quote-4">Quote Now</a>
+                            <a href="#quote" class="btn-reservar-clean" id="btn-quote-4">Quote Now</a>
                         </div>
                     </div>
                 </div>
@@ -1185,7 +1185,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     </section>
 
     <!-- ===== SECCIÓN SERVICIO PERSONALIZADO ===== -->
-    <section id="servicio-personalizado" style="background:#f4f4f4; padding:60px 20px;">
+    <section id="custom" style="background:#f4f4f4; padding:60px 20px;">
         <div style="max-width:900px; margin:0 auto;">
             <div style="text-align:center; margin-bottom:40px;">
                 <h2 id="custom-title" style="font-family:var(--font-title); font-size:2rem; font-weight:900; color:var(--navy-bg); text-transform:uppercase; margin-bottom:10px;">Can't Find Your Route?</h2>
@@ -2137,7 +2137,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         <p style="color:#555;font-size:15px;margin-bottom:25px;max-width:500px;margin-left:auto;margin-right:auto;">
                             We couldn't find a price for this route automatically. Our team will quote you as soon as possible through our Custom Service.
                         </p>
-                        <a href="#servicio-personalizado" onclick="preCargarCustom({origen:document.getElementById('origen').value,destino:document.getElementById('destino').value,fecha:document.getElementById('fechaIda').value,hora:document.getElementById('horaIda').value,pax:document.getElementById(document.getElementById('tipoServicio').value==='REDONDO'?'pasajeros':'pasajerosOneWay').value,tipoViaje:document.getElementById('tipoServicio').value,fechaRegreso:document.getElementById('fechaVuelta').value,horaRegreso:document.getElementById('horaVuelta').value});document.getElementById('servicio-personalizado').scrollIntoView({behavior:'smooth'});return false;" style="display:inline-block;background:var(--navy-bg);color:#fff;padding:14px 35px;border-radius:8px;font-family:var(--font-title);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:1px;text-decoration:none;transition:0.3s;" >
+                        <a href="#custom" onclick="preCargarCustom({origen:document.getElementById('origen').value,destino:document.getElementById('destino').value,fecha:document.getElementById('fechaIda').value,hora:document.getElementById('horaIda').value,pax:document.getElementById(document.getElementById('tipoServicio').value==='REDONDO'?'pasajeros':'pasajerosOneWay').value,tipoViaje:document.getElementById('tipoServicio').value,fechaRegreso:document.getElementById('fechaVuelta').value,horaRegreso:document.getElementById('horaVuelta').value});document.getElementById('custom').scrollIntoView({behavior:'smooth'});return false;" style="display:inline-block;background:var(--navy-bg);color:#fff;padding:14px 35px;border-radius:8px;font-family:var(--font-title);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:1px;text-decoration:none;transition:0.3s;" >
                             <i class="fas fa-concierge-bell"></i> Request Custom Quote
                         </a>
                     </div>`;
@@ -2166,7 +2166,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         <p style="color:#555;font-size:15px;margin-bottom:25px;max-width:500px;margin-left:auto;margin-right:auto;">
                             We couldn't find a price for this route automatically. Our team will quote you as soon as possible through our Custom Service.
                         </p>
-                        <a href="#servicio-personalizado" onclick="preCargarCustom({origen:document.getElementById('origen').value,destino:document.getElementById('destino').value,fecha:document.getElementById('fechaIda').value,hora:document.getElementById('horaIda').value,pax:document.getElementById(document.getElementById('tipoServicio').value==='REDONDO'?'pasajeros':'pasajerosOneWay').value,tipoViaje:document.getElementById('tipoServicio').value,fechaRegreso:document.getElementById('fechaVuelta').value,horaRegreso:document.getElementById('horaVuelta').value});document.getElementById('servicio-personalizado').scrollIntoView({behavior:'smooth'});return false;" style="display:inline-block;background:var(--navy-bg);color:#fff;padding:14px 35px;border-radius:8px;font-family:var(--font-title);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:1px;text-decoration:none;" >
+                        <a href="#custom" onclick="preCargarCustom({origen:document.getElementById('origen').value,destino:document.getElementById('destino').value,fecha:document.getElementById('fechaIda').value,hora:document.getElementById('horaIda').value,pax:document.getElementById(document.getElementById('tipoServicio').value==='REDONDO'?'pasajeros':'pasajerosOneWay').value,tipoViaje:document.getElementById('tipoServicio').value,fechaRegreso:document.getElementById('fechaVuelta').value,horaRegreso:document.getElementById('horaVuelta').value});document.getElementById('custom').scrollIntoView({behavior:'smooth'});return false;" style="display:inline-block;background:var(--navy-bg);color:#fff;padding:14px 35px;border-radius:8px;font-family:var(--font-title);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:1px;text-decoration:none;" >
                             <i class="fas fa-concierge-bell"></i> Request Custom Quote
                         </a>
                     </div>`;
@@ -2212,7 +2212,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                         <p style="color:#555;font-size:15px;margin-bottom:25px;max-width:500px;margin-left:auto;margin-right:auto;">
                             For groups of 16 or more passengers, we offer a personalized service. Contact us and we'll quote you as soon as possible.
                         </p>
-                        <a href="#servicio-personalizado" onclick="preCargarCustom({origen:document.getElementById('origen').value,destino:document.getElementById('destino').value,fecha:document.getElementById('fechaIda').value,hora:document.getElementById('horaIda').value,pax:document.getElementById(document.getElementById('tipoServicio').value==='REDONDO'?'pasajeros':'pasajerosOneWay').value,tipoViaje:document.getElementById('tipoServicio').value,fechaRegreso:document.getElementById('fechaVuelta').value,horaRegreso:document.getElementById('horaVuelta').value});document.getElementById('servicio-personalizado').scrollIntoView({behavior:'smooth'});return false;" style="display:inline-block;background:var(--navy-bg);color:#fff;padding:14px 35px;border-radius:8px;font-family:var(--font-title);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:1px;text-decoration:none;" >
+                        <a href="#custom" onclick="preCargarCustom({origen:document.getElementById('origen').value,destino:document.getElementById('destino').value,fecha:document.getElementById('fechaIda').value,hora:document.getElementById('horaIda').value,pax:document.getElementById(document.getElementById('tipoServicio').value==='REDONDO'?'pasajeros':'pasajerosOneWay').value,tipoViaje:document.getElementById('tipoServicio').value,fechaRegreso:document.getElementById('fechaVuelta').value,horaRegreso:document.getElementById('horaVuelta').value});document.getElementById('custom').scrollIntoView({behavior:'smooth'});return false;" style="display:inline-block;background:var(--navy-bg);color:#fff;padding:14px 35px;border-radius:8px;font-family:var(--font-title);font-weight:800;font-size:14px;text-transform:uppercase;letter-spacing:1px;text-decoration:none;" >
                             <i class="fas fa-concierge-bell"></i> Request Custom Quote
                         </a>
                     </div>`;
@@ -2776,7 +2776,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             });
             const bandera = document.getElementById('bandera-' + id);
             if (bandera) bandera.addEventListener('change', () => guardarDatosForm(id));
-            setTimeout(() => tarjeta.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+            setTimeout(() => form.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
         }
     }
 
@@ -4562,7 +4562,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             horaRegreso: document.getElementById('horaVuelta') ? document.getElementById('horaVuelta').value : '',
             autoLargeGroup: true
         });
-        document.getElementById('servicio-personalizado').scrollIntoView({behavior:'smooth'});
+        document.getElementById('custom').scrollIntoView({behavior:'smooth'});
     }
     // Close pax dropdown on outside click
     document.addEventListener('click', function(e) {
@@ -4603,7 +4603,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             el.value = code;
         });
         cerrarCupon();
-        document.getElementById('seccion-quote').scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('quote').scrollIntoView({ behavior: 'smooth' });
     }
 
     // Show coupon after 4 seconds
