@@ -4202,6 +4202,20 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
                 try { setTimeout(() => mostrarRecuperacion(JSON.parse(raw)), 1500); } catch(_) {}
             }
         }
+
+        // Scroll para ocultar título cuando abre teclado en móvil
+        const inputsCalc = ['origen','destino','origenRT','destinoRT'];
+        inputsCalc.forEach(function(inputId) {
+            const el = document.getElementById(inputId);
+            if (!el) return;
+            el.addEventListener('focus', function() {
+                const box = document.querySelector('.search-box-inner');
+                if (!box) return;
+                const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 60;
+                const top = box.getBoundingClientRect().top + window.scrollY - headerH - 5;
+                window.scrollTo({ top: top, behavior: 'smooth' });
+            });
+        });
     });
 
     (function detectarRetornoPago() {
