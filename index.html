@@ -2776,7 +2776,12 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             });
             const bandera = document.getElementById('bandera-' + id);
             if (bandera) bandera.addEventListener('change', () => guardarDatosForm(id));
-            setTimeout(() => form.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+            setTimeout(() => {
+                const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 60;
+                const top = form.getBoundingClientRect().top + window.scrollY - headerH - 10;
+                window.scrollTo({ top, behavior: 'smooth' });
+                setTimeout(() => { const n = document.getElementById('nombre-' + id); if (n) n.focus(); }, 600);
+            }, 200);
         }
     }
 
