@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Luxury Transfers Riviera</title>
+<script>
+  var path = window.location.pathname;
+  sessionStorage.setItem('ltr_redirect_path', path);
+  var target = path.startsWith('/es/') ? '/es/' : '/';
+  window.location.replace(target);
+</script>
+</head>
+<body></body>
+</html>
