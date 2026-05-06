@@ -4196,16 +4196,15 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             }
         }
 
-        // Scroll to hide title when keyboard opens on mobile
+        // Scroll to focused field just below header when keyboard opens on mobile
         const inputsCalc = ['origen','destino','origenRT','destinoRT','codigoPromoOneWay','codigoPromo'];
         inputsCalc.forEach(function(inputId) {
             const el = document.getElementById(inputId);
             if (!el) return;
             el.addEventListener('focus', function() {
-                const box = document.querySelector('.search-box-inner');
-                if (!box) return;
                 const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 60;
-                const top = box.getBoundingClientRect().top + window.scrollY - headerH - 5;
+                const wrapper = this.closest('.input-wrapper') || this;
+                const top = wrapper.getBoundingClientRect().top + window.scrollY - headerH - 10;
                 window.scrollTo({ top: top, behavior: 'smooth' });
             });
         });
