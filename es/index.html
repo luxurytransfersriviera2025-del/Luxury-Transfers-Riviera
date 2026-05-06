@@ -4197,17 +4197,16 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             }
         }
 
-        // Scroll al campo enfocado justo bajo el header cuando abre teclado en móvil
-        const inputsCalc = ['origen','destino','origenRT','destinoRT','codigoPromoOneWay','codigoPromo'];
-        inputsCalc.forEach(function(inputId) {
-            const el = document.getElementById(inputId);
-            if (!el) return;
-            el.addEventListener('focus', function() {
-                const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 60;
-                const wrapper = this.closest('.input-wrapper') || this;
-                const top = wrapper.getBoundingClientRect().top + window.scrollY - headerH - 10;
-                window.scrollTo({ top: top, behavior: 'smooth' });
-            });
+        // Scroll a cualquier input/textarea enfocado bajo el header (solo móvil)
+        document.addEventListener('focusin', function(e) {
+            if (window.innerWidth > 932) return;
+            const el = e.target;
+            if (el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA') return;
+            if (el.type === 'checkbox' || el.type === 'radio' || el.type === 'hidden') return;
+            const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 60;
+            const wrapper = el.closest('.input-wrapper') || el;
+            const top = wrapper.getBoundingClientRect().top + window.scrollY - headerH - 10;
+            window.scrollTo({ top: top, behavior: 'smooth' });
         });
     });
 
