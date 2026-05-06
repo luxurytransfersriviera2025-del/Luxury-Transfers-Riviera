@@ -3,3 +3,5 @@ Allow: /
 
 Disallow: /check-payment
 Disallow: /thank-you.html
+
+Sitemap: https://luxurytransfersriviera.com.mx/sitemap.xml
