@@ -1319,7 +1319,7 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
     <div class="ltr-social-container">
         <h3>Síguenos y Contáctanos</h3>
         <div class="ltr-social-icons">
-            <a href="https://api.whatsapp.com/send/?phone=529842411158&text&type=phone_number&app_absent=0" target="_blank" class="ltr-social-link ltr-wa" title="WhatsApp" onclick="if(typeof fbq!=='undefined') fbq('track','Contact');"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="https://api.whatsapp.com/send/?phone=529842411158&text&type=phone_number&app_absent=0" target="_blank" class="ltr-social-link ltr-wa" title="WhatsApp" onclick="if(typeof fbq!=='undefined') fbq('track','Contact',{},{eventID:'WA-'+Date.now()});"><i class="fa-brands fa-whatsapp"></i></a>
             <a href="https://facebook.com/share/1Yt1WbvDFV" target="_blank" class="ltr-social-link ltr-fb" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
             <a href="https://instagram.com/luxury_transfers_riviera" target="_blank" class="ltr-social-link ltr-insta" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
             <a href="https://tiktok.com/@luxurytransfersriviera?_r=1&_t=ZS-92t33quHLzs" target="_blank" class="ltr-social-link ltr-tiktok" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
@@ -2231,7 +2231,23 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             divRes.style.display = 'block';
             divRes.scrollIntoView({ behavior: 'smooth', block: 'start' });
             // META PIXEL — ViewContent (precios mostrados)
-            if(typeof fbq !== 'undefined') fbq('track', 'ViewContent');
+            try {
+                var _vcPrices = [];
+                var _vcVehicles = [];
+                if (p.sedan)     { _vcPrices.push(cpBase(p.sedan));     _vcVehicles.push('CLASSIC SEDAN'); }
+                if (p.van)       { _vcPrices.push(cpBase(p.van));       _vcVehicles.push('COMFORT VAN'); }
+                if (p.familyVan) { _vcPrices.push(cpBase(p.familyVan)); _vcVehicles.push('FAMILY VAN'); }
+                if (p.sprinter)  { _vcPrices.push(cpBase(p.sprinter));  _vcVehicles.push('GRAND SPRINTER'); }
+                if (p.luxVip)    { _vcPrices.push(cpBase(p.luxVip));    _vcVehicles.push('LUXURY VIP'); }
+                var _vcMinPrice = _vcPrices.length ? Math.min.apply(null, _vcPrices) : 0;
+                if(typeof fbq !== 'undefined') fbq('track', 'ViewContent', {
+                    content_name: _vcVehicles.join(', '),
+                    content_ids: _vcVehicles,
+                    value: _vcMinPrice,
+                    currency: moneda
+                });
+                enviarConversionsAPI({ codigo: 'VC-' + Date.now(), precioTotal: _vcMinPrice + ' ' + moneda, vehiculo: _vcVehicles.join(', ') }, 'ViewContent');
+            } catch(e) {}
             // Start image sliders after rendering
             setTimeout(initErtigaSliders, 100);
         } catch (error) {
@@ -2944,6 +2960,17 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         const totalFinal   = Math.round((basePrice + extras) * 100) / 100;
         const currencyCode = moneda === 'MXN' ? 'MXN' : moneda === 'CAD' ? 'CAD' : 'USD';
 
+        // META PIXEL — AddPaymentInfo (usuario vio métodos de pago con precio final)
+        try {
+            const apiEventId = 'API-' + Date.now() + '-' + Math.random().toString(36).substr(2,6);
+            if (typeof fbq !== 'undefined') fbq('track', 'AddPaymentInfo', {
+                value: totalFinal,
+                currency: currencyCode,
+                content_name: (datosCard.vehiculo || '')
+            }, { eventID: apiEventId });
+            enviarConversionsAPI({ codigo: apiEventId, precioTotal: totalFinal + ' ' + currencyCode, vehiculo: datosCard.vehiculo || '', nombre: document.getElementById('nombre-' + id).value.trim(), email: document.getElementById('email-' + id).value.trim(), telefono: document.getElementById('tel-' + id).value.trim() }, 'AddPaymentInfo');
+        } catch(e) {}
+
         // Montar botones PayPal (lazy)
         const container = document.getElementById('paypal-button-container-' + id);
         if (container && !container.hasChildNodes()) {
@@ -3326,16 +3353,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             }));
         } catch(e) { console.error('bookingConfirmed save error:', e); }
 
-        // 2. Pixels (fire and forget)
-        try { gtag('event', 'conversion', { 'send_to': 'AW-17859609175/8AeACLKZ6N4bENeEkMRC', 'transaction_id': datosVenta.codigo }); } catch(e) {}
-        try {
-            if (typeof fbq !== 'undefined' && datosVenta.precioTotal) {
-                const priceNum   = parseFloat(datosVenta.precioTotal.replace(/[^0-9.]/g, '')) || 0;
-                const currencyFb = datosVenta.precioTotal.includes('MXN') ? 'MXN' : datosVenta.precioTotal.includes('CAD') ? 'CAD' : 'USD';
-                fbq('track', 'Purchase', { value: priceNum, currency: currencyFb, content_name: datosVenta.vehiculo }, { eventID: datosVenta.codigo });
-            }
-        } catch(e) {}
-        try { enviarConversionsAPI(datosVenta, 'Purchase'); } catch(e) {}
+        // 2. Pixels — Purchase se dispara en thank-you.html tras verificar session_id con Stripe
+        // NO disparar aquí para Stripe: la sesión fue creada pero el pago aún no está confirmado
 
         // 3. Generate PDF for email attachment, then send to Google Sheet
         // Wait for the fetch response before redirecting so the email arrives reliably.
@@ -4406,8 +4425,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
         // ⚠️  Purchase fires ONLY from _finalizarReserva() — after
         //     the server confirms payment. Here we only fire Lead for quotes.
         if (!data.esVenta) {
-            if (typeof fbq !== 'undefined') fbq('track', 'Lead', {}, { eventID: data.codigo });
-            enviarConversionsAPI(data, 'Lead');
+            if (typeof fbq !== 'undefined') fbq('track', 'CompleteRegistration', { content_name: 'Solicitud de Cotización' }, { eventID: data.codigo });
+            enviarConversionsAPI(data, 'CompleteRegistration');
         }
         
         const l = { code: 'CÓDIGO', type: 'TIPO', veh: 'VEHÍCULO', orig: 'ORIGEN', dest: 'DESTINO', date: 'FECHA', time: 'HORA', pax: 'PASAJEROS', price: 'PRECIO WEB', name: 'Mi Nombre' };
@@ -4602,7 +4621,8 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             idioma: 'es'
         };
         // META PIXEL — Lead con eventID (formulario de servicio personalizado)
-        if(typeof fbq !== 'undefined') fbq('track', 'Lead', {}, { eventID: datos.codigo });
+        if(typeof fbq !== 'undefined') fbq('track', 'Lead', { content_name: 'Formulario Servicio Personalizado' }, { eventID: datos.codigo });
+        enviarConversionsAPI(datos, 'Lead');
         document.getElementById('codigoDisplay').innerText = codigoUnico;
         iniciarEnvio(datos);
     }
