@@ -2,13 +2,32 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Luxury Transfers Riviera</title>
+<title>Page Not Found | Luxury Transfers Riviera</title>
 <script>
-  var path = window.location.pathname;
-  sessionStorage.setItem('ltr_redirect_path', path);
-  var target = path.startsWith('/es/') ? '/es/' : '/';
-  window.location.replace(target);
+  var path = window.location.pathname.replace(/\/$/, '') || '/';
+
+  var validRoutes = [
+    '/quote', '/services', '/fleet', '/custom',
+    '/es/cotizar', '/es/servicios', '/es/flota', '/es/personalizado'
+  ];
+
+  if (validRoutes.indexOf(path) !== -1) {
+    sessionStorage.setItem('ltr_redirect_path', path);
+    var target = path.startsWith('/es/') ? '/es/' : '/';
+    window.location.replace(target);
+  }
 </script>
 </head>
-<body></body>
+<body>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 80px 20px; background: #fff; color: #333; }
+    h1 { font-size: 48px; margin-bottom: 8px; }
+    p { font-size: 18px; color: #666; margin-bottom: 32px; }
+    a { display: inline-block; padding: 12px 28px; background: #1a1a1a; color: #fff; text-decoration: none; border-radius: 6px; font-size: 16px; }
+    a:hover { background: #333; }
+  </style>
+  <h1>404</h1>
+  <p>The page you're looking for doesn't exist.</p>
+  <a href="/">Back to Home</a>
+</body>
 </html>
