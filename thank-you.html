@@ -644,7 +644,8 @@ function _enablePdfBtn() {
             }
         } catch(e) {}
         // CAPI — servidor respaldo para Stripe (navegador puede fallar)
-        try { _enviarCAPIpurchase(_confirmedData); } catch(e) {}
+        var _capiData = JSON.parse(JSON.stringify(_confirmedData));
+        _enviarCAPIpurchase(_capiData).catch(function(){});
         try {
             var data = JSON.parse(JSON.stringify(_confirmedData));
             if (window.jspdf) { try { data.pdfBase64 = generarVoucherPDF(data, true); } catch(e) {} }
@@ -784,7 +785,8 @@ function _enablePdfBtn() {
             }
         } catch(e) {}
         // CAPI — servidor respaldo para PayPal
-        try { _enviarCAPIpurchase(_confirmedData); } catch(e) {}
+        var _capiDataPP = JSON.parse(JSON.stringify(_confirmedData));
+        _enviarCAPIpurchase(_capiDataPP).catch(function(){});
         try {
             var data = JSON.parse(JSON.stringify(_confirmedData));
             if (window.jspdf) { try { data.pdfBase64 = generarVoucherPDF(data, true); } catch(e) {} }
