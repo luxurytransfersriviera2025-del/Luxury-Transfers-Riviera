@@ -643,12 +643,44 @@ function _enablePdfBtn() {
                 fbq('track', 'Purchase', { value: priceNum, currency: currencyFb, content_name: _confirmedData.vehiculo }, { eventID: _confirmedData.codigo });
             }
         } catch(e) {}
+        // CAPI — servidor respaldo para Stripe (navegador puede fallar)
+        try { _enviarCAPIpurchase(_confirmedData); } catch(e) {}
         try {
             var data = JSON.parse(JSON.stringify(_confirmedData));
             if (window.jspdf) { try { data.pdfBase64 = generarVoucherPDF(data, true); } catch(e) {} }
             var fetchSheet = fetch(WORKER_PAGOS_URL + '/send-to-sheet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
             Promise.race([fetchSheet, new Promise(function(r){ setTimeout(r, 6000); })]).catch(function(){});
         } catch(e) {}
+    }
+
+    async function _enviarCAPIpurchase(data) {
+        try {
+            var CAPI_URL = 'https://meta-conversiones-api.luxurytransfersriviera2025.workers.dev';
+            async function _hash(str) {
+                var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str.toLowerCase().trim()));
+                return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+            }
+            var userData = { client_user_agent: navigator.userAgent };
+            if (data.email)    userData.em = [await _hash(data.email)];
+            if (data.telefono) userData.ph = [await _hash(data.telefono.replace(/\D/g,''))];
+            if (data.nombre) {
+                var parts = data.nombre.trim().split(' ');
+                userData.fn = [await _hash(parts[0])];
+                if (parts.length > 1) userData.ln = [await _hash(parts.slice(1).join(' '))];
+            }
+            var priceNum = data.precioTotal ? parseFloat(data.precioTotal.replace(/[^0-9.]/g,'')) || 0 : 0;
+            var currency = data.precioTotal && data.precioTotal.indexOf('MXN') >= 0 ? 'MXN' : data.precioTotal && data.precioTotal.indexOf('CAD') >= 0 ? 'CAD' : 'USD';
+            var payload = { data: [{
+                event_name:       'Purchase',
+                event_time:       Math.floor(Date.now() / 1000),
+                event_id:         data.codigo,
+                action_source:    'website',
+                event_source_url: window.location.href,
+                user_data:        userData,
+                custom_data:      { value: priceNum, currency: currency, order_id: data.codigo }
+            }]};
+            await fetch(CAPI_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        } catch(e) { console.warn('CAPI Purchase error:', e); }
     }
 
     fetch(WORKER_PAGOS_URL + '/process-payment', {
@@ -751,6 +783,8 @@ function _enablePdfBtn() {
                 fbq('track', 'Purchase', { value: priceNum, currency: currencyFb, content_name: _confirmedData.vehiculo }, { eventID: _confirmedData.codigo });
             }
         } catch(e) {}
+        // CAPI — servidor respaldo para PayPal
+        try { _enviarCAPIpurchase(_confirmedData); } catch(e) {}
         try {
             var data = JSON.parse(JSON.stringify(_confirmedData));
             if (window.jspdf) { try { data.pdfBase64 = generarVoucherPDF(data, true); } catch(e) {} }
