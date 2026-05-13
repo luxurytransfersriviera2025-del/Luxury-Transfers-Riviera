@@ -1902,52 +1902,34 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     }
 
 
-    function detectarZonaPorGPS(lat, lng, zonasGPS) {
-        if (!lat || !lng) return null;
-        for (let i = 0; i < zonasGPS.length; i++) {
-            if (lat >= zonasGPS[i].latMin && lat <= zonasGPS[i].latMax && lng >= zonasGPS[i].lonMin && lng <= zonasGPS[i].lonMax) {
-                return zonasGPS[i].nombre;
+    function puntoDentroDePoligono(lon, lat, poligono) {
+        let dentro = false;
+        for (let i = 0, j = poligono.length - 1; i < poligono.length; j = i++) {
+            const xi = poligono[i][0], yi = poligono[i][1];
+            const xj = poligono[j][0], yj = poligono[j][1];
+            if (((yi > lat) !== (yj > lat)) && (lon < (xj - xi) * (lat - yi) / (yj - yi) + xi)) {
+                dentro = !dentro;
             }
         }
-        return null;
+        return dentro;
     }
 
-    function detectarZonaPorCP(cp, zonasCP) {
-        if (!cp) return null;
-        for (let codigo in zonasCP) {
-            if (cp === codigo || cp.startsWith(codigo)) return zonasCP[codigo];
+    function detectarZonaPorGPS(lat, lng, zonasPoligonos) {
+        if (!lat || !lng) return null;
+        for (const zona of zonasPoligonos) {
+            for (const poligono of zona.poligonos) {
+                if (puntoDentroDePoligono(lng, lat, poligono)) return zona.nombre;
+            }
         }
         return null;
     }
 
     function detectarZonaCompleta(lugar, lat, lng, cp, preciosData) {
-        let zona = null;
-        const diccionarioZonas    = preciosData.diccionarioZonas;
-        const zonasGPS             = preciosData.zonasGPS;
-        const zonasCP              = preciosData.zonasCP;
-        const zonasLargaDistancia  = preciosData.zonasLargaDistancia;
-        const zonasBlockeadas      = preciosData.zonasBlockeadas;
-        if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
-            zona = detectarZonaPorGPS(lat, lng, zonasGPS);
-        }
-        if (!zona && cp) zona = detectarZonaPorCP(cp, zonasCP);
-        if (!zona && lugar) {
-            const up = lugar.slice(0, 600).toUpperCase();
-            for (let key in diccionarioZonas) {
-                const esLargaDistancia = zonasLargaDistancia.includes(key);
-                for (let kw of diccionarioZonas[key]) {
-                    if (esLargaDistancia) {
-                        // Coincidencia estricta: palabra completa con \b
-                        const regex = new RegExp('\\b' + kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
-                        if (regex.test(up)) { zona = key; break; }
-                    } else {
-                        // Normal match for Riviera Maya and Cancun
-                        if (up.includes(kw)) { zona = key; break; }
-                    }
-                }
-                if (zona) break;
-            }
-        }
+        const zonasPoligonos  = preciosData.zonasPoligonos;
+        const zonasBlockeadas = preciosData.zonasBlockeadas;
+        const zona = (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0)
+            ? detectarZonaPorGPS(lat, lng, zonasPoligonos)
+            : null;
         if (zona && zonasBlockeadas.includes(zona)) return null;
         return zona;
     }
