@@ -1148,10 +1148,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <label style="display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--navy-bg);margin-bottom:6px;">Comentario *</label>
               <textarea id="rv-comentario" required placeholder="Cuéntanos sobre tu experiencia..." rows="4" style="width:100%;padding:12px 14px;border:1px solid #ccc;border-radius:8px;font-size:14px;resize:vertical;box-sizing:border-box;"></textarea>
             </div>
-            <div style="margin-bottom:24px;">
-              <label style="display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--navy-bg);margin-bottom:6px;">Foto (opcional)</label>
-              <input type="file" id="rv-foto" accept="image/*" style="font-size:14px;">
-            </div>
             <button type="submit" style="width:100%;padding:14px;background:var(--gold);color:#fff;font-weight:700;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-family:var(--font-title);letter-spacing:.5px;text-transform:uppercase;">Enviar Reseña</button>
             <p id="rv-msg" style="text-align:center;margin-top:14px;font-size:14px;display:none;"></p>
           </form>
@@ -1169,7 +1165,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     .ltr-card-text { font-size:13.5px; color:#444; line-height:1.65; flex:1; font-style:italic; }
     .ltr-card-name { font-weight:700; color:var(--navy-bg); font-size:14px; }
     .ltr-card-source { font-size:11px; color:#999; display:flex; align-items:center; gap:5px; margin-top:2px; }
-    .ltr-card-photo { width:100%; border-radius:8px; max-height:150px; object-fit:cover; }
     #ltr-cards::-webkit-scrollbar { display:none; }
     .rv-star { transition:color .12s; user-select:none; }
     </style>
@@ -1228,8 +1223,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           var stars='★'.repeat(r.estrellas)+'☆'.repeat(5-r.estrellas);
           var srcBadge=r.fuente==='Google'?googleSVG():r.fuente==='TripAdvisor'?taSVG():'<img src="https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/Favicon%20200%20x%20200%20px.webp" style="height:14px;width:14px;vertical-align:middle;object-fit:contain;" alt="LTR">';
           var srcLabel=r.fuente==='Google'?'Google':r.fuente==='TripAdvisor'?'TripAdvisor':'Reseña de Huésped';
-          var photo=r.foto?'<img src="'+r.foto+'" class="ltr-card-photo" alt="Foto">':'';
-          return '<div class="ltr-card">'+photo+'<div class="ltr-card-stars">'+stars+'</div><div class="ltr-card-text">&ldquo;'+r.comentario+'&rdquo;</div><div><div class="ltr-card-name">'+r.nombre+'</div><div class="ltr-card-source">'+srcBadge+' '+srcLabel+(r.fecha?' &middot; '+r.fecha:'')+'</div></div></div>';
+          return '<div class="ltr-card"><div class="ltr-card-stars">'+stars+'</div><div class="ltr-card-text">&ldquo;'+r.comentario+'&rdquo;</div><div><div class="ltr-card-name">'+r.nombre+'</div><div class="ltr-card-source">'+srcBadge+' '+srcLabel+(r.fecha?' &middot; '+r.fecha:'')+'</div></div></div>';
         }).join('');
       }
 
@@ -1268,35 +1262,27 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         var nombre=document.getElementById('rv-nombre').value.trim();
         var estrellas=parseInt(document.getElementById('rv-estrellas').value);
         var comentario=document.getElementById('rv-comentario').value.trim();
-        var fotoInput=document.getElementById('rv-foto');
         var msg=document.getElementById('rv-msg');
         if(!nombre||!comentario)return;
         if(estrellas<1){alert('Por favor selecciona una calificación con estrellas.');return;}
         var btn=e.target.querySelector('button[type=submit]');
         btn.disabled=true; btn.textContent='Enviando...';
-        function send(fotoB64){
-          var fuenteMap={tripadvisor:'TripAdvisor',google:'Google',propia:'Propia'};
-          fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({nombre:nombre,estrellas:estrellas,comentario:comentario,foto:fotoB64||'',fuente:fuenteMap[activeFilter]||'Propia'})})
-          .then(function(r){return r.json();})
-          .then(function(data){
-            if(data && data.ok){
-              msg.style.display='block';msg.style.color='#2d7a2d';
-              msg.textContent='✓ ¡Gracias! Tu reseña se publicará después de ser aprobada.';
-              e.target.reset();window.ltrStar(0);
-            } else {
-              msg.style.display='block';msg.style.color='#c0392b';
-              msg.textContent='Error al enviar. Por favor intenta de nuevo.';
-            }
-          }).catch(function(){
+        var fuenteMap={tripadvisor:'TripAdvisor',google:'Google',propia:'Propia'};
+        fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({nombre:nombre,estrellas:estrellas,comentario:comentario,fuente:fuenteMap[activeFilter]||'Propia'})})
+        .then(function(r){return r.json();})
+        .then(function(data){
+          if(data && data.ok){
+            msg.style.display='block';msg.style.color='#2d7a2d';
+            msg.textContent='✓ ¡Gracias! Tu reseña se publicará después de ser aprobada.';
+            e.target.reset();window.ltrStar(0);
+          } else {
             msg.style.display='block';msg.style.color='#c0392b';
             msg.textContent='Error al enviar. Por favor intenta de nuevo.';
-          }).finally(function(){btn.disabled=false;btn.textContent='Enviar Reseña';});
-        }
-        if(fotoInput.files.length){
-          var reader=new FileReader();
-          reader.onload=function(ev){send(ev.target.result);};
-          reader.readAsDataURL(fotoInput.files[0]);
-        } else { send(''); }
+          }
+        }).catch(function(){
+          msg.style.display='block';msg.style.color='#c0392b';
+          msg.textContent='Error al enviar. Por favor intenta de nuevo.';
+        }).finally(function(){btn.disabled=false;btn.textContent='Enviar Reseña';});
       };
 
       function getVis(){return activeFilter==='all'?allReviews:allReviews.filter(function(r){return r.fuente.toLowerCase()===activeFilter;});}
@@ -1332,7 +1318,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         .then(function(data){
           if(Array.isArray(data)&&data.length){
             allReviews=STATIC.concat(data.map(function(r){
-              return {nombre:r.nombre||'',estrellas:Number(r.estrellas)||5,comentario:r.comentario||'',foto:r.foto||'',fuente:r.fuente||'Propia',fecha:r.fecha||''};
+              return {nombre:r.nombre||'',estrellas:Number(r.estrellas)||5,comentario:r.comentario||'',fuente:r.fuente||'Propia',fecha:r.fecha||''};
             }));
             renderCards();
             updateArrows();
