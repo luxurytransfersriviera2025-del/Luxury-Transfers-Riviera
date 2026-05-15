@@ -1162,6 +1162,33 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <label style="display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--navy-bg);margin-bottom:6px;">Comment *</label>
               <textarea id="rv-comentario" required placeholder="Tell us about your experience..." rows="4" style="width:100%;padding:12px 14px;border:1px solid #ccc;border-radius:8px;font-size:14px;resize:vertical;box-sizing:border-box;"></textarea>
             </div>
+            <div style="margin-bottom:16px;">
+              <label style="display:block;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--navy-bg);margin-bottom:6px;">Date of Service *</label>
+              <div style="display:flex;gap:10px;">
+                <select id="rv-mes" required style="flex:1;padding:12px 14px;border:1px solid #ccc;border-radius:8px;font-size:14px;background:#fff;">
+                  <option value="">Month</option>
+                  <option value="Jan">January</option>
+                  <option value="Feb">February</option>
+                  <option value="Mar">March</option>
+                  <option value="Apr">April</option>
+                  <option value="May">May</option>
+                  <option value="Jun">June</option>
+                  <option value="Jul">July</option>
+                  <option value="Aug">August</option>
+                  <option value="Sep">September</option>
+                  <option value="Oct">October</option>
+                  <option value="Nov">November</option>
+                  <option value="Dec">December</option>
+                </select>
+                <select id="rv-anio" required style="flex:1;padding:12px 14px;border:1px solid #ccc;border-radius:8px;font-size:14px;background:#fff;">
+                  <option value="">Year</option>
+                  <option value="2023">2023</option>
+                  <option value="2024">2024</option>
+                  <option value="2025">2025</option>
+                  <option value="2026">2026</option>
+                </select>
+              </div>
+            </div>
             <button type="submit" style="width:100%;padding:14px;background:var(--gold);color:#fff;font-weight:700;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-family:var(--font-title);letter-spacing:.5px;text-transform:uppercase;">Submit Review</button>
             <p id="rv-msg" style="text-align:center;margin-top:14px;font-size:14px;display:none;"></p>
           </form>
@@ -1276,13 +1303,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         var nombre=document.getElementById('rv-nombre').value.trim();
         var estrellas=parseInt(document.getElementById('rv-estrellas').value);
         var comentario=document.getElementById('rv-comentario').value.trim();
+        var mes=document.getElementById('rv-mes').value;
+        var anio=document.getElementById('rv-anio').value;
         var msg=document.getElementById('rv-msg');
         if(!nombre||!comentario)return;
         if(estrellas<1){alert('Please select a star rating.');return;}
+        if(!mes||!anio){alert('Please select the month and year of your service.');return;}
+        var fechaServicio=mes+' '+anio;
         var btn=e.target.querySelector('button[type=submit]');
         btn.disabled=true; btn.textContent='Sending...';
         var fuenteMap={tripadvisor:'TripAdvisor',google:'Google',propia:'Propia'};
-        fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({nombre:nombre,estrellas:estrellas,comentario:comentario,fuente:fuenteMap[activeFilter]||'Propia'})})
+        fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({nombre:nombre,estrellas:estrellas,comentario:comentario,fuente:fuenteMap[activeFilter]||'Propia',lang:'en',fechaServicio:fechaServicio})})
         .then(function(r){return r.json();})
         .then(function(data){
           if(data && data.ok){
@@ -1327,7 +1358,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         updateArrows();
       };
 
-      fetch(SCRIPT_URL)
+      fetch(SCRIPT_URL+'?lang=en')
         .then(function(r){return r.json();})
         .then(function(data){
           if(Array.isArray(data)&&data.length){
