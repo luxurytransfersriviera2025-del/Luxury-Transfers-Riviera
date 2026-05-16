@@ -4766,6 +4766,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         if(SCRIPT_URL.includes("PEGAR")) { alert("Falta configurar la URL del Script."); return; }
         if (data.esVenta) {
             _setLoadingMsg('Estamos generando tu reserva...', 'Por favor no cierres esta ventana.<br>Esto puede tomar unos segundos.');
+            _startCountdown(30);
         } else {
             _setLoadingMsg('Enviando tu solicitud...', 'Un momento por favor.');
         }
