@@ -1753,12 +1753,12 @@ function lpFaq(btn) {
                     Your driver will collect payment in <strong style="color:#002855;">cash when you board</strong> at Cancun Airport.
                 </p>
 
-                <!-- Currencies -->
+                <!-- Currency selected -->
                 <div style="background:#f8f9ff; border-radius:12px; padding:14px 18px; margin-bottom:16px; display:flex; align-items:center; gap:14px; border:1px solid #e0e6ff;">
                     <i class="fas fa-coins" style="color:#D4AF37; font-size:22px; flex-shrink:0;"></i>
                     <div>
-                        <div style="font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:#002855; font-family:'Montserrat',sans-serif; margin-bottom:4px;">Accepted currencies</div>
-                        <div style="font-size:14px; font-weight:700; color:#222; font-family:'Montserrat',sans-serif;">🇺🇸 USD &nbsp;·&nbsp; 🇲🇽 MXN &nbsp;·&nbsp; 🇨🇦 CAD</div>
+                        <div style="font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:#002855; font-family:'Montserrat',sans-serif; margin-bottom:4px;">Your payment currency</div>
+                        <div id="cashCurrencyDisplay" style="font-size:15px; font-weight:800; color:#002855; font-family:'Montserrat',sans-serif;"></div>
                     </div>
                 </div>
 
@@ -3751,6 +3751,10 @@ function lpFaq(btn) {
         if (!tel)               { alert('Enter your phone number.'); return; }
 
         _cashPendingId = id;
+        const monedaSel = document.getElementById('moneda') ? document.getElementById('moneda').value : 'USD';
+        const flagMap = { USD: '🇺🇸', MXN: '🇲🇽', CAD: '🇨🇦' };
+        const flag = flagMap[monedaSel] || '💵';
+        document.getElementById('cashCurrencyDisplay').textContent = flag + ' ' + monedaSel;
         document.getElementById('cashConfirmOverlay').style.display = 'flex';
         document.body.style.overflow = 'hidden';
     }
