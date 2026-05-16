@@ -1736,46 +1736,45 @@ function lpFaq(btn) {
 </div>
 
     <!-- ══ CASH ON ARRIVAL CONFIRMATION MODAL ══ -->
-    <div id="cashConfirmOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:26000; align-items:center; justify-content:center; backdrop-filter:blur(6px); padding:16px; box-sizing:border-box;">
-        <div style="background:#fff; width:100%; max-width:420px; border-radius:20px; overflow:hidden; box-shadow:0 40px 80px rgba(0,0,0,0.4);">
-            <!-- Header verde -->
-            <div style="background:#00a651; padding:24px 28px 20px;">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <div style="width:44px; height:44px; background:rgba(255,255,255,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                        <i class="fas fa-money-bill-wave" style="color:#fff; font-size:20px;"></i>
-                    </div>
-                    <div>
-                        <div style="color:rgba(255,255,255,0.8); font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:2px; font-family:'Montserrat',sans-serif;">Payment at Pickup</div>
-                        <div style="color:#fff; font-size:17px; font-weight:900; font-family:'Montserrat',sans-serif; margin-top:2px;">Confirm your booking</div>
-                    </div>
+    <div id="cashConfirmOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.88); z-index:26000; align-items:center; justify-content:center; backdrop-filter:blur(8px); padding:16px; box-sizing:border-box;">
+        <div style="background:#fff; width:100%; max-width:420px; border-radius:20px; overflow:hidden; box-shadow:0 40px 80px rgba(0,0,0,0.5);">
+            <!-- Header navy + gold -->
+            <div style="background:#002855; padding:20px 24px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div style="color:#D4AF37; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:2px; font-family:'Montserrat',sans-serif;">Payment at Pickup</div>
+                    <div style="color:#fff; font-size:18px; font-weight:900; font-family:'Montserrat',sans-serif; margin-top:2px;">Confirm your booking</div>
                 </div>
+                <button onclick="cerrarCashConfirm()" style="background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:6px 12px; color:rgba(255,255,255,0.8); cursor:pointer; font-size:13px; font-weight:700;">✕</button>
             </div>
             <!-- Body -->
-            <div style="padding:24px 28px;">
-                <p style="font-size:14px; color:#333; line-height:1.7; margin:0 0 20px; font-family:'Open Sans',sans-serif;">
-                    Your reservation will be <strong>confirmed instantly</strong> — no payment required right now.<br><br>
-                    Your driver will collect payment in <strong>cash when you board</strong> at Cancun Airport.
+            <div style="padding:24px;">
+                <p style="font-size:14px; color:#333; line-height:1.75; margin:0 0 20px; font-family:'Open Sans',sans-serif;">
+                    Your reservation will be <strong style="color:#002855;">confirmed instantly</strong> — no payment required right now.<br><br>
+                    Your driver will collect payment in <strong style="color:#002855;">cash when you board</strong> at Cancun Airport.
                 </p>
-                <!-- Currencies accepted -->
-                <div style="background:#f0faf4; border-radius:12px; padding:14px 18px; margin-bottom:20px; display:flex; align-items:center; gap:12px;">
-                    <i class="fas fa-coins" style="color:#00a651; font-size:18px; flex-shrink:0;"></i>
+
+                <!-- Currencies -->
+                <div style="background:#f8f9ff; border-radius:12px; padding:14px 18px; margin-bottom:16px; display:flex; align-items:center; gap:14px; border:1px solid #e0e6ff;">
+                    <i class="fas fa-coins" style="color:#D4AF37; font-size:22px; flex-shrink:0;"></i>
                     <div>
-                        <div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:#1a6b3a; font-family:'Montserrat',sans-serif;">Accepted currencies</div>
-                        <div style="font-size:14px; font-weight:700; color:#333; margin-top:2px; font-family:'Montserrat',sans-serif;">🇺🇸 USD &nbsp;·&nbsp; 🇲🇽 MXN &nbsp;·&nbsp; 🇨🇦 CAD</div>
+                        <div style="font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:#002855; font-family:'Montserrat',sans-serif; margin-bottom:4px;">Accepted currencies</div>
+                        <div style="font-size:14px; font-weight:700; color:#222; font-family:'Montserrat',sans-serif;">🇺🇸 USD &nbsp;·&nbsp; 🇲🇽 MXN &nbsp;·&nbsp; 🇨🇦 CAD</div>
                     </div>
                 </div>
+
                 <!-- Aviso -->
-                <div style="background:#fff8e1; border-left:3px solid #f59e0b; border-radius:6px; padding:12px 14px; margin-bottom:24px;">
-                    <p style="margin:0; font-size:12px; color:#92400e; line-height:1.6; font-family:'Open Sans',sans-serif;">
-                        <i class="fas fa-exclamation-triangle" style="margin-right:5px;"></i>
-                        Please have the exact amount ready when your driver arrives. Your voucher will be sent to your email with all the details.
+                <div style="background:#fffbeb; border-left:3px solid #D4AF37; border-radius:6px; padding:12px 14px; margin-bottom:24px;">
+                    <p style="margin:0; font-size:12px; color:#78600a; line-height:1.65; font-family:'Open Sans',sans-serif;">
+                        <i class="fas fa-exclamation-triangle" style="margin-right:5px; color:#D4AF37;"></i>
+                        Please have the exact amount ready when your driver arrives. Your voucher will be sent to your email with all booking details.
                     </p>
                 </div>
+
                 <!-- Botones -->
-                <button id="cashConfirmBtn" onclick="confirmarPagoEfectivo()" style="width:100%; background:#00a651; color:#fff; border:none; border-radius:10px; padding:15px; font-size:15px; font-weight:800; cursor:pointer; font-family:'Montserrat',sans-serif; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; box-shadow:0 4px 0 #007a3d; transition:opacity .2s;">
-                    <i class="fas fa-check-circle" style="margin-right:8px;"></i>Confirm &amp; Book
+                <button id="cashConfirmBtn" onclick="confirmarPagoEfectivo()" style="width:100%; background:#002855; color:#fff; border:none; border-radius:10px; padding:15px; font-size:15px; font-weight:800; cursor:pointer; font-family:'Montserrat',sans-serif; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; box-shadow:0 5px 0 #001a3a; transition:opacity .2s;">
+                    <i class="fas fa-check-circle" style="margin-right:8px; color:#D4AF37;"></i>Confirm &amp; Book
                 </button>
-                <button onclick="cerrarCashConfirm()" style="width:100%; background:transparent; border:1.5px solid #ccc; border-radius:10px; padding:13px; font-size:13px; font-weight:700; color:#666; cursor:pointer; font-family:'Montserrat',sans-serif; text-transform:uppercase; letter-spacing:1px;">
+                <button onclick="cerrarCashConfirm()" style="width:100%; background:transparent; border:1.5px solid #ddd; border-radius:10px; padding:13px; font-size:13px; font-weight:700; color:#888; cursor:pointer; font-family:'Montserrat',sans-serif; text-transform:uppercase; letter-spacing:1px;">
                     Cancel
                 </button>
             </div>
@@ -2272,9 +2271,12 @@ function lpFaq(btn) {
         // Preload pricing data in background so cotizar() is instant
         cargarPrecios().catch(function(e) { console.warn('Precios preload failed:', e); });
 
-        // Pre-fill pick-up for this landing page
-        document.getElementById('origen').value = 'Cancun International Airport (CUN)';
-        document.getElementById('origenRT').value = 'Cancun International Airport (CUN)';
+        // Pre-fill pick-up for this landing page + inject known coordinates so zone detection works
+        document.getElementById('origen').value    = 'Cancun International Airport (CUN)';
+        document.getElementById('origenRT').value  = 'Cancun International Airport (CUN)';
+        document.getElementById('latitudOrigen').value  = '21.0365';
+        document.getElementById('longitudOrigen').value = '-86.8771';
+        document.getElementById('cpOrigen').value       = '77565';
 
         // Restaurar modo correcto sin re-llenar el campo
         direccionMode = 'desdeAero';
@@ -3750,10 +3752,12 @@ function lpFaq(btn) {
 
         _cashPendingId = id;
         document.getElementById('cashConfirmOverlay').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
 
     function cerrarCashConfirm() {
         document.getElementById('cashConfirmOverlay').style.display = 'none';
+        document.body.style.overflow = '';
         _cashPendingId = null;
     }
 
@@ -3766,8 +3770,9 @@ function lpFaq(btn) {
         if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Processing...'; }
 
         const datosVenta = _construirDatosVenta(id, datosCard, 'Cash on Arrival');
-        datosVenta.pago      = '💵 Cash on Arrival — USD · MXN · CAD';
-        datosVenta.pagoLabel = 'Cash on Arrival (USD · MXN · CAD)';
+        const monedaEfectivo = document.getElementById('moneda') ? document.getElementById('moneda').value : 'USD';
+        datosVenta.pago      = '💵 Cash on Arrival — ' + monedaEfectivo;
+        datosVenta.pagoLabel = 'Cash on Arrival (' + monedaEfectivo + ')';
 
         document.getElementById('cashConfirmOverlay').style.display = 'none';
 
@@ -4143,7 +4148,9 @@ function lpFaq(btn) {
             doc.rect(padL, y, cW, rowH, 'S');
             doc.setTextColor(...dark);
             doc.setFontSize(9); doc.setFont('helvetica', 'bold');
-            doc.text('Paid online \u2013 ' + pagoLabel, padL + 4, y + 5.5);
+            const isCash = (datos.pago || '').includes('Cash on Arrival');
+            const pagoPrefix = isCash ? 'Cash on Arrival - ' : 'Paid online - ';
+            doc.text(pagoPrefix + pagoLabel, padL + 4, y + 5.5);
             doc.setTextColor(39, 174, 96);
             doc.text(fmt(totalNum), pageW - padR - 4, y + 5.5, { align: 'right' });
             y += rowH;
