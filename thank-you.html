@@ -509,7 +509,8 @@ var _confirmedData = null;
 
     if (d.pagoLabel) {
         document.getElementById('paymentBadge').style.display = 'inline-flex';
-        document.getElementById('paymentLabel').textContent    = t.paid + d.pagoLabel;
+        var badgePrefix = isCash ? '💵 ' : t.paid;
+        document.getElementById('paymentLabel').textContent    = badgePrefix + d.pagoLabel;
     }
 
     function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
