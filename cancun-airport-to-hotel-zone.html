@@ -3645,7 +3645,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         const datosVenta = _construirDatosVenta(id, datosCard, 'Cash on Arrival');
         const monedaEfectivo = document.getElementById('moneda') ? document.getElementById('moneda').value : 'USD';
         datosVenta.pago      = '💵 Cash on Arrival — ' + monedaEfectivo;
-        datosVenta.pagoLabel = 'Cash on Arrival (' + monedaEfectivo + ')';
+        datosVenta.pagoLabel = 'Pagará en efectivo al llegar · ' + monedaEfectivo;
         document.getElementById('cashConfirmOverlay').style.display = 'none';
         try {
             if (typeof fbq !== 'undefined') fbq('track', 'Lead', { content_name: 'Cash on Arrival Booking', value: parseFloat((datosVenta.precioTotal || '0').replace(/[^0-9.]/g,'')), currency: 'USD' }, { eventID: datosVenta.codigo });
