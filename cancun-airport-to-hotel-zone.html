@@ -3711,8 +3711,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         const _fetchSheet = fetch(WORKER_PAGOS_URL + '/send-to-sheet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datosVenta) });
         const _timeout4s  = new Promise(resolve => setTimeout(resolve, 4000));
         Promise.race([_fetchSheet, _timeout4s])
-            .then(function()  { window.location.href = 'thank-you.html'; })
-            .catch(function() { window.location.href = 'thank-you.html'; });
+            .then(function()  { window.location.href = '/thank-you.html'; })
+            .catch(function() { window.location.href = '/thank-you.html'; });
     }
 
     function _dispararPurchaseYEnviar(datosVenta) {
@@ -4337,7 +4337,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 } catch(e) {}
                 sessionStorage.removeItem('ltr_pendingBooking');
                 cerrarRecuperacion();
-                window.location.href = 'thank-you.html';
+                window.location.href = '/thank-you.html';
             } else {
                 // ❌ Payment not completed — show payment buttons normally
                 document.getElementById('recovery-info-msg').style.display        = 'flex';
@@ -4890,7 +4890,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         .then(() => {
             try { gtag('event', 'conversion', { 'send_to': 'AW-17859609175/8AeACLKZ6N4bENeEkMRC', 'transaction_id': data.codigo }); } catch(e) {}
             if (data.esVenta) {
-                window.location.href = 'thank-you.html';
+                window.location.href = '/thank-you.html';
             } else {
                 document.getElementById('loadingOverlay').style.display = 'none';
                 mostrarModalExito(data);
@@ -4900,7 +4900,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             console.error(e);
             if (data.esVenta) {
                 // Payment was already confirmed — go to confirmation page even if Google Sheet failed
-                window.location.href = 'thank-you.html';
+                window.location.href = '/thank-you.html';
             } else {
                 alert("Error al enviar la solicitud. Por favor intenta por WhatsApp.");
                 document.getElementById('loadingOverlay').style.display = 'none';
