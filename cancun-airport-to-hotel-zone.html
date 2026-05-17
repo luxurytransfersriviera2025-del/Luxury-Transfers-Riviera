@@ -1057,7 +1057,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                         <div class="input-wrapper">
                             <label id="label-promo" style="color:var(--gold);">PROMO CODE</label>
-                            <input type="text" id="codigoPromoOneWay" placeholder="OPTIONAL" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; width:100%; font-family:var(--font-body); text-transform:uppercase;">
+                            <input type="text" id="codigoPromoOneWay" placeholder="OPTIONAL" autocomplete="off" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; width:100%; font-family:var(--font-body); text-transform:uppercase;">
                         </div>
                     </div>
 
@@ -1081,7 +1081,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                         <div class="input-wrapper">
                             <label id="label-promo-rt" style="color:var(--gold);">PROMO CODE</label>
-                            <input type="text" id="codigoPromo" placeholder="OPTIONAL" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; width:100%; font-family:var(--font-body); text-transform:uppercase;">
+                            <input type="text" id="codigoPromo" placeholder="OPTIONAL" autocomplete="off" style="border:none; outline:none; background:transparent; font-size:14px; font-weight:600; color:#333; width:100%; font-family:var(--font-body); text-transform:uppercase;">
                         </div>
                     </div>
 
@@ -3647,6 +3647,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         datosVenta.pago      = '💵 Cash on Arrival — ' + monedaEfectivo;
         datosVenta.pagoLabel = 'Will pay cash on arrival · ' + monedaEfectivo;
         document.getElementById('cashConfirmOverlay').style.display = 'none';
+        const _cashCuponKey = (datosVenta.cupon || '').toUpperCase();
+        const _cashCuponRes = _couponCache[_cashCuponKey] || { valid: false, discount: 0 };
+        datosVenta.cuponDiscount = _cashCuponRes.valid ? _cashCuponRes.discount : 0;
         try {
             if (typeof fbq !== 'undefined') fbq('track', 'Lead', { content_name: 'Cash on Arrival Booking', value: parseFloat((datosVenta.precioTotal || '0').replace(/[^0-9.]/g,'')), currency: 'USD' }, { eventID: datosVenta.codigo });
             enviarConversionsAPI(datosVenta, 'Lead');
@@ -3707,6 +3710,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         // Wait for the fetch response before redirecting so the email arrives reliably.
         // ltr_bookingConfirmed is already saved above, so thank-you.html has data regardless.
         try { datosVenta.pdfBase64 = generarVoucherPDF(datosVenta, true); } catch(e) {}
+        const _stripeCuponRes = _couponCache[(datosVenta.cupon || '').toUpperCase()] || { valid: false, discount: 0 };
+        datosVenta.cuponDiscount = _stripeCuponRes.valid ? _stripeCuponRes.discount : 0;
         const _fetchSheet = fetch(WORKER_PAGOS_URL + '/send-to-sheet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(datosVenta) });
         const _timeout4s  = new Promise(resolve => setTimeout(resolve, 4000));
         Promise.race([_fetchSheet, _timeout4s])
@@ -5036,7 +5041,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     function irACotizar() {
         // Auto-apply coupon code to all promo fields
         const code = 'LTR-10';
-        ['codigoPromoOneWay', 'codigoPromoRT'].forEach(function(id) {
+        ['codigoPromoOneWay', 'codigoPromo'].forEach(function(id) {
             const el = document.getElementById(id);
             if (el) el.value = code;
         });
