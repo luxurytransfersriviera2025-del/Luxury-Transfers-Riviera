@@ -1029,6 +1029,11 @@ function generarVoucherPDF(datos, soloBase64) {
         var discAmt=Math.round((origBase-baseNum)*100)/100;
         priceRow(t.pdfSvcPrice,fmt(origBase),dark,false,null);
         priceRow(t.pdfDiscount+' ('+Math.round(discPct*100)+'%)','-'+fmt(discAmt),green,false,null);
+    } else if (totalNum < baseNum) {
+        var discAmt2=Math.round((baseNum-totalNum)*100)/100;
+        var discLabel=t.pdfDiscount;
+        priceRow(t.pdfSvcPrice,fmt(baseNum),dark,false,null);
+        priceRow(discLabel,'-'+fmt(discAmt2),green,false,null);
     } else {
         priceRow(t.pdfSvcPrice,fmt(baseNum),dark,false,null);
     }
