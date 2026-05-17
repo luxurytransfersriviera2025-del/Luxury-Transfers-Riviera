@@ -1050,7 +1050,8 @@ function generarVoucherPDF(datos, soloBase64) {
         doc.setFillColor.apply(doc,white); doc.rect(padL,y,cW,rowH,'F');
         doc.setDrawColor.apply(doc,greyLn); doc.setLineWidth(0.3); doc.rect(padL,y,cW,rowH,'S');
         doc.setTextColor.apply(doc,dark); doc.setFontSize(9); doc.setFont('helvetica','bold');
-        doc.text(t.pdfPaidOnline+pagoLabel, padL+4, y+5.5);
+        var esCashVoucher = (datos.pago || '').indexOf('Cash on Arrival') > -1;
+        doc.text((esCashVoucher ? '' : t.pdfPaidOnline) + pagoLabel, padL+4, y+5.5);
         doc.setTextColor(39,174,96);
         doc.text(fmt(totalNum),pageW-padR-4,y+5.5,{align:'right'});
         y+=rowH;
