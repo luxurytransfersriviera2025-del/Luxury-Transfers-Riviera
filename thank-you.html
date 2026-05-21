@@ -439,7 +439,12 @@ var _T = {
 var _confirmedData = null;
 
 (function init() {
-    var raw = localStorage.getItem('ltr_bookingConfirmed');
+    var raw = null;
+    var _usedSession = false;
+    try { raw = localStorage.getItem('ltr_bookingConfirmed'); } catch(e) {}
+    if (!raw) {
+        try { raw = sessionStorage.getItem('ltr_pendingBooking'); _usedSession = true; } catch(e) {}
+    }
     var t = _T.en;
 
     if (!raw) {
@@ -454,6 +459,19 @@ var _confirmedData = null;
         return;
     }
     localStorage.removeItem('ltr_bookingConfirmed');
+
+    // Fallback for iOS Safari Private mode: sessionStorage data lacks imgUrl — compute it
+    if (_usedSession && _confirmedData && !_confirmedData.imgUrl) {
+        var _fbImgs = {
+            'CLASSIC SEDAN':  'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/CLASSIC%20SEDAN%201%20Desglose%20de%20Precios.webp',
+            'COMFORT VAN':    'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/COMFORT%20VAN%20Desglose%20de%20Precios.webp',
+            'LUXURY VIP':     'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/LUXURY%20VIP%20Desglose%20de%20Precios.webp',
+            'GRAND SPRINTER': 'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/GRAND%20SPRINTER%20Desglose%20de%20Precios.webp',
+            'FAMILY VAN':     'https://raw.githubusercontent.com/luxurytransfersriviera2025-del/Luxury-Transfers-Riviera/main/FAMILY%20VAN%20Desglose%20de%20Precios.webp',
+        };
+        var _fbVk = Object.keys(_fbImgs).find(function(k){ return (_confirmedData.vehiculo||'').toUpperCase().indexOf(k) !== -1; });
+        if (_fbVk) _confirmedData.imgUrl = _fbImgs[_fbVk];
+    }
 
     var d = _confirmedData;
     t = (d.idioma === 'es') ? _T.es : _T.en;
@@ -672,6 +690,21 @@ function _enablePdfBtn() {
         _enviarCAPIpurchase(_capiData).catch(function(){});
         try {
             var data = JSON.parse(JSON.stringify(_confirmedData));
+            // Inject pre-saved vehicle image from index.html into the PDF generator.
+            // By this point _confirmedData already has pagoLabel (Visa **** 4242)
+            // from the Stripe API call above — so the PDF will have BOTH the vehicle
+            // photo AND the payment method.
+            try {
+                var _savedImg = null;
+                try { _savedImg = localStorage.getItem('ltr_vehImgB64'); } catch(e2) {}
+                if (!_savedImg) { try { _savedImg = sessionStorage.getItem('ltr_vehImgB64'); } catch(e2) {} }
+                if (_savedImg) {
+                    var _imgData = JSON.parse(_savedImg);
+                    if (_imgData.key && _imgData.b64) { _vehicleImgB64[_imgData.key] = _imgData.b64; }
+                    try { localStorage.removeItem('ltr_vehImgB64'); } catch(e2) {}
+                    try { sessionStorage.removeItem('ltr_vehImgB64'); } catch(e2) {}
+                }
+            } catch(e) {}
             if (window.jspdf) { try { data.pdfBase64 = generarVoucherPDF(data, true); } catch(e) {} }
             var fetchSheet = fetch(WORKER_PAGOS_URL + '/send-to-sheet', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
             Promise.race([fetchSheet, new Promise(function(r){ setTimeout(r, 6000); })]).catch(function(){});
@@ -736,7 +769,12 @@ function _enablePdfBtn() {
     .catch(function() {})
     .then(function() {
         _pdfStripeTaskDone = true;
-        if (_pdfPendingTasks <= 0) {
+        // If pre-generated PDF exists, fire sheet send immediately —
+        // no need to wait for image preloads (QR + social icons).
+        var _hasPre = false;
+        try { _hasPre = !!localStorage.getItem('ltr_vehImgB64'); } catch(e) {}
+        if (!_hasPre) { try { _hasPre = !!sessionStorage.getItem('ltr_vehImgB64'); } catch(e) {} }
+        if (_pdfPendingTasks <= 0 || _hasPre) {
             _enablePdfBtn();
             _sendToSheetAndPixels();
         } else {
