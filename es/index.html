@@ -4198,7 +4198,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 idioma: datos.idioma || 'es',
             }));
         } catch(e) {}
-        sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datos));
+        // Fallback para iOS Safari modo privado (localStorage bloqueado)
+        try { sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datos)); } catch(e) {}
+
+        // ─── Guardar imagen del vehículo antes de redirigir a Stripe ───────────
+        try {
+            const _rsVehKey2 = Object.keys(_vehicleImages).find(k => (datos.vehiculo || '').toUpperCase().includes(k));
+            if (_rsVehKey2 && _vehicleImgB64Email[_rsVehKey2]) {
+                const _rsImgPayload = JSON.stringify({ key: _rsVehKey2, b64: _vehicleImgB64Email[_rsVehKey2] });
+                try { localStorage.setItem('ltr_vehImgB64', _rsImgPayload); }
+                catch(e) { try { sessionStorage.setItem('ltr_vehImgB64', _rsImgPayload); } catch(e2) {} }
+            }
+        } catch(e) { console.warn('Image pre-save warning:', e); }
 
         try {
             // Step 1: Get server-verified price token
@@ -4225,14 +4236,31 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    method:      'stripe',
-                    action:      'create-checkout-session',
-                    priceToken:  _rsPriceToken,
-                    currency:    currencyCode,
-                    bookingCode: datos.codigo,
-                    vehicle:     datos.vehiculo || 'Transfer Privado',
-                    successUrl:  thankYouUrl + '?session_id={CHECKOUT_SESSION_ID}',
-                    cancelUrl:   siteUrl + '?payment=cancelled'
+                    method:         'stripe',
+                    action:         'create-checkout-session',
+                    priceToken:     _rsPriceToken,
+                    currency:       currencyCode,
+                    bookingCode:    datos.codigo,
+                    vehicle:        datos.vehiculo    || 'Transfer Privado',
+                    customerName:   datos.nombre      || '',
+                    customerPhone:  datos.telefono    || '',
+                    customerEmail:  datos.email       || '',
+                    origen:         datos.origen      || '',
+                    destino:        datos.destino     || '',
+                    fecha:          datos.fecha       || '',
+                    hora:           datos.hora        || '',
+                    fechaRegreso:   datos.fechaRegreso || '',
+                    horaRegreso:    datos.horaRegreso  || '',
+                    pasajeros:      datos.pasajeros   || '',
+                    tipoViaje:      datos.tipoViaje   || '',
+                    vuelo:          datos.vuelo       || '',
+                    vueloRegreso:   datos.vueloRegreso || '',
+                    precioTotal:    datos.precioTotal  || '',
+                    idioma:         datos.idioma      || 'es',
+                    cupon:          datos.cupon       || '',
+                    notas:          datos.notas       || '',
+                    successUrl:     thankYouUrl + '?session_id={CHECKOUT_SESSION_ID}',
+                    cancelUrl:      siteUrl + '?payment=cancelled'
                 })
             });
             if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -4245,100 +4273,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     saved.stripeSessionId = json.sessionId;
                     localStorage.setItem('ltr_bookingConfirmed', JSON.stringify(saved));
                 } catch(e) {}
-                sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datos));
+                try { sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datos)); } catch(e) {}
             }
             window.location.href = json.url;
         } catch (e) {
             console.error('Recovery Stripe error:', e);
-            btn.disabled = false;
-            btn.innerHTML = '<span style="display:flex;align-items:center;gap:10px;"><span style="display:flex;gap:5px;"><svg width="36" height="22" viewBox="0 0 38 24" style="border-radius:3px;overflow:hidden;"><rect width="38" height="24" rx="4" fill="#fff"/><text x="5" y="17" font-family="Arial" font-size="11" font-weight="900" fill="#1a1f71">VISA</text></svg></span><span>Pagar con Tarjeta</span></span><i class="fas fa-chevron-right" style="opacity:0.5;"></i>';
-            alert('⚠️ Error de conexión. Intenta con PayPal o contáctanos por WhatsApp.');
-        }
-    }
-
-    async function reintentarPayPal() {
-        if (!_recoveryDatos) return;
-        const datos        = _recoveryDatos;
-        const moneda       = (datos.precioTotal || '').includes('MXN') ? 'MXN' : (datos.precioTotal || '').includes('CAD') ? 'CAD' : 'USD';
-        const currencyCode = moneda;
-        const siteUrl      = window.location.origin + window.location.pathname;
-        const thankYouUrl  = window.location.origin + '/thank-you.html';
-
-        datos.pago = 'PayPal ✅ Pagado en línea';
-        sessionStorage.setItem('ltr_pendingBooking', JSON.stringify(datos));
-
-        document.getElementById('loadingOverlay').style.display = 'flex';
-        cerrarRecuperacion();
-
-        try {
-            // Step 1: Get server-verified price token
-            const _rpPriceRes = await fetch(WORKER_PAGOS_URL + '/calculate-price', {
-                method:  'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    zonaOrigen:  datos.zona        || '',
-                    zonaDestino: datos.zonaDestino || '',
-                    vehiculo:    datos.vehiculo    || '',
-                    tipo:        datos.tipo        || 'SENCILLO',
-                    stops:       datos.extraStop   || 0,
-                    stopsR:      datos.extraStopR  || 0,
-                    currency:    currencyCode,
-                    cupon:       datos.cupon       || '',
-                })
-            });
-            if (!_rpPriceRes.ok) throw new Error('Price calc HTTP ' + _rpPriceRes.status);
-            const _rpPriceData  = await _rpPriceRes.json();
-            const _rpPriceToken = _rpPriceData.priceToken;
-            if (!_rpPriceToken) throw new Error('No priceToken from server');
-
-            // Save to localStorage before redirecting — thank-you.html reads this on return
-            try {
-                const _rpVehKey = Object.keys(_vehicleImages).find(k => (datos.vehiculo || '').toUpperCase().includes(k));
-                const _rpImgUrl = _rpVehKey ? _vehicleImages[_rpVehKey] : _vehicleImages['CLASSIC SEDAN'];
-                localStorage.setItem('ltr_bookingConfirmed', JSON.stringify({
-                    esVenta: true, codigo: datos.codigo, vehiculo: datos.vehiculo, imgUrl: _rpImgUrl,
-                    origen: datos.origen, destino: datos.destino, fecha: datos.fecha, hora: datos.hora,
-                    fechaRegreso: datos.fechaRegreso || '', horaRegreso: datos.horaRegreso || '',
-                    pasajeros: datos.pasajeros, nombre: datos.nombre, email: datos.email, telefono: datos.telefono,
-                    tipoViaje: datos.tipoViaje, precio: datos.precio || '',
-                    precioTotal: datos.precioTotal || datos.precio || '',
-                    pago: 'PayPal ✅ Pagado en línea', pagoLabel: '',
-                    vuelo: datos.vuelo || '', vueloRegreso: datos.vueloRegreso || '',
-                    extraStop: datos.extraStop || 0, extraStopR: datos.extraStopR || 0,
-                    cupon: datos.cupon || '', cuponDiscount: 0,
-                    extras: datos.extras || '', notas: datos.notas || '',
-                    idioma: datos.idioma || 'es',
-                }));
-            } catch(_e) {}
-
-            // Step 2: Create PayPal order with verified token, redirect to thank-you.html
-            const res = await fetch(WORKER_PAGOS_URL + '/process-payment', {
-                method:  'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    method:          'paypal',
-                    action:          'create-order',
-                    priceToken:      _rpPriceToken,
-                    currency:        currencyCode,
-                    bookingCode:     datos.codigo,
-                    vehicle:         datos.vehiculo || '',
-                    returnUrl:       thankYouUrl + '?payment=paypal-success',
-                    cancelPayPalUrl: siteUrl + '?payment=cancelled'
-                })
-            });
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            const json    = await res.json();
-            const orderID = json.orderID || json.id;
-            if (!orderID) throw new Error('No orderID');
-
-            const useSandbox = WORKER_PAGOS_URL.includes('sandbox');
-            const paypalBase = useSandbox ? 'https://www.sandbox.paypal.com' : 'https://www.paypal.com';
-            window.location.href = paypalBase + '/checkoutnow?token=' + orderID;
-        } catch (e) {
-            document.getElementById('loadingOverlay').style.display = 'none';
-            console.error('Recovery PayPal error:', e);
-            mostrarRecuperacion(datos); // re-show modal
-            alert('⚠️ Error de conexión. Intenta pagar con tarjeta o contáctanos por WhatsApp.');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<span style="display:flex;align-items:center;gap:10px;"><span style="display:flex;gap:5px;"><svg width="36" height="22" viewBox="0 0 38 24" style="border-radius:3px;overflow:hidden;"><rect width="38" height="24" rx="4" fill="#fff"/><text x="5" y="17" font-family="Arial" font-size="11" font-weight="900" fill="#1a1f71">VISA</text></svg></span><span>Pagar con Tarjeta</span></span><i class="fas fa-chevron-right" style="opacity:0.5;"></i>';
+            }
+            alert('⚠️ Error de conexión. Intenta de nuevo o contáctanos por WhatsApp.');
         }
     }
 
