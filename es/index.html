@@ -4162,6 +4162,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         document.getElementById('recoveryOverlay').style.display = 'none';
         document.body.style.overflow = '';
         _recoveryDatos = null;
+        // Limpiar sessionStorage para que el modal no reaparezca en cargas futuras
+        try { sessionStorage.removeItem('ltr_pendingBooking'); } catch(e) {}
     }
 
     async function reintentarStripe() {
