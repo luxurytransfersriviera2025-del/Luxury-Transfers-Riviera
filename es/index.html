@@ -360,6 +360,11 @@ src="https://www.facebook.com/tr?id=1206982288231935&ev=PageView&noscript=1"
             border: 1px solid #ccc; transition: 0.2s; 
         }
         .input-wrapper:focus-within { box-shadow: 0 0 0 2px rgba(0, 40, 85, 0.2); border-color: var(--navy-bg); }
+        /* ── Clear button ── */
+        .clear-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#d5d5d5;border:none;border-radius:50%;width:20px;height:20px;display:none;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:#555;line-height:1;padding:0;z-index:5;transition:background .15s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;font-family:sans-serif;}
+        .clear-btn:hover,.clear-btn:active{background:#aaa;color:#111;}
+        .clear-btn.visible{display:flex;}
+        #origen,#destino,#origenRT,#destinoRT{padding-right:32px !important;}
         .input-wrapper label { font-size: 11px; color: var(--navy-bg); font-weight: 800; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; font-family: var(--font-title); }
         .time-tip { position: relative; display: inline-flex; align-items: center; gap: 4px; }
         .time-tip .tip-icon { font-size: 11px; color: var(--navy-bg); cursor: default; flex-shrink: 0; line-height: 1; opacity: 0.7; }
@@ -962,14 +967,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                     <!-- FILA 1 ONE WAY: Origen | Destino -->
                     <div class="row-top" id="rowTopOneWay">
-                        <div class="input-wrapper"><label id="labelOrigen">ORIGEN</label><input type="text" id="origen" placeholder="Ej: Aeropuerto CUN/TQO, Hotel, Airbnb, Resort..."></div>
-                        <div class="input-wrapper" id="divDestinoInput"><label id="labelDestino">DESTINO</label><input type="text" id="destino" placeholder="Ej: Aeropuerto CUN/TQO, Hotel, Airbnb, Resort..."></div>
+                        <div class="input-wrapper"><label id="labelOrigen">ORIGEN</label><input type="text" id="origen" placeholder="Ej: Aeropuerto CUN/TQO, Hotel, Airbnb, Resort..."><button class="clear-btn" id="clr_origen" type="button" tabindex="-1" aria-label="Limpiar" onclick="clearLocField('origen')">✕</button></div>
+                        <div class="input-wrapper" id="divDestinoInput"><label id="labelDestino">DESTINO</label><input type="text" id="destino" placeholder="Ej: Aeropuerto CUN/TQO, Hotel, Airbnb, Resort..."><button class="clear-btn" id="clr_destino" type="button" tabindex="-1" aria-label="Limpiar" onclick="clearLocField('destino')">✕</button></div>
                     </div>
 
                     <!-- FILA 1 ROUND TRIP: Origen | Destino | Pasajeros -->
                     <div class="row-top-rt" id="rowTopRoundTrip" style="display:none;">
-                        <div class="input-wrapper"><label id="labelOrigenRT">ORIGEN</label><input type="text" id="origenRT" placeholder="Ej: Aeropuerto CUN/TQO, Hotel, Airbnb, Resort..." oninput="document.getElementById('origen').value=this.value" onfocus="syncRT()"></div>
-                        <div class="input-wrapper"><label id="labelDestinoRT">DESTINO</label><input type="text" id="destinoRT" placeholder="Ej: Aeropuerto CUN/TQO, Hotel, Airbnb, Resort..." oninput="document.getElementById('destino').value=this.value" onfocus="syncRT()"></div>
+                        <div class="input-wrapper"><label id="labelOrigenRT">ORIGEN</label><input type="text" id="origenRT" placeholder="Ej: Aeropuerto CUN/TQO, Hotel, Airbnb, Resort..." oninput="document.getElementById('origen').value=this.value" onfocus="syncRT()"><button class="clear-btn" id="clr_origenRT" type="button" tabindex="-1" aria-label="Limpiar" onclick="clearLocField('origenRT')">✕</button></div>
+                        <div class="input-wrapper"><label id="labelDestinoRT">DESTINO</label><input type="text" id="destinoRT" placeholder="Ej: Aeropuerto CUN/TQO, Hotel, Airbnb, Resort..." oninput="document.getElementById('destino').value=this.value" onfocus="syncRT()"><button class="clear-btn" id="clr_destinoRT" type="button" tabindex="-1" aria-label="Limpiar" onclick="clearLocField('destinoRT')">✕</button></div>
                         <div class="input-wrapper promo-rt-cell" style="overflow:visible;">
                             <label id="label-pax-rt">PASAJEROS</label>
                             <div class="pax-wrapper">
@@ -2681,13 +2686,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                     </div>
                     <div class="input-wrapper">
-                        <label>No. Vuelo (Llegada)</label>
-                        <input type="text" id="vuelo-${id}" placeholder="Opcional">
+                        <label>Vuelo de Llegada</label>
+                        <input type="text" id="vuelo-${id}" placeholder="Opcional · Ej: Aeroméxico 442">
                     </div>
                     ${tipo === 'REDONDO' ? `
                     <div class="input-wrapper">
-                        <label style="color:var(--action-green);">No. Vuelo (Regreso)</label>
-                        <input type="text" id="vuelo-regreso-${id}" placeholder="Opcional">
+                        <label style="color:var(--action-green);">Vuelo de Regreso</label>
+                        <input type="text" id="vuelo-regreso-${id}" placeholder="Opcional · Ej: Aeroméxico 442">
                     </div>` : ''}
                 </div>
                 <!-- OPTIONAL EXTRAS -->
@@ -3696,7 +3701,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         if (!hasRegreso && hasVuelo) {
             const w3 = (cW - gap * 2) / 3;
             drawCell(padL,               y, w3, cellH, 'Fecha y hora',   dateStr);
-            drawCell(padL + w3 + gap,    y, w3, cellH, 'No. de vuelo', datos.vuelo || '');
+            drawCell(padL + w3 + gap,    y, w3, cellH, 'Vuelo de Llegada', datos.vuelo || '');
             drawCell(padL + (w3+gap)*2,  y, w3, cellH, 'Pasajeros',    paxStr);
             y += cellH + gap;
             if (notasVal) { drawCell(padL, y, cW, notaH, 'Notas', notasVal); y += notaH + gap; }
@@ -3706,7 +3711,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         if (hasRegreso && hasVuelo) {
             const w3 = (cW - gap * 2) / 3;
             drawCell(padL,               y, w3, cellH, 'Fecha y hora',    dateStr);
-            drawCell(padL + w3 + gap,    y, w3, cellH, 'No. de vuelo',    datos.vuelo || '');
+            drawCell(padL + w3 + gap,    y, w3, cellH, 'Vuelo de Llegada',    datos.vuelo || '');
             drawCell(padL + (w3+gap)*2,  y, w3, cellH, 'Pasajeros',       paxStr);
             y += cellH + gap;
             const w2 = (cW - gap) / 2;
@@ -4846,6 +4851,42 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             extraerDatos(p, "Destino");
         });
     }
+    // ── CLEAR LOCATION FIELD BUTTONS ──────────────────────────────────────
+    function clearLocField(id) {
+      var input = document.getElementById(id);
+      if (!input) return;
+      input.value = '';
+      input.focus();
+      syncClearBtn(id);
+      // Limpiar campos ocultos de geolocalización
+      var geo = {
+        origen:    ['latitudOrigen','longitudOrigen','cpOrigen'],
+        origenRT:  ['latitudOrigen','longitudOrigen','cpOrigen'],
+        destino:   ['latitudDestino','longitudDestino','cpDestino'],
+        destinoRT: ['latitudDestino','longitudDestino','cpDestino']
+      };
+      (geo[id] || []).forEach(function(hid){ var h=document.getElementById(hid); if(h) h.value=''; });
+      // Mantener sincronía OW ↔ RT
+      var pairs = {origen:'origenRT', origenRT:'origen', destino:'destinoRT', destinoRT:'destino'};
+      var pair = pairs[id];
+      if (pair) { var el=document.getElementById(pair); if(el){ el.value=''; syncClearBtn(pair); } }
+    }
+    function syncClearBtn(id) {
+      var input = document.getElementById(id);
+      var btn   = document.getElementById('clr_' + id);
+      if (input && btn) btn.classList.toggle('visible', input.value.trim() !== '');
+    }
+    function setupClearBtn(id) {
+      var input = document.getElementById(id);
+      if (!input) return;
+      var _t;
+      input.addEventListener('input',  function(){ syncClearBtn(id); });
+      input.addEventListener('focus',  function(){ syncClearBtn(id); _t = setInterval(function(){ syncClearBtn(id); }, 250); });
+      input.addEventListener('blur',   function(){ clearInterval(_t); setTimeout(function(){ syncClearBtn(id); }, 300); });
+    }
+    document.addEventListener('DOMContentLoaded', function(){
+      ['origen','destino','origenRT','destinoRT'].forEach(setupClearBtn);
+    });
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAdK5yLQ20SQrLc_0rOuo7oxxHVQ233Bh0&libraries=places&callback=initAutocomplete" async defer></script>
 
