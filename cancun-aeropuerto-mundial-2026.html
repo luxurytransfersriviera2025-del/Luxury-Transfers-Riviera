@@ -1742,12 +1742,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <p style="margin-top: 10px;"><a href="https://wa.me/529842411158" target="_blank" style="color: #25d366; font-weight: 700; text-decoration: none;"><i class="fab fa-whatsapp"></i> WhatsApp: +52 984 241 1158</a></p>
 </div>
 
-    <!-- ══ PAYMENT RECOVERY MODAL ══ -->
-    <div id="recoveryOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.88); z-index:25000; align-items:center; justify-content:center; backdrop-filter:blur(8px); padding:16px; box-sizing:border-box;">
-        <div style="background:#fff; width:100%; max-width:480px; border-radius:20px; overflow:hidden; box-shadow:0 40px 80px rgba(0,0,0,0.5); max-height:90vh; display:flex; flex-direction:column;">
-
-            <!-- Header -->
-            <div id="recovery-header-bg" style="background:#002855; padding:20px 24px; display:flex; justify-content:space-between; align-items:center;">
+    <!-- ══ PAYMENT RECOVERY MODAL — REMOVED ══ -->
+    <div id="recoveryOverlay" style="display:none;">
+        <div>
                 <div>
                     <div id="recovery-header-tag" style="color:#D4AF37; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:2px; font-family:'Montserrat',sans-serif;">Pago Incompleto</div>
                     <div id="recovery-header-title" style="color:#fff; font-size:18px; font-weight:900; font-family:'Montserrat',sans-serif; margin-top:2px;">No te preocupes — tu reserva está guardada</div>
@@ -4124,58 +4121,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     })();
 
     function mostrarRecuperacion(datos) {
-        _recoveryDatos = datos;
-        // Populate modal fields
-        document.getElementById('recovery-code').textContent    = datos.codigo || 'LTR-????';
-        document.getElementById('recovery-vehicle').textContent = datos.vehiculo || '';
-        document.getElementById('recovery-price').textContent   = datos.precioTotal || datos.precio || '';
-        document.getElementById('recovery-origen').textContent  = datos.origen   || '';
-        document.getElementById('recovery-destino').textContent = datos.destino  || '';
-        document.getElementById('recovery-fecha').textContent   = datos.fecha    || '';
-        document.getElementById('recovery-hora').textContent    = datos.hora     || '';
-        document.getElementById('recovery-pax-num').textContent = datos.pasajeros || '';
-        document.getElementById('recovery-nombre').textContent  = datos.nombre   || '';
-        document.getElementById('recovery-pax').textContent     = datos.pasajeros ? datos.pasajeros + + (parseInt(datos.pasajeros) > 1 ? ' Pasajeros' : ' Pasajero') : '';
-        document.getElementById('recovery-email').textContent    = datos.email    || 'N/A';
-        document.getElementById('recovery-telefono').textContent = datos.telefono || 'N/A';
-        const _vuelo = (datos.vuelo || '') + (datos.vueloRegreso ? (datos.vuelo ? ' | Return: ' : 'Return: ') + datos.vueloRegreso : '');
-        document.getElementById('recovery-vuelo').textContent    = _vuelo || 'N/A';
-        const _extrasLines = [];
-        if (parseInt(datos.extraStop)  > 0) _extrasLines.push(`Parada Rápida 20 Min: ${datos.extraStop}`);
-        if (parseInt(datos.extraStopR) > 0) _extrasLines.push(`Parada Rápida 20 Min (Regreso): ${datos.extraStopR}`);
-        document.getElementById('recovery-extras').textContent   = _extrasLines.length > 0 ? _extrasLines.join(' | ') : 'Ninguno';
-        document.getElementById('recovery-notas').textContent    = datos.notas    || 'N/A';
-
-        // Set vehicle image
-        const vehKey = Object.keys(_vehicleImages).find(k => (datos.vehiculo || '').toUpperCase().includes(k));
-        const img = document.getElementById('recovery-img');
-        img.src = vehKey ? _vehicleImages[vehKey] : _vehicleImages['CLASSIC SEDAN'];
-        img.alt = datos.vehiculo || '';
-
-        // Reset modal state (in case it was opened before)
-        document.getElementById('recovery-header-bg').style.background    = '#002855';
-        document.getElementById('recovery-header-tag').textContent         = 'Pago Incompleto';
-        document.getElementById('recovery-header-title').textContent       = 'No te preocupes \u2014 tu reserva est\u00e1 guardada';
-        document.getElementById('recovery-info-msg').style.display         = 'flex';
-        document.getElementById('recovery-checking').style.display         = 'none';
-        document.getElementById('recovery-already-paid').style.display     = 'none';
-        document.getElementById('recovery-payment-buttons').style.display  = 'flex';
-
-        // Show modal
-        const overlay = document.getElementById('recoveryOverlay');
-        overlay.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-
-        // Verify payment status with Stripe
-        _verificarPagoExistente(datos);
+        // Sin modal — verificación silenciosa de Stripe
+        _verificarPagoSilencioso(datos);
     }
 
-    async function _verificarPagoExistente(datos) {
-        // Show spinner, hide payment buttons
-        document.getElementById('recovery-checking').style.display        = 'block';
-        document.getElementById('recovery-payment-buttons').style.display = 'none';
-        document.getElementById('recovery-info-msg').style.display        = 'none';
-
+    async function _verificarPagoSilencioso(datos) {
+        // Sin stripeSessionId = efectivo o link de pago — limpiar y salir
+        if (!datos || !datos.stripeSessionId) {
+            try { sessionStorage.removeItem('ltr_pendingBooking'); } catch(e) {}
+            return;
+        }
         try {
             const res = await fetch(WORKER_PAGOS_URL + '/check-payment', {
                 method:  'POST',
@@ -4187,8 +4142,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             });
             if (!res.ok) throw new Error('HTTP ' + res.status);
             const result = await res.json();
-
-            document.getElementById('recovery-checking').style.display = 'none';
 
             if (result.paid) {
                 // ✅ Payment confirmed — fetch card/PayPal details, save, then redirect
@@ -4241,25 +4194,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 cerrarRecuperacion();
                 window.location.href = '/thank-you.html';
             } else {
-                // ❌ Payment not completed — show payment buttons normally
-                document.getElementById('recovery-info-msg').style.display        = 'flex';
-                document.getElementById('recovery-payment-buttons').style.display = 'flex';
+                // ❌ No pagado — limpiar storage silenciosamente, sin mostrar nada
+                try { sessionStorage.removeItem('ltr_pendingBooking'); } catch(e) {}
             }
         } catch(e) {
-            // On any error, fail open — show payment buttons so user can retry
-            console.error('Payment verification error:', e);
-            document.getElementById('recovery-checking').style.display        = 'none';
-            document.getElementById('recovery-info-msg').style.display        = 'flex';
-            document.getElementById('recovery-payment-buttons').style.display = 'flex';
+            // Error de red — limpiar storage silenciosamente
+            try { sessionStorage.removeItem('ltr_pendingBooking'); } catch(e2) {}
         }
     }
 
     function cerrarRecuperacion() {
-        document.getElementById('recoveryOverlay').style.display = 'none';
-        document.body.style.overflow = '';
-        _recoveryDatos = null;
-        // Limpiar sessionStorage para que el modal no reaparezca en cargas futuras
         try { sessionStorage.removeItem('ltr_pendingBooking'); } catch(e) {}
+        _recoveryDatos = null;
     }
 
     async function reintentarStripe() {
