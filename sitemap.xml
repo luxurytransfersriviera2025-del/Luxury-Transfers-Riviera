@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
@@ -31,6 +31,58 @@
     <lastmod>2026-05-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+
+  <!-- ══ Meeting Point pages ══ -->
+
+  <url>
+    <loc>https://luxurytransfersriviera.com.mx/cancun-and-tulum-airport-meeting-points</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://luxurytransfersriviera.com.mx/cancun-and-tulum-airport-meeting-points"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://luxurytransfersriviera.com.mx/cancun-and-tulum-airport-meeting-points"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://luxurytransfersriviera.com.mx/puntos-de-encuentro-del-aeropuerto-de-cancun-y-tulum"/>
+    <lastmod>2026-05-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <url>
+    <loc>https://luxurytransfersriviera.com.mx/cancun-airport-terminal-2-meeting-point</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://luxurytransfersriviera.com.mx/cancun-airport-terminal-2-meeting-point"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://luxurytransfersriviera.com.mx/cancun-airport-terminal-2-meeting-point"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://luxurytransfersriviera.com.mx/cancun-airport-terminal-2-meeting-point"/>
+    <lastmod>2026-05-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <url>
+    <loc>https://luxurytransfersriviera.com.mx/cancun-airport-terminal-3-meeting-point</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://luxurytransfersriviera.com.mx/cancun-airport-terminal-3-meeting-point"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://luxurytransfersriviera.com.mx/cancun-airport-terminal-3-meeting-point"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://luxurytransfersriviera.com.mx/cancun-airport-terminal-3-meeting-point"/>
+    <lastmod>2026-05-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <url>
+    <loc>https://luxurytransfersriviera.com.mx/cancun-airport-terminal-4-meeting-point</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://luxurytransfersriviera.com.mx/cancun-airport-terminal-4-meeting-point"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://luxurytransfersriviera.com.mx/cancun-airport-terminal-4-meeting-point"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://luxurytransfersriviera.com.mx/cancun-airport-terminal-4-meeting-point"/>
+    <lastmod>2026-05-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
+  </url>
+
+  <url>
+    <loc>https://luxurytransfersriviera.com.mx/tulum-airport-meeting-point</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://luxurytransfersriviera.com.mx/tulum-airport-meeting-point"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://luxurytransfersriviera.com.mx/tulum-airport-meeting-point"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://luxurytransfersriviera.com.mx/tulum-airport-meeting-point"/>
+    <lastmod>2026-05-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.75</priority>
   </url>
 
   <url>
@@ -94,6 +146,17 @@
   </url>
 
   <!-- ══ Spanish pages ══ -->
+
+  <url>
+    <loc>https://luxurytransfersriviera.com.mx/puntos-de-encuentro-del-aeropuerto-de-cancun-y-tulum</loc>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://luxurytransfersriviera.com.mx/cancun-and-tulum-airport-meeting-points"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://luxurytransfersriviera.com.mx/puntos-de-encuentro-del-aeropuerto-de-cancun-y-tulum"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://luxurytransfersriviera.com.mx/cancun-and-tulum-airport-meeting-points"/>
+    <lastmod>2026-05-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
 
   <url>
     <loc>https://luxurytransfersriviera.com.mx/es/</loc>
