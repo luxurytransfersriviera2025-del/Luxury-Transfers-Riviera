@@ -269,6 +269,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 </div>
 
+<!-- ══ MEETING POINT CARD ══ -->
+<div id="meetingPtCard" style="display:none; background:#080d17; border-top:2px solid rgba(212,175,55,0.25); border-bottom:2px solid rgba(212,175,55,0.25); padding:36px 20px; text-align:center; margin-top:8px;">
+    <p style="font-family:'Montserrat',sans-serif; font-size:0.65rem; font-weight:800; text-transform:uppercase; letter-spacing:3px; color:#D4AF37; margin-bottom:10px;">📍 <span id="txtMPEyebrow">Already have your booking?</span></p>
+    <p style="font-family:'Montserrat',sans-serif; font-size:1.25rem; font-weight:900; text-transform:uppercase; color:#fff; margin-bottom:10px;" id="txtMPTitle">Where to find your driver</p>
+    <p style="font-size:0.88rem; color:rgba(255,255,255,0.6); margin-bottom:22px; max-width:420px; margin-left:auto; margin-right:auto;" id="txtMPText">When you arrive at the airport, go to your terminal's meeting point. Your driver will be holding a sign with your name.</p>
+    <a id="btnMeetingPt" href="/cancun-and-tulum-airport-meeting-points" style="display:inline-flex; align-items:center; gap:8px; background:#D4AF37; color:#000; font-family:'Montserrat',sans-serif; font-weight:900; font-size:0.82rem; text-transform:uppercase; letter-spacing:1px; padding:13px 28px; border-radius:8px; text-decoration:none; transition:opacity 0.2s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+        <span id="txtMPBtn">View Meeting Points →</span>
+    </a>
+</div>
+
 <!-- ══ SOCIAL ══ -->
 <div class="ltr-social-container">
     <h3 id="txtSocial">Follow us &amp; Contact us</h3>
@@ -365,7 +375,12 @@ var _T = {
         pdfPaidOnline:  'Paid online – ',
         pdfNotice:      'Please save your booking code {code}. We invite you to download the WhatsApp app and contact us at +52 984 241 1158 for faster communication.',
         pdfFooter:      'Follow us & Contact us  |  @LuxuryTransfersRiviera  |  reservas@luxurytransfersriviera.com',
-        pdfStopR:       'Extra stop (return) x'
+        pdfStopR:       'Extra stop (return) x',
+        mpEyebrow:      'Already have your booking?',
+        mpTitle:        'Where to find your driver',
+        mpText:         'When you arrive at the airport, go to your terminal\'s meeting point. Your driver will be holding a sign with your name.',
+        mpBtn:          'View Meeting Points →',
+        mpHref:         '/cancun-and-tulum-airport-meeting-points'
     },
     es: {
         back:           'Volver al Inicio',
@@ -429,7 +444,12 @@ var _T = {
         pdfPaidOnline:  'Pagado en línea – ',
         pdfNotice:      'Por favor guarda tu código de reserva {code}. Te invitamos a descargar WhatsApp y contactarnos al +52 984 241 1158 para una comunicación más rápida.',
         pdfFooter:      'Síguenos  |  @LuxuryTransfersRiviera  |  reservas@luxurytransfersriviera.com',
-        pdfStopR:       'Parada adicional (regreso) x'
+        pdfStopR:       'Parada adicional (regreso) x',
+        mpEyebrow:      '¿Ya tienes tu reserva?',
+        mpTitle:        'Dónde encontrar a tu conductor',
+        mpText:         'Cuando llegues al aeropuerto, dirígete al punto de encuentro de tu terminal. Tu conductor sostendrá un letrero con tu nombre.',
+        mpBtn:          'Ver puntos de encuentro →',
+        mpHref:         '/puntos-de-encuentro-del-aeropuerto-de-cancun-y-tulum'
     }
 };
 
@@ -496,6 +516,17 @@ var _confirmedData = null;
     document.getElementById('txtBtnPDF').textContent  = t.loadingPDF;
     document.getElementById('txtBtnHome').textContent = t.btnHome;
     document.getElementById('btnHome').href           = t.homeHref;
+
+    // Meeting point card
+    var mpCard = document.getElementById('meetingPtCard');
+    if (mpCard) {
+        mpCard.style.display = 'block';
+        document.getElementById('txtMPEyebrow').textContent = t.mpEyebrow;
+        document.getElementById('txtMPTitle').textContent   = t.mpTitle;
+        document.getElementById('txtMPText').textContent    = t.mpText;
+        document.getElementById('txtMPBtn').textContent     = t.mpBtn;
+        document.getElementById('btnMeetingPt').href        = t.mpHref;
+    }
 
     // Social & footer
     document.getElementById('txtSocial').innerHTML      = t.social;
