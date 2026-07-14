@@ -3386,10 +3386,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     tipoViaje:     datosVenta.tipoViaje || '',
                     vuelo:         datosVenta.vuelo     || '',
                     vueloRegreso:  datosVenta.vueloRegreso || '',
+                    precio:        datosVenta.precio       || '',
                     precioTotal:   datosVenta.precioTotal  || '',
                     idioma:        datosVenta.idioma    || 'en',
                     cupon:         datosVenta.cupon     || '',
                     notas:         (datosVenta.notas    || '').substring(0, 490),
+                    totalExtras:   datosVenta.totalExtras || '',
+                    extraStop:     datosVenta.extraStop   || 0,
+                    extraStopR:    datosVenta.extraStopR  || 0,
                     successUrl:    thankYouUrl + '?session_id={CHECKOUT_SESSION_ID}',
                     cancelUrl:     siteUrl + '?payment=cancelled'
                 })
@@ -4203,10 +4207,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     tipoViaje:     datos.tipoViaje   || '',
                     vuelo:         datos.vuelo       || '',
                     vueloRegreso:  datos.vueloRegreso || '',
+                    precio:        datos.precio       || '',
                     precioTotal:   datos.precioTotal  || '',
                     idioma:        datos.idioma      || 'en',
                     cupon:         datos.cupon       || '',
                     notas:         (datos.notas      || '').substring(0, 490),
+                    totalExtras:   datos.totalExtras || '',
+                    extraStop:     datos.extraStop   || 0,
+                    extraStopR:    datos.extraStopR  || 0,
                     successUrl:    thankYouUrl + '?session_id={CHECKOUT_SESSION_ID}',
                     cancelUrl:     siteUrl + '?payment=cancelled'
                 })
