@@ -697,6 +697,16 @@ function _enablePdfBtn() {
     var sessionId = params.get('session_id');
     if (!sessionId) { _pdfStripeTaskDone = true; return; }
 
+    // Evita registrar la misma reserva dos veces si esta página llega a
+    // cargar más de una vez para el mismo session_id (ej. precarga
+    // automática del navegador). sessionStorage sobrevive entre cargas
+    // de página, a diferencia de una variable normal de JavaScript.
+    var _stripeDedupKey = 'ltr_stripe_processed_' + sessionId;
+    var _stripeAlreadyProcessed = false;
+    try { _stripeAlreadyProcessed = sessionStorage.getItem(_stripeDedupKey) === '1'; } catch(e) {}
+    if (_stripeAlreadyProcessed) { _pdfStripeTaskDone = true; return; }
+    try { sessionStorage.setItem(_stripeDedupKey, '1'); } catch(e) {}
+
     var pdfBtn = document.getElementById('btnPDF');
     var t = (_confirmedData && _confirmedData.idioma === 'es') ? _T.es : _T.en;
     if (pdfBtn) { pdfBtn.disabled = true; pdfBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + t.loadingPDF; }
