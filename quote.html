@@ -4056,6 +4056,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             try { sessionStorage.removeItem('ltr_pendingBooking'); } catch(e) {}
             return;
         }
+        // Seguro contra duplicados: si esta reserva ya se registró antes
+        // (por thank-you.html o por una verificación silenciosa anterior),
+        // no la vuelvas a mandar — solo limpia y redirige.
+        try {
+            if (datos.codigo && localStorage.getItem('ltr_registered_' + datos.codigo)) {
+                sessionStorage.removeItem('ltr_pendingBooking');
+                window.location.href = '/thank-you.html';
+                return;
+            }
+        } catch(e) {}
         try {
             const res = await fetch(WORKER_PAGOS_URL + '/check-payment', {
                 method: 'POST',
@@ -4104,6 +4114,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         extras: datos.extras || '', notas: datos.notas || '',
                     }));
                 } catch(e) { console.error('bookingConfirmed save error:', e); }
+                try { if (datos.codigo) localStorage.setItem('ltr_registered_' + datos.codigo, '1'); } catch(e) {}
                 try {
                     try { datos.pdfBase64 = generarVoucherPDF(datos, true); } catch(e) {}
                     await Promise.race([
