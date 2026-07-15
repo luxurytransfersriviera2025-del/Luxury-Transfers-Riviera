@@ -724,6 +724,13 @@ function _enablePdfBtn() {
         if (_sheetAlreadySent) return;
         _sheetAlreadySent = true;
         if (!_confirmedData) return;
+        // Seguro contra duplicados compartido con index.html: si esta
+        // reserva ya se registró (por la verificación silenciosa de pago
+        // en index.html), no la vuelvas a mandar.
+        try {
+            if (_confirmedData.codigo && localStorage.getItem('ltr_registered_' + _confirmedData.codigo)) return;
+            if (_confirmedData.codigo) localStorage.setItem('ltr_registered_' + _confirmedData.codigo, '1');
+        } catch(e) {}
         try { gtag('event', 'conversion', { 'send_to': 'AW-17859609175/8AeACLKZ6N4bENeEkMRC', 'transaction_id': _confirmedData.codigo }); } catch(e) {}
         try {
             if (typeof fbq !== 'undefined' && _confirmedData.precioTotal) {
