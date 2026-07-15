@@ -706,7 +706,13 @@ function _enablePdfBtn() {
 
     var WORKER_PAGOS_URL = 'https://checkout.luxurytransfersriviera.com.mx';
 
+    var _sheetAlreadySent = false;
     function _sendToSheetAndPixels() {
+        // Puede llamarse dos veces (cuando las imágenes terminan normal, y
+        // por el límite de seguridad de 8s) — este seguro asegura que solo
+        // se registre la reserva una sola vez sin importar cuál dispare primero.
+        if (_sheetAlreadySent) return;
+        _sheetAlreadySent = true;
         if (!_confirmedData) return;
         try { gtag('event', 'conversion', { 'send_to': 'AW-17859609175/8AeACLKZ6N4bENeEkMRC', 'transaction_id': _confirmedData.codigo }); } catch(e) {}
         try {
