@@ -3619,6 +3619,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             if (typeof fbq !== 'undefined') fbq('track', 'Lead', { content_name: 'Cash on Arrival Booking', value: parseFloat((datosVenta.precioTotal || '0').replace(/[^0-9.]/g,'')), currency: 'USD' }, { eventID: datosVenta.codigo });
             enviarConversionsAPI(datosVenta, 'Lead');
         } catch(e) {}
+
+        // GA4 Purchase Event for Cash Payments
+        try {
+            if (datosVenta.precioTotal) {
+                const priceNum = parseFloat(datosVenta.precioTotal.replace(/[^0-9.]/g, '')) || 0;
+                const currency = datosVenta.precioTotal.includes('MXN') ? 'mxn'
+                               : datosVenta.precioTotal.includes('CAD') ? 'cad' : 'usd';
+                gtag('event', 'purchase', {
+                    'value': priceNum,
+                    'currency': currency,
+                    'transaction_id': datosVenta.codigo,
+                    'items': [{
+                        'item_name': datosVenta.vehiculo || 'Transfer',
+                        'quantity': datosVenta.pasajeros || 1,
+                        'price': priceNum
+                    }]
+                });
+            }
+        } catch(e) {}
+
         iniciarEnvio(datosVenta);
     }
 
