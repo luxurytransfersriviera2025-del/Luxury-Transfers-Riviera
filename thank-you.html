@@ -732,6 +732,26 @@ function _enablePdfBtn() {
             if (_confirmedData.codigo) localStorage.setItem('ltr_registered_' + _confirmedData.codigo, '1');
         } catch(e) {}
         try { gtag('event', 'conversion', { 'send_to': 'AW-17859609175/8AeACLKZ6N4bENeEkMRC', 'transaction_id': _confirmedData.codigo }); } catch(e) {}
+
+        // GA4 Purchase Event for Card/PayPal Payments
+        try {
+            if (_confirmedData.precioTotal) {
+                var priceNum = parseFloat(_confirmedData.precioTotal.replace(/[^0-9.]/g, '')) || 0;
+                var currency = _confirmedData.precioTotal.includes('MXN') ? 'mxn'
+                             : _confirmedData.precioTotal.includes('CAD') ? 'cad' : 'usd';
+                gtag('event', 'purchase', {
+                    'value': priceNum,
+                    'currency': currency,
+                    'transaction_id': _confirmedData.codigo,
+                    'items': [{
+                        'item_name': _confirmedData.vehiculo || 'Transfer',
+                        'quantity': _confirmedData.pasajeros || 1,
+                        'price': priceNum
+                    }]
+                });
+            }
+        } catch(e) {}
+
         try {
             if (typeof fbq !== 'undefined' && _confirmedData.precioTotal) {
                 var priceNum   = parseFloat(_confirmedData.precioTotal.replace(/[^0-9.]/g, '')) || 0;
@@ -893,6 +913,26 @@ function _enablePdfBtn() {
     function _sendPayPalToSheet() {
         if (!_confirmedData) return;
         try { gtag('event', 'conversion', { 'send_to': 'AW-17859609175/8AeACLKZ6N4bENeEkMRC', 'transaction_id': _confirmedData.codigo }); } catch(e) {}
+
+        // GA4 Purchase Event for Card/PayPal Payments
+        try {
+            if (_confirmedData.precioTotal) {
+                var priceNum = parseFloat(_confirmedData.precioTotal.replace(/[^0-9.]/g, '')) || 0;
+                var currency = _confirmedData.precioTotal.includes('MXN') ? 'mxn'
+                             : _confirmedData.precioTotal.includes('CAD') ? 'cad' : 'usd';
+                gtag('event', 'purchase', {
+                    'value': priceNum,
+                    'currency': currency,
+                    'transaction_id': _confirmedData.codigo,
+                    'items': [{
+                        'item_name': _confirmedData.vehiculo || 'Transfer',
+                        'quantity': _confirmedData.pasajeros || 1,
+                        'price': priceNum
+                    }]
+                });
+            }
+        } catch(e) {}
+
         try {
             if (typeof fbq !== 'undefined' && _confirmedData.precioTotal) {
                 var priceNum   = parseFloat(_confirmedData.precioTotal.replace(/[^0-9.]/g, '')) || 0;
