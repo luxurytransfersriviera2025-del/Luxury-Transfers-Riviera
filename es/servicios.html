@@ -2015,7 +2015,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
 
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-    const SCRIPT_URL = "";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz7Fc9DMmnbwoc2Xt8xoRdem8jOoRNlnrofAx0JjFUNzlBLvVzpX5zi8Hj5OaojlGw/exec";
     const CAPI_WORKER_URL = "https://meta-conversiones-api.luxurytransfersriviera2025.workers.dev";
 
     function escapeHTML(str) {
@@ -3698,6 +3698,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             }
         } catch(e) {}
         try { enviarConversionsAPI(datosVenta, 'Purchase'); } catch(e) {}
+        // GA4 Purchase Event
+        try {
+            if (datosVenta.precioTotal) {
+                const priceNum = parseFloat(datosVenta.precioTotal.replace(/[^0-9.]/g, '')) || 0;
+                const currency = datosVenta.precioTotal.includes('MXN') ? 'mxn'
+                               : datosVenta.precioTotal.includes('CAD') ? 'cad' : 'usd';
+                gtag('event', 'purchase', {
+                    'value': priceNum,
+                    'currency': currency,
+                    'transaction_id': datosVenta.codigo,
+                    'items': [{
+                        'item_name': datosVenta.vehiculo || 'Transfer',
+                        'quantity': datosVenta.pasajeros || 1,
+                        'price': priceNum
+                    }]
+                });
+            }
+        } catch(e) {}
         iniciarEnvio(datosVenta);
     }
 
@@ -4655,6 +4673,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             if (typeof fbq !== 'undefined') fbq('track', 'CompleteRegistration', { content_name: 'Solicitud de Cotización' }, { eventID: data.codigo });
             enviarConversionsAPI(data, 'CompleteRegistration');
         }
+            // GA4 Lead Event for Quote Requests
+            try {
+                gtag('event', 'lead', {
+                    'value': 0,
+                    'currency': 'USD',
+                    'event_category': 'quote_request'
+                });
+            } catch(e) {}
         
         const l = { code: 'CÓDIGO', type: 'TIPO', veh: 'VEHÍCULO', orig: 'ORIGEN', dest: 'DESTINO', date: 'FECHA', time: 'HORA', pax: 'PASAJEROS', price: 'PRECIO WEB', name: 'Mi Nombre' };
         const lblFlight = 'VUELO';
